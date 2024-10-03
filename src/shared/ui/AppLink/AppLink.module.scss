@@ -1,0 +1,19 @@
+.AppLink {
+    color: var(--primary-color);
+
+    &:hover {
+        opacity: 0.6;
+    }
+}
+
+.primary {
+    color: var(--primary-color);
+}
+
+.inverted {
+    color: var(--inverted-primary-color);
+} 
+ 
+.red {
+    color: #f00; 
+}

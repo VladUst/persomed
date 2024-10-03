@@ -1,0 +1,20 @@
+{
+    "extends": [
+      "stylelint-config-standard",
+      "stylelint-config-sass-guidelines",
+      "stylelint-config-idiomatic-order"
+    ],
+    "rules": { 
+      "selector-class-pattern": null,
+      "@stylistic/indentation": 4
+    },
+    "ignoreFiles": [
+      "build/**",
+      "coverage/**",
+      "dist/**",
+      "**/*.js",
+      "**/*.jsx", 
+      "**/*.ts",
+      "**/*.tsx"  
+    ] 
+}
