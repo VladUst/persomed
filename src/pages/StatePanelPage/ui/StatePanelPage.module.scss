@@ -1,0 +1,40 @@
+.wrapper {
+    display: grid;
+    gap: 20px 30px;
+    grid-template-areas: 
+        'symptoms suspicions'
+        'diseases medicines'
+        'risks risks'
+        'rates rates';
+    grid-template-columns: 1fr 1fr;
+}
+
+.symptoms {
+    min-height: 300px;
+    grid-area: symptoms;
+}
+
+.suspicions {
+    min-height: 300px;
+    grid-area: suspicions;
+}
+
+.diseases {
+    min-height: 300px;
+    grid-area: diseases;
+}
+
+.medicines {
+    min-height: 300px;
+    grid-area: medicines;
+}
+
+.risks {
+    min-height: 300px;
+    grid-area: risks;
+}
+
+.rate {
+    min-height: 300px;
+    grid-area: rates;
+}
