@@ -1,16 +1,22 @@
-.wrapper {
+.wrapperA {
     display: grid;
+    gap: 20px;
+    grid-template-areas: 'symptoms diseases rates';
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+.wrapperB {
+    display: grid;
+    margin-top: 20px;
     gap: 20px 30px;
     grid-template-areas: 
-        'symptoms suspicions'
-        'diseases medicines'
-        'risks risks'
-        'rates rates';
+        'suspicions risks'
+        'medicines recommendations';
     grid-template-columns: 1fr 1fr;
 }
 
 .symptoms {
-    min-height: 300px;
+    height: 300px;
     grid-area: symptoms;
 }
 
@@ -37,4 +43,9 @@
 .rate {
     min-height: 300px;
     grid-area: rates;
+}
+
+.recommendations {
+    min-height: 300px;
+    grid-area: recommendations;
 }
