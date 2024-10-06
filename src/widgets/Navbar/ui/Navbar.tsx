@@ -15,7 +15,7 @@ export const Navbar = memo(({ className }: NavbarProps) => {
   return (
     <header className={classNames(cls.Navbar, {}, [className])}>
       <AppLink to={getRouteDigitalProfile()} className={cls.createBtn}>
-        Digital Profile
+        Цифровой профиль
       </AppLink>
       <AppLink to={getRouteStatePanel()} className={cls.createBtn}>
         Панель состояния

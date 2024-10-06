@@ -16,7 +16,7 @@ const data: PatientStateInfo = [
   },
   {
     text: "Дегенеративно-дистрофическое заболевание позвоночника",
-    label: "M40-M54",
+    label: "M40",
   },
 ];
 
