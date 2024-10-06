@@ -4,14 +4,27 @@ import {
 } from "@/entities/PatientState";
 import type { PatientStateInfo } from "../../model/types/patientStateInfo";
 import { PatientStateInfoList } from "../PatientStateInfoList/PatientStateInfoList";
+import PencilIcon from "@/shared/assets/icons/pencil.svg";
+import { getRouteDigitalProfile } from "@/shared/const/router";
 
 const data: PatientStateInfo = [
   {
-    text: "Принимать витамины D3 и OMEGA 6",
-    label: "1 доз./ден.",
+    text: "Принимать Омега 3",
+    label: "1000 мг./ден.",
+  },
+  {
+    text: "Альфа-липоевая кислота",
+    label: "600 мг./ден.",
+  },
+  {
+    text: "Магний",
+    label: "400 мг./ден.",
   },
   {
     text: "Ограничить употребление сахара",
+  },
+  {
+    text: "Регулярные аэробные нагрузки",
   },
 ];
 
@@ -23,6 +36,8 @@ export const RecommendationsCard = (props: RecommendationsCardProps) => {
   const { className } = props;
   return (
     <PatientStateCard
+      icon={PencilIcon}
+      link={getRouteDigitalProfile()}
       title="Рекомендации"
       className={className}
       variant={PatientStateCardVariant.GREEN}

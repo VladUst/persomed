@@ -4,13 +4,15 @@ import {
 } from "@/entities/PatientState";
 import type { PatientStateInfo } from "../../model/types/patientStateInfo";
 import { PatientStateInfoList } from "../PatientStateInfoList/PatientStateInfoList";
+import EyeIcon from "@/shared/assets/icons/eye.svg";
+import { getRouteDigitalProfile } from "@/shared/const/router";
 
 const data: PatientStateInfo = [
   {
-    text: "Повышенный уровень сахара",
+    text: "Повышенная глюкоза крови",
   },
   {
-    text: "Повышенная глюкоза крови",
+    text: "Высокие уровни кетонов",
   },
 ];
 
@@ -22,6 +24,8 @@ export const SymptomsCard = (props: SymptomsCardProps) => {
   const { className } = props;
   return (
     <PatientStateCard
+      icon={EyeIcon}
+      link={getRouteDigitalProfile()}
       title="Симптомы"
       className={className}
       variant={PatientStateCardVariant.ORANGE}

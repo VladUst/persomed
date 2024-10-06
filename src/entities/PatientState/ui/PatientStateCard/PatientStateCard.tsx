@@ -13,6 +13,8 @@ interface PatientStateCardProps {
   className?: string;
   variant?: PatientStateCardVariant;
   title: string;
+  link: string;
+  icon: React.FunctionComponent<React.SVGAttributes<SVGElement>>;
   children: ReactNode;
 }
 
@@ -21,11 +23,18 @@ export const PatientStateCard = (props: PatientStateCardProps) => {
     children,
     className,
     title,
+    link,
+    icon,
     variant = PatientStateCardVariant.GREEN,
   } = props;
   return (
     <article className={classNames(cls.PatientStateCard, {}, [className])}>
-      <PatientStateCardHeader title={title} className={cls[variant]} />
+      <PatientStateCardHeader
+        link={link}
+        icon={icon}
+        title={title}
+        className={cls[variant]}
+      />
       <div className={cls.content}>{children}</div>
     </article>
   );

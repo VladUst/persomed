@@ -4,6 +4,8 @@ import {
 } from "@/entities/PatientState";
 import type { PatientStateInfo } from "../../model/types/patientStateInfo";
 import { PatientStateInfoList } from "../PatientStateInfoList/PatientStateInfoList";
+import FireIcon from "@/shared/assets/icons/fire.svg";
+import { getRouteDigitalProfile } from "@/shared/const/router";
 
 const data: PatientStateInfo = [
   {
@@ -28,6 +30,8 @@ export const RisksCard = (props: RisksCardProps) => {
   const { className } = props;
   return (
     <PatientStateCard
+      icon={FireIcon}
+      link={getRouteDigitalProfile()}
       title="Факторы риска"
       className={className}
       variant={PatientStateCardVariant.RED}

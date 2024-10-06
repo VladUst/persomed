@@ -12,12 +12,25 @@ interface PatientStateInfoListProps {
 }
 
 const PatientStateInfoListItem = memo((props: PatientStateItem) => {
-  const { text, Icon, label } = props;
+  const { text, Icon, label, labelColor } = props;
+  const getLabel = () => {
+    if (label) {
+      return labelColor ? (
+        <span style={{ color: labelColor }} className={cls.label}>
+          {label}
+        </span>
+      ) : (
+        <span className={cls.label}>{label}</span>
+      );
+    }
+    return null;
+  };
+
   return (
     <li className={cls.listItem}>
       {Icon && <span>Icon</span>}
       <p>{text}</p>
-      {label && <span>{label}</span>}
+      {getLabel()}
     </li>
   );
 });

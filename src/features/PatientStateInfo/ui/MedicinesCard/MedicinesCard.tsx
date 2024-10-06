@@ -4,19 +4,21 @@ import {
 } from "@/entities/PatientState";
 import type { PatientStateInfo } from "../../model/types/patientStateInfo";
 import { PatientStateInfoList } from "../PatientStateInfoList/PatientStateInfoList";
+import { getRouteDigitalProfile } from "@/shared/const/router";
+import MedicinesIcon from "@/shared/assets/icons/medicine.svg";
 
 const data: PatientStateInfo = [
   {
-    text: "Ибупрофен",
-    label: "1 доз./ден.",
+    text: "Лозартан",
+    label: "50 мг./ден.",
   },
   {
-    text: "Магний",
-    label: "1 доз./ден.",
+    text: "Эналаприл",
+    label: "5 мг./ден.",
   },
   {
-    text: "Энтерол",
-    label: "1 доз./ден.",
+    text: "Амлодипин",
+    label: "5 мг./ден.",
   },
 ];
 
@@ -28,6 +30,8 @@ export const MedicinesCard = (props: MedicinesCardProps) => {
   const { className } = props;
   return (
     <PatientStateCard
+      icon={MedicinesIcon}
+      link={getRouteDigitalProfile()}
       title="Лекарства"
       className={className}
       variant={PatientStateCardVariant.GREEN}
