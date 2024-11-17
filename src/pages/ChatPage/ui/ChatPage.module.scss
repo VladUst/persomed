@@ -1,0 +1,6 @@
+.wrapperA {
+    display: grid;
+    gap: 20px;
+    grid-template-areas: 'symptoms diseases rates';
+    grid-template-columns: 1fr 1fr 1fr;
+}

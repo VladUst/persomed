@@ -3,7 +3,9 @@ import cls from "./Navbar.module.scss";
 import { memo } from "react";
 import { AppLink } from "@/shared/ui/AppLink";
 import {
+  getRouteChat,
   getRouteDigitalProfile,
+  getRouteHealthIndicators,
   getRouteStatePanel,
 } from "@/shared/const/router";
 
@@ -14,12 +16,10 @@ interface NavbarProps {
 export const Navbar = memo(({ className }: NavbarProps) => {
   return (
     <header className={classNames(cls.Navbar, {}, [className])}>
-      <AppLink to={getRouteDigitalProfile()} className={cls.createBtn}>
-        Цифровой профиль
-      </AppLink>
-      <AppLink to={getRouteStatePanel()} className={cls.createBtn}>
-        Панель состояния
-      </AppLink>
+      <AppLink to={getRouteDigitalProfile()}>Цифровой профиль</AppLink>
+      <AppLink to={getRouteHealthIndicators()}>Показатели здоровья</AppLink>
+      <AppLink to={getRouteStatePanel()}>Панель состояния</AppLink>
+      <AppLink to={getRouteChat()}>Чат с врачом</AppLink>
     </header>
   );
 });
