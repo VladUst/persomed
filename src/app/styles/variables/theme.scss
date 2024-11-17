@@ -1,7 +1,8 @@
 :root {
+    --primary-color: #536ec6;
     --bg-color: #eaeef3;
     --inverted-bg-color: #fff;
-    --primary-color: #444;
+    --text-primary-color: #444;
     --secondary-color: #fff;
     --skeleton-color: #fff;
     --skeleton-shadow: rgba(0 0 0 / 20%);
@@ -9,4 +10,5 @@
     --card-bg: #bbbbbd;
     --listbox-bg: #bbbbbd;
     --navbar-bg: linear-gradient(223deg, #67c3f3 0%, #5a98f2 100%);
+    
 }

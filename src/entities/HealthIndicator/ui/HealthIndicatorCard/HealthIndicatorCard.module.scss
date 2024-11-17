@@ -6,7 +6,7 @@
     border-radius: 10px;
     background: var(--inverted-bg-color);
     box-shadow: -8px 12px 18px 0 #dadee8;
-    color: var(--primary-color);
+    color: var(--text-primary-color);
     cursor: pointer;
     gap: 40px;
     transition: all ease 0.3s;
@@ -33,6 +33,11 @@
     .icon {
         width: 50px;
         height: 50px;
+    }
+
+    .iconBtn {
+        width: 30px;
+        height: 30px;
     }
 }
 

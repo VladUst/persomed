@@ -2,22 +2,28 @@ import { classNames } from "@/shared/lib/classNames";
 import type { HealthIndicator } from "../../model/types/HealthIndicator";
 import cls from "./HealthIndicatorCard.module.scss";
 import { Icon } from "@/shared/ui/Icon";
+import EditIcon from "@/shared/assets/icons/edit.svg";
+import ChartIcon from "@/shared/assets/icons/chart.svg";
+import { IconButton } from "@mui/material";
 
 interface HealthIndicatorCardProps {
   className?: string;
   icon: React.FunctionComponent<React.SVGAttributes<SVGElement>>;
   data: HealthIndicator;
+  onShowChart?: () => void;
+  onEdit?: () => void;
 }
 
-const getMeasurment = (
+export const getMeasurment = (
   unit: string,
-  targetReached?: boolean,
+  targetLevel: [number, number],
   value?: string,
 ) => {
   if (!value) {
     return <p>Нет данных</p>;
   }
-  if (targetReached) {
+  const val = parseInt(value);
+  if (val >= targetLevel[0] && val <= targetLevel[1]) {
     return (
       <p className={cls.success}>
         {value} {unit}
@@ -33,7 +39,15 @@ const getMeasurment = (
 };
 
 export const HealthIndicatorCard = (props: HealthIndicatorCardProps) => {
-  const { className, icon, data } = props;
+  const { className, icon, data, onShowChart, onEdit } = props;
+
+  const openChart = () => {
+    onShowChart?.();
+  };
+
+  const edit = () => {
+    onEdit?.();
+  };
 
   return (
     <article className={classNames(cls.HealthIndicatorCard, {}, [className])}>
@@ -42,9 +56,17 @@ export const HealthIndicatorCard = (props: HealthIndicatorCardProps) => {
           <Icon className={cls.icon} Svg={icon} />
           <h4>{data.name}</h4>
         </div>
+        <div>
+          <IconButton onClick={edit}>
+            <EditIcon className={cls.iconBtn} />
+          </IconButton>
+          <IconButton onClick={openChart}>
+            <ChartIcon className={cls.iconBtn} />
+          </IconButton>
+        </div>
       </div>
       <div className={cls.content}>
-        {getMeasurment(data.unit, data.targetReached, data.value)}
+        {getMeasurment(data.unit, data.targetLevel, data.value)}
       </div>
       <div className={cls.footer}>
         <div className={cls.date}>
@@ -53,7 +75,9 @@ export const HealthIndicatorCard = (props: HealthIndicatorCardProps) => {
         </div>
         <div className={cls.target}>
           <span className={cls.label}>Целевой уровень</span>
-          <span>{data.targetLevel}</span>
+          <span>
+            {data.targetLevel[0]}-{data.targetLevel[1]}
+          </span>
         </div>
       </div>
     </article>

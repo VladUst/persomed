@@ -5,5 +5,5 @@ export interface HealthIndicator {
   date?: string;
   targetReached?: boolean;
   unit: string;
-  targetLevel: string;
+  targetLevel: [number, number];
 }

@@ -1,0 +1,23 @@
+.IndicatorChart {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 850px;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: var(--inverted-bg-color);
+    transform: translate(-50%, -50%);
+
+    .title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font: var(--font-m);
+        font-weight: 700;
+    }
+
+    .btn {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+}
