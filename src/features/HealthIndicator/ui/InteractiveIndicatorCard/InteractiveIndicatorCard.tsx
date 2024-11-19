@@ -3,6 +3,7 @@ import type { HealthIndicator } from "@/entities/HealthIndicator";
 import { HealthIndicatorCard } from "@/entities/HealthIndicator";
 import { useState } from "react";
 import { IndicatorChart } from "../IndicatorChart/IndicatorChart";
+import { IndicatorForm } from "../IndicatorForm/IndicatorForm";
 
 interface InteractiveIndicatorCardProps {
   className?: string;
@@ -16,27 +17,42 @@ export const InteractiveIndicatorCard = (
   const { className, icon, data } = props;
 
   const [isChartOpen, setIsChartOpen] = useState(false);
+  const [isFormOpen, setIsFormOpen] = useState(false);
 
-  const onShowChart = () => {
+  const showChart = () => {
     setIsChartOpen(true);
   };
 
-  const onCloseChart = () => {
+  const closeChart = () => {
     setIsChartOpen(false);
+  };
+
+  const showForm = () => {
+    setIsFormOpen(true);
+  };
+
+  const closeForm = () => {
+    setIsFormOpen(false);
   };
 
   return (
     <>
+      <IndicatorForm
+        indicatorData={data}
+        isOpen={isFormOpen}
+        onClose={closeForm}
+      />
       <IndicatorChart
         indicatorData={data}
         isOpen={isChartOpen}
-        onClose={onCloseChart}
+        onClose={closeChart}
       />
       <HealthIndicatorCard
         className={className}
         icon={icon}
         data={data}
-        onShowChart={onShowChart}
+        onShowChart={showChart}
+        onShowForm={showForm}
       />
     </>
   );

@@ -29,11 +29,11 @@ const data = [
   },
   {
     name: "17.08.24",
-    value: 3.8,
+    value: 6.3,
   },
   {
     name: "20.10.24",
-    value: 3.5,
+    value: 7.5,
   },
 ];
 

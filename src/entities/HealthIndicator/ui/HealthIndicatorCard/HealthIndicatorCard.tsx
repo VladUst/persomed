@@ -11,7 +11,7 @@ interface HealthIndicatorCardProps {
   icon: React.FunctionComponent<React.SVGAttributes<SVGElement>>;
   data: HealthIndicator;
   onShowChart?: () => void;
-  onEdit?: () => void;
+  onShowForm?: () => void;
 }
 
 export const getMeasurment = (
@@ -39,14 +39,14 @@ export const getMeasurment = (
 };
 
 export const HealthIndicatorCard = (props: HealthIndicatorCardProps) => {
-  const { className, icon, data, onShowChart, onEdit } = props;
+  const { className, icon, data, onShowChart, onShowForm } = props;
 
   const openChart = () => {
     onShowChart?.();
   };
 
-  const edit = () => {
-    onEdit?.();
+  const openForm = () => {
+    onShowForm?.();
   };
 
   return (
@@ -57,7 +57,7 @@ export const HealthIndicatorCard = (props: HealthIndicatorCardProps) => {
           <h4>{data.name}</h4>
         </div>
         <div>
-          <IconButton onClick={edit}>
+          <IconButton onClick={openForm}>
             <EditIcon className={cls.iconBtn} />
           </IconButton>
           <IconButton onClick={openChart}>
