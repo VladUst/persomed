@@ -1,0 +1,10 @@
+.title {
+    font: var(--font-m);
+    font-weight: 700;
+}
+
+.content {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+}
