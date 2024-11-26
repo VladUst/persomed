@@ -1,6 +1,5 @@
 import { type RouteProps } from "react-router-dom";
 import { DigitalProfilePage } from "@/pages/DigitalProfilePage";
-import { StatePanelPage } from "@/pages/StatePanelPage";
 import { HealthIndicatorsPage } from "@/pages/HealthIndicatorsPage";
 import { ChatPage } from "@/pages/ChatPage";
 import {
@@ -8,8 +7,9 @@ import {
   getRouteChat,
   getRouteDigitalProfile,
   getRouteHealthIndicators,
-  getRouteStatePanel,
+  getRouteStatusPanel,
 } from "@/shared/const/router";
+import { StatusPanelPage } from "@/pages/StatusPanelPage";
 
 export const routeConfig: Record<AppRoutes, RouteProps> = {
   [AppRoutes.DIGITAL_PROFILE]: {
@@ -20,9 +20,9 @@ export const routeConfig: Record<AppRoutes, RouteProps> = {
     path: getRouteHealthIndicators(),
     element: <HealthIndicatorsPage />,
   },
-  [AppRoutes.STATE_PANEL]: {
-    path: getRouteStatePanel(),
-    element: <StatePanelPage />,
+  [AppRoutes.STATUS_PANEL]: {
+    path: getRouteStatusPanel(),
+    element: <StatusPanelPage />,
   },
   [AppRoutes.CHAT]: {
     path: getRouteChat(),

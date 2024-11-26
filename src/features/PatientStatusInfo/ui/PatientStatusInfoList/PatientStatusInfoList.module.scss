@@ -1,0 +1,12 @@
+.PatientStatusInfoList {
+    font: var(--font-m);
+}
+
+.listItem {
+    display: flex;
+    justify-content: space-between;
+}
+
+.label {
+    font-weight: 700;
+}
