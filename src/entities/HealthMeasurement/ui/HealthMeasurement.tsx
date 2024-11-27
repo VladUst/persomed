@@ -1,5 +1,5 @@
 import { classNames } from "@/shared/lib/classNames";
-import type { HealthMeasurementData } from "../model/HealthMeasurement";
+import type { HealthMeasurementData } from "../model/types";
 import cls from "./HealthMeasurement.module.scss";
 
 interface HealthMeasurementProps {

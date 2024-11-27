@@ -1,4 +1,10 @@
 import {
+  AnalyzesDocs,
+  DiseasesHistoryDocs,
+  OtherDocs,
+  RecommendationsDocs,
+} from "@/features/MedicalDocumentsInfo";
+import {
   AllergiesInfo,
   DetailedInfo,
   FamilyInfo,
@@ -17,6 +23,11 @@ export const DigitalProfilePage = () => {
       <AllergiesInfo />
       <FamilyInfo />
       <LifestyleInfo />
+
+      <DiseasesHistoryDocs />
+      <AnalyzesDocs />
+      <RecommendationsDocs />
+      <OtherDocs />
     </Page>
   );
 };

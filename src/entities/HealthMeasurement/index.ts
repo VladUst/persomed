@@ -1,2 +1,2 @@
-export type { HealthMeasurementData } from "./model/HealthMeasurement";
+export type { HealthMeasurementData } from "./model/types";
 export { HealthMeasurement } from "./ui/HealthMeasurement";
