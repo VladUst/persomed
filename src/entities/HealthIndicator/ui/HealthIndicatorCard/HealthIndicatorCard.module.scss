@@ -10,6 +10,7 @@
     cursor: pointer;
     gap: 40px;
     transition: all ease 0.3s;
+    min-height: 300px;
 
     &:hover {
         transform: scale(1.05);
@@ -53,6 +54,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    margin: auto 0;
 
     .date {
         display: flex;

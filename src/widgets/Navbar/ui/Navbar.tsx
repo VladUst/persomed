@@ -18,7 +18,7 @@ export const Navbar = memo(({ className }: NavbarProps) => {
     <header className={classNames(cls.Navbar, {}, [className])}>
       <AppLink to={getRouteDigitalProfile()}>Цифровой профиль</AppLink>
       <AppLink to={getRouteHealthIndicators()}>Показатели здоровья</AppLink>
-      <AppLink to={getRouteStatusPanel()}>Панель состояния</AppLink>
+      <AppLink to={getRouteStatusPanel()}>Панель статуса</AppLink>
       <AppLink to={getRouteChat()}>Чат с врачом</AppLink>
     </header>
   );

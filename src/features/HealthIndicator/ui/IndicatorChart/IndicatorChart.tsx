@@ -83,12 +83,12 @@ export const IndicatorChart = (props: IndicatorChartProps) => {
             <>
               <ReferenceLine
                 y={indicatorData.targetLevel[1]}
-                label="Max"
+                label="max"
                 stroke="red"
               />
               <ReferenceLine
                 y={indicatorData.targetLevel[0]}
-                label="Min"
+                label="min"
                 stroke="red"
               />
             </>

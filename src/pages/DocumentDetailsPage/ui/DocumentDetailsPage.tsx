@@ -11,7 +11,7 @@ const document = {
     icdCode: "I10",
     diagnosisDate: "2024-11-20",
     physicianName: "Иванов Петр Сергеевич",
-    specialty: "Терапевт",
+    specialty: "Кардиолог",
     nosology: "Сердечно-сосудистые заболевания",
     diseaseType: "Хроническое",
     clinicName: "Городская поликлиника №1",

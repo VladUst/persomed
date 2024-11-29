@@ -9,6 +9,7 @@
     color: var(--text-primary-color);
     cursor: pointer;
     transition: all ease 0.3s;
+    min-height: 300px;
 
     .wrapper {
         display: flex;

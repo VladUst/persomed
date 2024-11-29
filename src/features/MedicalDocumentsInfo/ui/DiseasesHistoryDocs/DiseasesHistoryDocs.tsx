@@ -11,6 +11,7 @@ const historyRows: GridRowsProp = [
     icdCode: "-",
     name: "Подозрение на диабет",
     type: "Анамнез",
+    speciality: "Эндокринолог",
     date: "2024-07-17",
   },
   {
@@ -18,6 +19,7 @@ const historyRows: GridRowsProp = [
     icdCode: "J00-J02",
     name: "ОРВИ",
     type: "Обычное",
+    speciality: "Терапевт",
     date: "2024-02-09",
   },
   {
@@ -25,6 +27,7 @@ const historyRows: GridRowsProp = [
     icdCode: "I11",
     name: "Артериальная гипертензия",
     type: "Хроническое",
+    speciality: "Кардиолог",
     date: "2023-01-15",
   },
   {
@@ -32,6 +35,7 @@ const historyRows: GridRowsProp = [
     icdCode: "I50.9",
     name: "Сердечная недостаточность",
     type: "Хроническое",
+    speciality: "Кардиолог",
     date: "2023-02-10",
   },
 ];
@@ -40,6 +44,7 @@ const historyColumns: GridColDef[] = [
   { field: "icdCode", headerName: "Код МКБ-10", width: 150 },
   { field: "name", headerName: "Название диагноза", flex: 1 },
   { field: "type", headerName: "Тип", width: 150 },
+  { field: "speciality", headerName: "Специальность врача", width: 150 },
   { field: "date", headerName: "Дата постановки", width: 150 },
 ];
 

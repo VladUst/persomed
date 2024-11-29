@@ -15,8 +15,8 @@ export const StatusPanelPage = () => {
       <section className={cls.wrapperA}>
         <SymptomsCard className={cls.symptoms} />
         <DiseasesCard className={cls.diseases} />
-        <RateCard className={cls.rate} />
       </section>
+      <RateCard className={cls.rate} />
       <section className={cls.wrapperB}>
         <SuspicionsCard className={cls.suspicions} />
         <RisksCard className={cls.risks} />
