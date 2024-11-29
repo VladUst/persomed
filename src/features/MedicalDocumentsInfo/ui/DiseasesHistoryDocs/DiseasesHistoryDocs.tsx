@@ -2,6 +2,8 @@ import { MedicalTable } from "@/entities/MedicalTable/ui/MedicalTable";
 import { Divider } from "@mui/material";
 import type { GridColDef, GridRowsProp } from "@mui/x-data-grid";
 import cls from "./DiseasesHistoryDocs.module.scss";
+import { useNavigate } from "react-router-dom";
+import { getRouteDocumentDetails } from "@/shared/const/router";
 
 const historyRows: GridRowsProp = [
   {
@@ -47,8 +49,10 @@ interface DiseasesHistoryDocsProps {
 
 export const DiseasesHistoryDocs = (props: DiseasesHistoryDocsProps) => {
   const { className } = props;
+  const navigate = useNavigate();
+
   const handleClick = (id: string) => {
-    console.log("History clicked:", id);
+    navigate(getRouteDocumentDetails(id));
   };
 
   return (

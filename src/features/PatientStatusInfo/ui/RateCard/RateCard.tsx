@@ -4,7 +4,6 @@ import {
 } from "@/entities/PatientStatus";
 import type { PatientStatusInfo } from "../../model/types/patientStatusInfo";
 import { PatientStatusInfoList } from "../PatientStatusInfoList/PatientStatusInfoList";
-import { getRouteDigitalProfile } from "@/shared/const/router";
 import WarnIcon from "@/shared/assets/icons/warning.svg";
 
 const data: PatientStatusInfo = [
@@ -52,7 +51,7 @@ export const RateCard = (props: RateCardProps) => {
   return (
     <PatientStatusCard
       icon={WarnIcon}
-      link={getRouteDigitalProfile()}
+      id="3"
       title="Оценка рисков"
       className={className}
       variant={PatientStatusCardVariant.ORANGE}

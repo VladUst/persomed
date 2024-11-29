@@ -3,7 +3,6 @@ import {
   PatientStatusCardVariant,
 } from "@/entities/PatientStatus";
 import type { PatientStatusInfo } from "../../model/types/patientStatusInfo";
-import { getRouteDigitalProfile } from "@/shared/const/router";
 import HealthIcon from "@/shared/assets/icons/health.svg";
 import { PatientStatusInfoList } from "../PatientStatusInfoList/PatientStatusInfoList";
 
@@ -31,7 +30,7 @@ export const DiseasesCard = (props: DiseasesCardProps) => {
   return (
     <PatientStatusCard
       icon={HealthIcon}
-      link={getRouteDigitalProfile()}
+      id="2"
       title="Заболевания"
       className={className}
       variant={PatientStatusCardVariant.ORANGE}

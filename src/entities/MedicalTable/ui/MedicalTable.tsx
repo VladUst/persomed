@@ -18,7 +18,7 @@ export const MedicalTable = (props: MedicalTableProps) => {
       <DataGrid
         rows={rows}
         columns={columns}
-        onRowClick={(params: any) => handleClick(params.id as string)}
+        onRowDoubleClick={(params: any) => handleClick(params.id as string)}
         initialState={{
           pagination: {
             paginationModel: {

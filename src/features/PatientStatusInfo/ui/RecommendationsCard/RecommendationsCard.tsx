@@ -5,7 +5,6 @@ import {
 import type { PatientStatusInfo } from "../../model/types/patientStatusInfo";
 import { PatientStatusInfoList } from "../PatientStatusInfoList/PatientStatusInfoList";
 import PencilIcon from "@/shared/assets/icons/pencil.svg";
-import { getRouteDigitalProfile } from "@/shared/const/router";
 
 const data: PatientStatusInfo = [
   {
@@ -37,7 +36,7 @@ export const RecommendationsCard = (props: RecommendationsCardProps) => {
   return (
     <PatientStatusCard
       icon={PencilIcon}
-      link={getRouteDigitalProfile()}
+      id="7"
       title="Рекомендации"
       className={className}
       variant={PatientStatusCardVariant.GREEN}

@@ -1,0 +1,33 @@
+.document {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    border-radius: 20px;
+    background-color: var(--inverted-bg-color);
+    box-shadow: -8px 12px 18px 0 #dadee8;
+    gap: 20px;
+
+    .title {
+        text-align: center;
+    }
+
+    .sectionLabel {
+        font-weight: 700;
+    }
+
+    .content {
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+    }
+
+    .divider {
+        margin-bottom: 10px;
+        font: var(--font-l);
+        font-weight: 700;
+    }
+
+    .button {
+        margin-left: auto;
+    }
+}

@@ -10,10 +10,10 @@ export enum PatientStatusCardVariant {
 }
 
 interface PatientStatusCardProps {
+  id: string;
   className?: string;
   variant?: PatientStatusCardVariant;
   title: string;
-  link: string;
   icon: React.FunctionComponent<React.SVGAttributes<SVGElement>>;
   children: ReactNode;
 }
@@ -23,14 +23,14 @@ export const PatientStatusCard = (props: PatientStatusCardProps) => {
     children,
     className,
     title,
-    link,
+    id,
     icon,
     variant = PatientStatusCardVariant.GREEN,
   } = props;
   return (
     <article className={classNames(cls.PatientStatusCard, {}, [className])}>
       <PatientStatusCardHeader
-        link={link}
+        id={id}
         icon={icon}
         title={title}
         className={cls[variant]}

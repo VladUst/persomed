@@ -5,9 +5,11 @@ import {
 import type { PatientStatusInfo } from "../../model/types/patientStatusInfo";
 import { PatientStatusInfoList } from "../PatientStatusInfoList/PatientStatusInfoList";
 import FireIcon from "@/shared/assets/icons/fire.svg";
-import { getRouteDigitalProfile } from "@/shared/const/router";
 
 const data: PatientStatusInfo = [
+  {
+    text: "Высокий шанс сердечного приступа",
+  },
   {
     text: "Целевое АД не достигнуто",
   },
@@ -18,10 +20,7 @@ const data: PatientStatusInfo = [
     text: "Артериальная гипертензия",
   },
   {
-    text: "Наличие сердечно-сосудистых заболеваний",
-  },
-  {
-    text: "Увеличение ЧСС в покое",
+    text: "Сердечная недостаточность",
   },
 ];
 
@@ -34,7 +33,7 @@ export const RisksCard = (props: RisksCardProps) => {
   return (
     <PatientStatusCard
       icon={FireIcon}
-      link={getRouteDigitalProfile()}
+      id="5"
       title="Факторы риска"
       className={className}
       variant={PatientStatusCardVariant.RED}
