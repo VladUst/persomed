@@ -66,7 +66,7 @@ export const IndicatorForm = (props: IndicatorFormProps) => {
           />
         </LocalizationProvider>
 
-        <Divider>Допустимы диапазоны</Divider>
+        <Divider>Допустимые диапазоны</Divider>
 
         <div className={cls.horizontalWrapper}>
           <TextField

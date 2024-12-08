@@ -1,0 +1,23 @@
+.MessageBubble {
+    padding: 10px;
+    border-radius: 10px;
+}
+  
+.receiver {
+    align-self: flex-start;
+    background-color: var(--bg-color);
+    box-shadow: 4px 4px 8px 0 rgb(34 60 80 / 20%);
+}
+  
+.sender {
+    align-self: flex-end;
+    background-color: #d0e9ff;
+    box-shadow: 4px 4px 8px 0 rgb(34 60 80 / 20%);
+}
+  
+.date {
+    display: block;
+    color: var(--text-primary-color);
+    font: var(--font-s);
+    text-align: right;
+}

@@ -19,7 +19,7 @@ export const Navbar = memo(({ className }: NavbarProps) => {
       <AppLink to={getRouteDigitalProfile()}>Цифровой профиль</AppLink>
       <AppLink to={getRouteHealthIndicators()}>Показатели здоровья</AppLink>
       <AppLink to={getRouteStatusPanel()}>Панель состояния</AppLink>
-      <AppLink to={getRouteChat()}>Чат с врачом</AppLink>
+      <AppLink to={getRouteChat()}>Чат</AppLink>
     </header>
   );
 });

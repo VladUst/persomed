@@ -1,6 +1,27 @@
-.wrapperA {
-    display: grid;
-    gap: 20px;
-    grid-template-areas: 'symptoms diseases rates';
-    grid-template-columns: 1fr 1fr 1fr;
+.chatContainer {
+    display: flex;
+    height: 800px;
+}
+  
+.contacts {
+    position: relative;
+    display: flex;
+    width: 300px;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: var(--inverted-bg-color);
+    box-shadow: 5px 5px 5px -5px rgb(34 60 80 / 60%);
+    overflow-y: auto;
+}
+  
+.chat {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    background-color: var(--inverted-bg-color);
+}
+  
+.placeholder {
+    margin: auto;
+    color: #aaa;
 }

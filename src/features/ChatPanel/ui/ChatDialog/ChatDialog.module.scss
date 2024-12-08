@@ -1,0 +1,30 @@
+.ChatDialog {
+    display: flex;
+    flex-direction: column;
+}
+  
+.header {
+    padding: 10px;
+    border-bottom: 1px solid var(--border-color);
+    background-color: var(--inverted-bg-color);
+}
+  
+.messages {
+    display: flex;
+    height: 670px;
+    flex-direction: column;
+    padding: 20px;
+    background-color: var(--inverted-bg-color);
+    gap: 20px;
+    overflow-y: auto;
+}
+
+.messageBubble {
+    width: 70%;
+}
+  
+.inputContainer {
+    padding: 10px;
+    border-top: 1px solid var(--border-color);
+    background-color: var(--inverted-bg-color);
+}
