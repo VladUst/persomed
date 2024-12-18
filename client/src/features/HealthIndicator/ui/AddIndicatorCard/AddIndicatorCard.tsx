@@ -33,7 +33,7 @@ export const AddIndicatorCard = (props: AddIndicatorCardProps) => {
           <Icon className={cls.icon} Svg={AddIcon} />
         </div>
 
-        <h2>Добавить новый показатель...</h2>
+        <h2>Add a new metric...</h2>
       </article>
     </>
   );

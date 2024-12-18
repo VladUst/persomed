@@ -14,66 +14,67 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 const data: HealthMeasurementData[] = [
   {
-    name: "Возраст",
+    name: "Age",
     value: "30",
   },
   {
-    name: "Пол",
-    value: "Мужской",
+    name: "Gender",
+    value: "Male",
   },
   {
-    name: "Дата рождения",
+    name: "Date of Birth",
     value: "27.07.1994",
   },
   {
-    name: "Рост",
+    name: "Height",
     value: "170",
-    unit: "см",
+    unit: "cm",
     date: "10-20-2024",
   },
   {
-    name: "Вес",
+    name: "Weight",
     value: "60",
-    unit: "кг",
+    unit: "kg",
     date: "10-20-2024",
   },
   {
-    name: "ИМТ",
+    name: "BMI",
     value: "24.2",
-    unit: "кг/м^3",
+    unit: "kg/m^3",
     date: "10-20-2024",
   },
   {
-    name: "Температура",
+    name: "Temperature",
     value: "36",
     unit: "°C",
     date: "10-20-2024",
   },
   {
-    name: "Систолическое АД",
+    name: "Systolic BP",
     value: "160",
-    unit: "мм рт.ст.",
+    unit: "mmHg",
     date: "10-20-2024",
   },
   {
-    name: "Диастолическое АД",
+    name: "Diastolic BP",
     value: "100",
-    unit: "мм рт.ст.",
+    unit: "mmHg",
     date: "10-20-2024",
   },
   {
-    name: "ЧСС",
+    name: "Heart Rate",
     value: "90",
-    unit: "уд/мин",
+    unit: "bpm",
     date: "10-20-2024",
   },
   {
-    name: "Частота дыхания",
+    name: "Respiratory Rate",
     value: "30",
-    unit: "число/мин",
+    unit: "breaths/min",
     date: "10-20-2024",
   },
 ];
+
 interface GeneralInfoProps {
   className?: string;
 }
@@ -82,7 +83,7 @@ export const GeneralInfo = (props: GeneralInfoProps) => {
   return (
     <Accordion defaultExpanded>
       <AccordionSummary className={cls.title} expandIcon={<ExpandMoreIcon />}>
-        Общая информация
+        General information
       </AccordionSummary>
       <AccordionDetails className={cls.content}>
         {data.map((measurement) => (
@@ -90,7 +91,7 @@ export const GeneralInfo = (props: GeneralInfoProps) => {
         ))}
       </AccordionDetails>
       <AccordionActions>
-        <Button>Редактировать</Button>
+        <Button>Edit</Button>
       </AccordionActions>
     </Accordion>
   );

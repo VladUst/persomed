@@ -6,24 +6,24 @@ import cls from "./AnalyzesDocs.module.scss";
 const analyzesRows: GridRowsProp = [
   {
     id: "1",
-    name: "Общий анализ крови",
-    type: "Лабораторный",
+    name: "Complete Blood Count",
+    type: "Laboratory",
     date: "2024-01-15",
   },
   {
     id: "2",
-    name: "Биохимический анализ крови",
-    type: "Лабораторный",
+    name: "Biochemical Blood Test",
+    type: "Laboratory",
     date: "2024-01-20",
   },
-  { id: "3", name: "ЭКГ", type: "Диагностический", date: "2024-02-01" },
-  { id: "4", name: "УЗИ сердца", type: "Диагностический", date: "2024-02-10" },
+  { id: "3", name: "ECG", type: "Diagnostic", date: "2024-02-01" },
+  { id: "4", name: "Heart Ultrasound", type: "Diagnostic", date: "2024-02-10" },
 ];
 
 const analyzesColumns: GridColDef[] = [
-  { field: "name", headerName: "Название исследования", flex: 1 },
-  { field: "type", headerName: "Тип", width: 200 },
-  { field: "date", headerName: "Дата проведения", width: 150 },
+  { field: "name", headerName: "Test Name", flex: 1 },
+  { field: "type", headerName: "Type", width: 200 },
+  { field: "date", headerName: "Date Conducted", width: 150 },
 ];
 
 interface AnalyzesDocsProps {
@@ -38,9 +38,7 @@ export const AnalyzesDocs = (props: AnalyzesDocsProps) => {
 
   return (
     <>
-      <Divider className={cls.title}>
-        Лабораторные и диагностические исследования
-      </Divider>
+      <Divider className={cls.title}>Laboratory and diagnostic studies</Divider>
       <MedicalTable
         className={className}
         columns={analyzesColumns}

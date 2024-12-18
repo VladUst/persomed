@@ -23,10 +23,10 @@ export const AnamnesisForm = (props: AnamnesisFormProps) => {
   return (
     <Modal open={isOpen} onClose={onClose}>
       <form className={classNames(cls.InfoForm, {}, [className])}>
-        <h2>Анамнез</h2>
+        <h2>Anamnesis</h2>
         <TextField
           className={cls.input}
-          label="Общее состояние"
+          label="General"
           variant="outlined"
           value={state}
           rows={4}
@@ -35,7 +35,7 @@ export const AnamnesisForm = (props: AnamnesisFormProps) => {
         />
         <TextField
           className={cls.input}
-          label="Измерения"
+          label="Measurements"
           variant="outlined"
           value={measurements}
           rows={2}
@@ -45,7 +45,7 @@ export const AnamnesisForm = (props: AnamnesisFormProps) => {
         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ru">
           <DatePicker
             className={cls.input}
-            label="Дата"
+            label="Date"
             value={date}
             onChange={(newDate) => setDate(newDate)}
           />
@@ -57,7 +57,7 @@ export const AnamnesisForm = (props: AnamnesisFormProps) => {
           variant="contained"
           size="large"
         >
-          Сохранить
+          Save
         </Button>
       </form>
     </Modal>

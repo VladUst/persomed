@@ -27,7 +27,7 @@ export const MessageInput = (props: MessageInputProps) => {
         fullWidth
         value={message}
         onChange={(e) => setMessage(e.target.value)}
-        placeholder="Введите сообщение..."
+        placeholder="Enter a message..."
       />
       <IconButton onClick={handleSend} color="primary">
         <SendIcon />

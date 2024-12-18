@@ -8,16 +8,16 @@ import MedicinesIcon from "@/shared/assets/icons/medicine.svg";
 
 const data: PatientStatusInfo = [
   {
-    text: "Лозартан",
-    label: "50 мг./ден.",
+    text: "Losartan",
+    label: "50 mg/day",
   },
   {
-    text: "Эналаприл",
-    label: "5 мг./ден.",
+    text: "Enalapril",
+    label: "5 mg/day",
   },
   {
-    text: "Амлодипин",
-    label: "5 мг./ден.",
+    text: "Amlodipine",
+    label: "5 mg/day",
   },
 ];
 
@@ -31,7 +31,7 @@ export const MedicinesCard = (props: MedicinesCardProps) => {
     <PatientStatusCard
       icon={MedicinesIcon}
       id="6"
-      title="Лекарства"
+      title="Medicines"
       className={className}
       variant={PatientStatusCardVariant.GREEN}
     >

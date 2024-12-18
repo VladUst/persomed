@@ -6,70 +6,70 @@ import { Button, Divider } from "@mui/material";
 import PlagiarismIcon from "@mui/icons-material/Plagiarism";
 
 const document = {
-  title: "Артериальная гипертензия",
+  title: "Arterial Hypertension",
   meta: {
     icdCode: "I10",
     diagnosisDate: "2024-11-20",
-    physicianName: "Иванов Петр Сергеевич",
-    specialty: "Терапевт",
-    nosology: "Сердечно-сосудистые заболевания",
-    diseaseType: "Хроническое",
-    clinicName: "Городская поликлиника №1",
+    physicianName: "Ivanov Petr Sergeevich",
+    specialty: "Therapist",
+    nosology: "Cardiovascular Diseases",
+    diseaseType: "Chronic",
+    clinicName: "City Polyclinic №1",
   },
   sections: {
     anamnesis: `
-      Пациент обратился с жалобами на периодические головные боли, учащенное сердцебиение, 
-      повышенное давление до 160/100 мм рт. ст., ощущение усталости. 
-      История болезни: гипертония у пациента диагностирована впервые 5 лет назад. 
-      Семейный анамнез отягощен: у отца и матери артериальная гипертензия.
-      Обострение состояния отмечается на фоне стрессов и нерегулярного образа жизни.
+      The patient presented with complaints of periodic headaches, rapid heartbeat, 
+      elevated blood pressure up to 160/100 mmHg, and fatigue. 
+      Medical history: hypertension was first diagnosed 5 years ago. 
+      Family history is burdened: both father and mother have arterial hypertension.
+      Condition exacerbations are noted during periods of stress and irregular lifestyle.
     `,
     clinicalFindings: `
-      При осмотре: артериальное давление - 150/95 мм рт. ст., частота сердечных сокращений - 85 уд./мин.
-      Данные ЭКГ: признаки гипертрофии левого желудочка.
-      Биохимический анализ крови: повышение уровня холестерина до 6,5 ммоль/л.
-      Анализы мочи: без особенностей.
+      During examination: blood pressure - 150/95 mmHg, heart rate - 85 bpm.
+      ECG data: signs of left ventricular hypertrophy.
+      Blood biochemistry: elevated cholesterol level up to 6.5 mmol/L.
+      Urine analysis: no abnormalities.
     `,
     diagnosis: `
-      Установленный диагноз: Артериальная гипертензия, стадия 2, риск 3.
-      Осложнения: гипертрофия левого желудочка.
+      Established diagnosis: Arterial hypertension, stage 2, risk 3.
+      Complications: left ventricular hypertrophy.
     `,
     treatmentPlan: `
-      - Фармакотерапия:
-        1. Лизиноприл 10 мг утром, ежедневно.
-        2. Аторвастатин 20 мг на ночь, ежедневно.
-        3. Гидрохлортиазид 12,5 мг утром, ежедневно.
-      - Диетические рекомендации:
-        Ограничение соли до 5 г в сутки, уменьшение потребления насыщенных жиров.
-      - Лечебная физкультура:
-        Умеренные аэробные нагрузки (30 минут в день, 5 раз в неделю).
-      - Контроль состояния:
-        Ежедневное измерение артериального давления, повторный визит через месяц.
+      - Pharmacotherapy:
+        1. Lisinopril 10 mg in the morning, daily.
+        2. Atorvastatin 20 mg at night, daily.
+        3. Hydrochlorothiazide 12.5 mg in the morning, daily.
+      - Dietary recommendations:
+        Limit salt intake to 5 g per day, reduce consumption of saturated fats.
+      - Therapeutic physical exercises:
+        Moderate aerobic activities (30 minutes per day, 5 times a week).
+      - Condition monitoring:
+        Daily blood pressure measurement, follow-up visit in one month.
     `,
     conclusion: `
-      На основании клинических данных, анамнеза и результатов лабораторных исследований 
-      рекомендована фармакотерапия и изменения образа жизни.
-      Необходим постоянный контроль уровня артериального давления и липидного профиля.
+      Based on clinical data, medical history, and laboratory test results, 
+      pharmacotherapy and lifestyle changes are recommended.
+      Continuous monitoring of blood pressure and lipid profile is necessary.
     `,
   },
 };
 
 const metaKeyMapper: Record<string, string> = {
-  icdCode: "Код МКБ",
-  diagnosisDate: "Дата постановки",
-  physicianName: "Врач",
-  specialty: "Специальность",
-  nosology: "Нозология",
-  diseaseType: "Тип заболевания",
-  clinicName: "Учреждение",
+  icdCode: "ICD Code",
+  diagnosisDate: "Diagnosis Date",
+  physicianName: "Physician",
+  specialty: "Specialty",
+  nosology: "Nosology",
+  diseaseType: "Disease Type",
+  clinicName: "Institution",
 };
 
 const sectionKeyMapper: Record<string, string> = {
-  anamnesis: "Анамнез",
-  clinicalFindings: "Клинические данные",
-  diagnosis: "Диагноз",
-  treatmentPlan: "План лечения",
-  conclusion: "Заключение",
+  anamnesis: "Anamnesis",
+  clinicalFindings: "Laboratory tests",
+  diagnosis: "Diagnosis",
+  treatmentPlan: "Treatment Plan",
+  conclusion: "Conclusion",
 };
 
 export const DocumentDetailsPage = () => {
@@ -112,7 +112,7 @@ export const DocumentDetailsPage = () => {
           className={cls.button}
           endIcon={<PlagiarismIcon />}
         >
-          Анализ текста
+          Analysis
         </Button>
       </article>
     </Page>

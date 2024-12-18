@@ -16,10 +16,10 @@ interface NavbarProps {
 export const Navbar = memo(({ className }: NavbarProps) => {
   return (
     <header className={classNames(cls.Navbar, {}, [className])}>
-      <AppLink to={getRouteDigitalProfile()}>Цифровой профиль</AppLink>
-      <AppLink to={getRouteHealthIndicators()}>Показатели здоровья</AppLink>
-      <AppLink to={getRouteStatusPanel()}>Панель состояния</AppLink>
-      <AppLink to={getRouteChat()}>Чат</AppLink>
+      <AppLink to={getRouteDigitalProfile()}>Digital Profile</AppLink>
+      <AppLink to={getRouteHealthIndicators()}>Health Indicators</AppLink>
+      <AppLink to={getRouteStatusPanel()}>Status Panel</AppLink>
+      <AppLink to={getRouteChat()}>Chat</AppLink>
     </header>
   );
 });

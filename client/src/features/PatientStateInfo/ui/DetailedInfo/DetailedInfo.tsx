@@ -90,7 +90,7 @@ export const DetailedInfo = (props: DetailedInfoProps) => {
   return (
     <Accordion>
       <AccordionSummary className={cls.title} expandIcon={<ExpandMoreIcon />}>
-        Лабораторные исследования
+        Laboratory tests
       </AccordionSummary>
       <AccordionDetails className={cls.content}>
         {data.map((measurement) => (

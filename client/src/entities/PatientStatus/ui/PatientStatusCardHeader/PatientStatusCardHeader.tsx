@@ -22,7 +22,7 @@ export const PatientStatusCardHeader = (
         {title}
       </div>
       <AppLink className={cls.link} to={getRouteStatusDetails(id)}>
-        Подробнее
+        Details
       </AppLink>
     </div>
   );

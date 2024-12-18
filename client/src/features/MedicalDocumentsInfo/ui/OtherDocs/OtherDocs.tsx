@@ -6,28 +6,28 @@ import cls from "./OtherDocs.module.scss";
 const otherDocsRows: GridRowsProp = [
   {
     id: "1",
-    name: "Генетический профиль",
-    type: "Генетика",
+    name: "Genetic Profile",
+    type: "Genetics",
     date: "2023-12-01",
   },
   {
     id: "2",
-    name: "Справка о госпитализации",
-    type: "Справка",
+    name: "Hospitalization Certificate",
+    type: "Certificate",
     date: "2023-11-15",
   },
   {
     id: "3",
-    name: "Выписка из стационара",
-    type: "Выписка",
+    name: "Hospital Discharge Summary",
+    type: "Discharge",
     date: "2024-01-20",
   },
 ];
 
 const otherDocsColumns: GridColDef[] = [
-  { field: "name", headerName: "Название документа", flex: 1 },
-  { field: "type", headerName: "Тип", width: 150 },
-  { field: "date", headerName: "Дата", width: 150 },
+  { field: "name", headerName: "Document Name", flex: 1 },
+  { field: "type", headerName: "Type", width: 150 },
+  { field: "date", headerName: "Date", width: 150 },
 ];
 
 interface OtherDocsProps {
@@ -42,7 +42,7 @@ export const OtherDocs = (props: OtherDocsProps) => {
 
   return (
     <>
-      <Divider className={cls.title}>Другие документы</Divider>
+      <Divider className={cls.title}>Other documents</Divider>
       <MedicalTable
         className={className}
         columns={otherDocsColumns}

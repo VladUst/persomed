@@ -77,7 +77,7 @@ export const IndicatorChart = (props: IndicatorChartProps) => {
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" dy={10} />
           <YAxis />
-          <Tooltip formatter={(value: string) => [`${value}`, "Значение"]} />
+          <Tooltip formatter={(value: string) => [`${value}`, "Value"]} />
 
           {isLevelsVisible && (
             <>
@@ -103,8 +103,8 @@ export const IndicatorChart = (props: IndicatorChartProps) => {
         </LineChart>
         <Button className={cls.btn} onClick={onToggle}>
           {isLevelsVisible
-            ? "Скрыть допустимые диапазоны"
-            : "Показать допустимые диапазоны"}
+            ? "Hide acceptable ranges"
+            : "Show acceptable ranges"}
         </Button>
       </div>
     </Modal>

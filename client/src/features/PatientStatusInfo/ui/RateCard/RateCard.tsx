@@ -8,37 +8,37 @@ import WarnIcon from "@/shared/assets/icons/warning.svg";
 
 const data: PatientStatusInfo = [
   {
-    text: "Сердечно-сосудистые заболевания",
-    label: "Высокие",
+    text: "Cardiovascular diseases",
+    label: "High",
     labelColor: "#E90711",
   },
   {
-    text: "Заболевания системы пищеварения",
-    label: "Средние",
+    text: "Digestive system diseases",
+    label: "Moderate",
     labelColor: "#ECB404",
   },
   {
-    text: "Заболевания органов дыхания",
-    label: "Низкие",
+    text: "Respiratory system diseases",
+    label: "Low",
     labelColor: "#53D006",
   },
   {
-    text: "Заболевания эндокринной системы",
-    label: "Низкие",
+    text: "Endocrine system diseases",
+    label: "Low",
     labelColor: "#53D006",
   },
   {
-    text: "Заболевания почек и мочевыделительной системы",
-    label: "Низкие",
+    text: "Kidney and urinary system diseases",
+    label: "Low",
     labelColor: "#53D006",
   },
   {
-    text: "Заболевания опорно-двигательного аппарата",
-    label: "Неизвестно",
+    text: "Musculoskeletal system diseases",
+    label: "Unknown",
   },
   {
-    text: "Заболевания кожи и волосяных покровов",
-    label: "Неизвестно",
+    text: "Skin and hair diseases",
+    label: "Unknown",
   },
 ];
 
@@ -52,7 +52,7 @@ export const RateCard = (props: RateCardProps) => {
     <PatientStatusCard
       icon={WarnIcon}
       id="3"
-      title="Оценка рисков"
+      title="Risk assessment"
       className={className}
       variant={PatientStatusCardVariant.ORANGE}
     >

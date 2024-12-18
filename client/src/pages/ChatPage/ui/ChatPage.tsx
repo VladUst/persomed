@@ -12,47 +12,52 @@ import { NotePanel } from "@/features/NotePanel";
 export const mockContacts: Contact[] = [
   {
     id: "1",
-    name: "Иван Иванов",
-    lastMessage: "Здравствуйте! Результаты будут завтра.",
+    name: "Ivan Ivanov",
+    lastMessage: "Hello! The results will be ready tomorrow.",
     avatar: "https://poloskun-shop.ru/wp-content/uploads/2021/07/gPZwCbdS.jpg",
   },
   {
     id: "2",
-    name: "Анна Смирнова",
-    lastMessage: "Напомните, пожалуйста, по препаратам. Сколько раз...",
+    name: "Anna Smirnova",
+    lastMessage: "Please remind me about the medications. How many times...",
     avatar: "https://cdn1.flamp.ru/2af703592e4212ae59e420a39c0a7dca.jpg",
   },
 ];
 
 export const mockMessages: Record<string, Message[]> = {
   "1": [
-    { id: "m1", source: "receiver", text: "Здравствуйте!", date: "09.12.2024" },
+    { id: "m1", source: "receiver", text: "Hello!", date: "12/09/2024" },
     {
       id: "m2",
       source: "receiver",
-      text: "Как долго ждать результаты?",
-      date: "09.12.2024",
+      text: "How long will the results take?",
+      date: "12/09/2024",
     },
     {
       id: "m3",
       source: "sender",
-      text: "Здравствуйте! Результаты будут завтра.",
-      date: "09.12.2024",
+      text: "Hello! The results will be ready tomorrow.",
+      date: "12/09/2024",
     },
   ],
   "2": [
-    { id: "m4", source: "receiver", text: "Добрый день!", date: "08.12.2024" },
+    {
+      id: "m4",
+      source: "receiver",
+      text: "Good afternoon!",
+      date: "12/08/2024",
+    },
     {
       id: "m5",
       source: "sender",
-      text: "Добрый день! Чем могу помочь?",
-      date: "08.12.2024",
+      text: "Good afternoon! How can I help you?",
+      date: "12/08/2024",
     },
     {
       id: "m6",
       source: "receiver",
-      text: "Напомните, пожалуйста, по препаратам. Сколько раз в день нужно принимать Респифорб?",
-      date: "08.12.2024",
+      text: "Please remind me about the medications. How many times a day should Respiphorb be taken?",
+      date: "12/08/2024",
     },
   ],
 };

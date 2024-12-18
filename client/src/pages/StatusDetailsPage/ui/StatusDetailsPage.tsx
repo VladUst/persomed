@@ -7,28 +7,28 @@ import { RateForm } from "@/features/PatientStatusInfo";
 
 const riskFactors = [
   {
-    name: "Высокий шанс сердечного приступа",
-    source: "Модель оценки риска сердечного принципа. Точность работы - 95%",
+    name: "High risk of heart attack",
+    source: "Heart attack risk assessment model. Accuracy: 95%",
     date: "2024-11-15",
   },
   {
-    name: "Целевое АД не достигнуто",
-    source: "Оценка динамики показателей здоровья",
+    name: "Target blood pressure not achieved",
+    source: "Health indicator dynamics assessment",
     date: "2024-11-18",
   },
   {
-    name: "Целевое ЧСС не достигнуто",
-    source: "Оценка динамики показателей здоровья",
+    name: "Target heart rate not achieved",
+    source: "Health indicator dynamics assessment",
     date: "2024-11-20",
   },
   {
-    name: "Артериальная гипертензия",
-    source: "Хроническое заболевание из истории болезней",
+    name: "Arterial hypertension",
+    source: "Chronic condition from medical history",
     date: "2024-11-12",
   },
   {
-    name: "Сердечная недостаточность",
-    source: "Хроническое заболевание из истории болезней",
+    name: "Heart failure",
+    source: "Chronic condition from medical history",
     date: "2024-11-19",
   },
 ];
@@ -149,10 +149,10 @@ export const StatusDetailsPage = () => {
           {factor.name}
         </Divider>
         <p>
-          <span className={cls.sectionLabel}>Источник:</span> {factor.source}
+          <span className={cls.sectionLabel}>Source:</span> {factor.source}
         </p>
         <p>
-          <span className={cls.sectionLabel}>Дата фиксации:</span> {factor.date}
+          <span className={cls.sectionLabel}>Date:</span> {factor.date}
         </p>
       </div>
     ));
@@ -160,7 +160,7 @@ export const StatusDetailsPage = () => {
   return (
     <Page>
       <article className={cls.document}>
-        <h1 className={cls.title}>Факторы риска</h1>
+        <h1 className={cls.title}>Risk Factors</h1>
         <section className={cls.content}>{renderRiskFactors()}</section>
       </article>
     </Page>

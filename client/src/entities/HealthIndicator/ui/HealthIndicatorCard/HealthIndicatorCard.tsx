@@ -70,11 +70,11 @@ export const HealthIndicatorCard = (props: HealthIndicatorCardProps) => {
       </div>
       <div className={cls.footer}>
         <div className={cls.date}>
-          <span className={cls.label}>Дата обновления</span>
-          <span>{data.date ? data.date : "Нет данных"}</span>
+          <span className={cls.label}>Date of update</span>
+          <span>{data.date ? data.date : "No data"}</span>
         </div>
         <div className={cls.target}>
-          <span className={cls.label}>Целевой уровень</span>
+          <span className={cls.label}>Target level</span>
           <span>
             {data.targetLevel[0]}-{data.targetLevel[1]}
           </span>

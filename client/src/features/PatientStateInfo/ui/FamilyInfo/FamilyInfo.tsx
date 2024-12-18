@@ -30,7 +30,7 @@ export const FamilyInfo = (props: FamilyInfoProps) => {
   return (
     <Accordion>
       <AccordionSummary className={cls.title} expandIcon={<ExpandMoreIcon />}>
-        Семейный анамез
+        Family history
       </AccordionSummary>
       <AccordionDetails className={cls.content}>
         {data.map((measurement) => (

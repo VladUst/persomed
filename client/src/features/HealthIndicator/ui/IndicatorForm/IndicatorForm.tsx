@@ -32,10 +32,10 @@ export const IndicatorForm = (props: IndicatorFormProps) => {
   return (
     <Modal open={isOpen} onClose={onClose}>
       <form className={classNames(cls.IndicatorForm, {}, [className])}>
-        <h2>{indicatorData ? "Обновить данные" : "Добавить показатель"}</h2>
+        <h2>{indicatorData ? "Update data" : "Add indicator"}</h2>
         <TextField
           className={cls.input}
-          label="Название"
+          label="Name"
           variant="outlined"
           value={name}
           onChange={(e) => setName(e.target.value)}
@@ -43,7 +43,7 @@ export const IndicatorForm = (props: IndicatorFormProps) => {
 
         <TextField
           className={cls.input}
-          label="Значение"
+          label="Value"
           variant="outlined"
           value={value}
           onChange={(e) => setValue(e.target.value)}
@@ -51,7 +51,7 @@ export const IndicatorForm = (props: IndicatorFormProps) => {
 
         <TextField
           className={cls.input}
-          label="Единица измерения"
+          label="Unit"
           variant="outlined"
           value={unit}
           onChange={(e) => setUnit(e.target.value)}
@@ -60,24 +60,24 @@ export const IndicatorForm = (props: IndicatorFormProps) => {
         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ru">
           <DatePicker
             className={cls.input}
-            label="Дата измерения"
+            label="Date"
             value={date}
             onChange={(newDate) => setDate(newDate)}
           />
         </LocalizationProvider>
 
-        <Divider>Допустимые диапазоны</Divider>
+        <Divider>Acceptable ranges</Divider>
 
         <div className={cls.horizontalWrapper}>
           <TextField
-            label="Минимум"
+            label="Min"
             variant="outlined"
             type="number"
             value={minTargetLevel}
             onChange={(e) => setMinTargetLevel(parseInt(e.target.value))}
           />
           <TextField
-            label="Максимум"
+            label="Max"
             variant="outlined"
             type="number"
             value={maxTargetLevel}
@@ -90,7 +90,7 @@ export const IndicatorForm = (props: IndicatorFormProps) => {
           variant="contained"
           size="large"
         >
-          {indicatorData ? "Обновить" : "Добавить"}
+          {indicatorData ? "Update" : "Add"}
         </Button>
       </form>
     </Modal>

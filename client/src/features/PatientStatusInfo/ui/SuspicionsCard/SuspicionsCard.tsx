@@ -8,7 +8,7 @@ import SearchIcon from "@/shared/assets/icons/search.svg";
 
 const data: PatientStatusInfo = [
   {
-    text: "Сахарный диабет",
+    text: "Diabetes mellitus",
     label: "E10",
   },
 ];
@@ -23,7 +23,7 @@ export const SuspicionsCard = (props: SuspicionsCardProps) => {
     <PatientStatusCard
       icon={SearchIcon}
       id="4"
-      title="Подозрения"
+      title="Suspicions"
       className={className}
       variant={PatientStatusCardVariant.RED}
     >

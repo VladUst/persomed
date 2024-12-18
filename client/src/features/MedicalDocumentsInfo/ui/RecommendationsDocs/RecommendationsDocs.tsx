@@ -6,25 +6,32 @@ import cls from "./RecommendationsDocs.module.scss";
 const recommendationsRows: GridRowsProp = [
   {
     id: "1",
-    name: "Рекомендации по лечению ОРВИ",
-    type: "Рекомендации",
-    specialty: "Терапевт",
+    name: "Reduce consumption of fatty foods",
+    type: "Recommendation",
+    specialty: "Therapist",
     date: "2024-03-01",
   },
   {
     id: "2",
-    name: "Препараты для лечения гипертензии",
-    type: "Препараты",
-    specialty: "Кардиолог",
+    name: "Medication: Lisinopril",
+    type: "Prescription",
+    specialty: "Cardiologist",
     date: "2024-03-05",
+  },
+  {
+    id: "3",
+    name: "Daily walking for 30 minutes",
+    type: "Recommendation",
+    specialty: "Cardiologist",
+    date: "2024-03-10",
   },
 ];
 
 const recommendationsColumns: GridColDef[] = [
-  { field: "name", headerName: "Название", flex: 1 },
-  { field: "type", headerName: "Тип", width: 200 },
-  { field: "specialty", headerName: "Специальность врача", width: 200 },
-  { field: "date", headerName: "Дата", width: 150 },
+  { field: "name", headerName: "Recommendation Name", flex: 1 },
+  { field: "type", headerName: "Type", width: 200 },
+  { field: "specialty", headerName: "Doctor Specialty", width: 200 },
+  { field: "date", headerName: "Date", width: 150 },
 ];
 
 interface RecommendationsDocsProps {
@@ -39,7 +46,9 @@ export const RecommendationsDocs = (props: RecommendationsDocsProps) => {
 
   return (
     <>
-      <Divider className={cls.title}>Рекомендации и назначения врачей</Divider>
+      <Divider className={cls.title}>
+        Recommendations and appointments of doctors
+      </Divider>
       <MedicalTable
         className={className}
         columns={recommendationsColumns}

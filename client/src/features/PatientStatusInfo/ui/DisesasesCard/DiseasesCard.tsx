@@ -8,15 +8,15 @@ import { PatientStatusInfoList } from "../PatientStatusInfoList/PatientStatusInf
 
 const data: PatientStatusInfo = [
   {
-    text: "Артериальная гипертензия",
+    text: "Arterial hypertension",
     label: "I11",
   },
   {
-    text: "Сердечная недостаточность",
+    text: "Heart failure",
     label: "I50.0",
   },
   {
-    text: "ОРВИ",
+    text: "Acute respiratory viral infection",
     label: "J00-J02",
   },
 ];
@@ -31,7 +31,7 @@ export const DiseasesCard = (props: DiseasesCardProps) => {
     <PatientStatusCard
       icon={HealthIcon}
       id="2"
-      title="Заболевания"
+      title="Diseases"
       className={className}
       variant={PatientStatusCardVariant.ORANGE}
     >

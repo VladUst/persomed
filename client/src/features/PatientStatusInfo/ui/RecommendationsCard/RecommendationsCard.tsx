@@ -8,22 +8,22 @@ import PencilIcon from "@/shared/assets/icons/pencil.svg";
 
 const data: PatientStatusInfo = [
   {
-    text: "Принимать Омега 3",
-    label: "1000 мг./ден.",
+    text: "Take Omega 3",
+    label: "1000 mg/day",
   },
   {
-    text: "Альфа-липоевая кислота",
-    label: "600 мг./ден.",
+    text: "Alpha-lipoic acid",
+    label: "600 mg/day",
   },
   {
-    text: "Магний",
-    label: "400 мг./ден.",
+    text: "Magnesium",
+    label: "400 mg/day",
   },
   {
-    text: "Ограничить употребление сахара",
+    text: "Limit sugar intake",
   },
   {
-    text: "Регулярные аэробные нагрузки",
+    text: "Regular aerobic exercise",
   },
 ];
 
@@ -37,7 +37,7 @@ export const RecommendationsCard = (props: RecommendationsCardProps) => {
     <PatientStatusCard
       icon={PencilIcon}
       id="7"
-      title="Рекомендации"
+      title="Recommendations"
       className={className}
       variant={PatientStatusCardVariant.GREEN}
     >

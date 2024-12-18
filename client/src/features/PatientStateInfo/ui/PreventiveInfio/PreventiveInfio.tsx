@@ -41,7 +41,7 @@ export const PreventiveInfio = (props: PreventiveInfioProps) => {
   return (
     <Accordion>
       <AccordionSummary className={cls.title} expandIcon={<ExpandMoreIcon />}>
-        Вакцинации и профилактические мероприятия
+        Vaccinations and preventive measures
       </AccordionSummary>
       <AccordionDetails className={cls.content}>
         {data.map((measurement) => (

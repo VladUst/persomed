@@ -8,10 +8,10 @@ import EyeIcon from "@/shared/assets/icons/eye.svg";
 
 const data: PatientStatusInfo = [
   {
-    text: "Повышенная глюкоза крови",
+    text: "Elevated blood glucose",
   },
   {
-    text: "Высокие уровни кетонов",
+    text: "High levels of ketones",
   },
 ];
 
@@ -25,7 +25,7 @@ export const SymptomsCard = (props: SymptomsCardProps) => {
     <PatientStatusCard
       icon={EyeIcon}
       id={"1"}
-      title="Симптомы"
+      title="Symptoms"
       className={className}
       variant={PatientStatusCardVariant.ORANGE}
     >

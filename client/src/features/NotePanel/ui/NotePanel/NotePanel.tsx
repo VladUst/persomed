@@ -49,14 +49,14 @@ export const NotePanel = (props: NotePanelProps) => {
           <ListItemIcon>
             <DescriptionOutlined fontSize="small" />
           </ListItemIcon>
-          <ListItemText>Сохранить анамнез</ListItemText>
+          <ListItemText>Save anamnesis</ListItemText>
         </MenuItem>
         <Divider />
         <MenuItem onClick={showRecommendationsForm}>
           <ListItemIcon>
             <MedicalInformationOutlined fontSize="small" />
           </ListItemIcon>
-          <ListItemText>Составить рекомендации</ListItemText>
+          <ListItemText>Make recommendations</ListItemText>
         </MenuItem>
       </MenuList>
       <AnamnesisForm

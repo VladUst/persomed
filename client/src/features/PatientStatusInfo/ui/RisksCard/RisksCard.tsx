@@ -8,19 +8,19 @@ import FireIcon from "@/shared/assets/icons/fire.svg";
 
 const data: PatientStatusInfo = [
   {
-    text: "Высокий шанс сердечного приступа",
+    text: "High risk of heart attack",
   },
   {
-    text: "Целевое АД не достигнуто",
+    text: "Target blood pressure not reached",
   },
   {
-    text: "Целевое ЧСС не достигнуто",
+    text: "Target heart rate not reached",
   },
   {
-    text: "Артериальная гипертензия",
+    text: "Arterial hypertension",
   },
   {
-    text: "Сердечная недостаточность",
+    text: "Heart failure",
   },
 ];
 
@@ -34,7 +34,7 @@ export const RisksCard = (props: RisksCardProps) => {
     <PatientStatusCard
       icon={FireIcon}
       id="5"
-      title="Факторы риска"
+      title="Risk factors"
       className={className}
       variant={PatientStatusCardVariant.RED}
     >

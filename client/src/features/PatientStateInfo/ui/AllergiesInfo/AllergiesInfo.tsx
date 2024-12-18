@@ -36,7 +36,7 @@ export const AllergiesInfo = (props: AllergiesInfoProps) => {
   return (
     <Accordion>
       <AccordionSummary className={cls.title} expandIcon={<ExpandMoreIcon />}>
-        Аллергии и непереносимости
+        Allergies and intolerances
       </AccordionSummary>
       <AccordionDetails className={cls.content}>
         {data.map((measurement) => (

@@ -23,10 +23,10 @@ export const RecommendationsForm = (props: RecommendationsFormProps) => {
   return (
     <Modal open={isOpen} onClose={onClose}>
       <form className={classNames(cls.InfoForm, {}, [className])}>
-        <h2>Рекомендации</h2>
+        <h2>Recommendations</h2>
         <TextField
           className={cls.input}
-          label="План лечения"
+          label="Treatment plan"
           variant="outlined"
           value={plan}
           rows={4}
@@ -35,7 +35,7 @@ export const RecommendationsForm = (props: RecommendationsFormProps) => {
         />
         <TextField
           className={cls.input}
-          label="Препараты и дозировки"
+          label="Drugs and dosages"
           variant="outlined"
           value={medicines}
           rows={4}
@@ -45,7 +45,7 @@ export const RecommendationsForm = (props: RecommendationsFormProps) => {
         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="ru">
           <DatePicker
             className={cls.input}
-            label="Дата"
+            label="Date"
             value={date}
             onChange={(newDate) => setDate(newDate)}
           />
@@ -57,7 +57,7 @@ export const RecommendationsForm = (props: RecommendationsFormProps) => {
           variant="contained"
           size="large"
         >
-          Сохранить
+          Save
         </Button>
       </form>
     </Modal>
