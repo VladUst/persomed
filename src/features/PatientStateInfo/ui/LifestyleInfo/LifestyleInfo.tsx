@@ -41,7 +41,7 @@ export const LifestyleInfo = (props: LifestyleInfoProps) => {
   return (
     <Accordion>
       <AccordionSummary className={cls.title} expandIcon={<ExpandMoreIcon />}>
-        Лабораторные и инструментальные измерения
+        Образ жизни
       </AccordionSummary>
       <AccordionDetails className={cls.content}>
         {data.map((measurement) => (

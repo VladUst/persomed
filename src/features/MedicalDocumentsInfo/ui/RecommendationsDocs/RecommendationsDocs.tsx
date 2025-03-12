@@ -6,29 +6,22 @@ import cls from "./RecommendationsDocs.module.scss";
 const recommendationsRows: GridRowsProp = [
   {
     id: "1",
-    name: "Снижение потребления жирной пищи",
-    type: "Рекомендация",
+    name: "Рекомендации по лечению ОРВИ",
+    type: "Рекомендации",
     specialty: "Терапевт",
     date: "2024-03-01",
   },
   {
     id: "2",
-    name: "Препарат: Лизиноприл",
-    type: "Назначение",
+    name: "Препараты для лечения гипертензии",
+    type: "Препараты",
     specialty: "Кардиолог",
     date: "2024-03-05",
-  },
-  {
-    id: "3",
-    name: "Ежедневная ходьба 30 минут",
-    type: "Рекомендация",
-    specialty: "Кардиолог",
-    date: "2024-03-10",
   },
 ];
 
 const recommendationsColumns: GridColDef[] = [
-  { field: "name", headerName: "Название рекомендации", flex: 1 },
+  { field: "name", headerName: "Название", flex: 1 },
   { field: "type", headerName: "Тип", width: 200 },
   { field: "specialty", headerName: "Специальность врача", width: 200 },
   { field: "date", headerName: "Дата", width: 150 },

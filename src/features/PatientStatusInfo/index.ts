@@ -5,3 +5,4 @@ export { RateCard } from "./ui/RateCard/RateCard";
 export { MedicinesCard } from "./ui/MedicinesCard/MedicinesCard";
 export { RecommendationsCard } from "./ui/RecommendationsCard/RecommendationsCard";
 export { RisksCard } from "./ui/RisksCard/RisksCard";
+export { RateForm } from "./ui/RateForm/RateForm";
