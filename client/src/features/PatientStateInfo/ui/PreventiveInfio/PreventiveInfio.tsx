@@ -14,22 +14,21 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 const data: HealthMeasurementData[] = [
   {
-    name: "Противогриппозная вакцина",
-    value: "Последняя прививка — октябрь 2023",
+    name: "Flu Vaccine",
+    value: "Last vaccination — October 2023",
   },
-  { name: "Прививка от COVID-19", value: "Полный курс, февраль 2021" },
+  { name: "COVID-19 Vaccine", value: "Full course, February 2021" },
   {
-    name: "Вакцинация от гепатита B",
-    value: "Привит в детстве, ревакцинация не требовалась",
-  },
-  {
-    name: "Флюорография",
-    value: "Последнее обследование — март 2024, без патологий",
+    name: "Hepatitis B Vaccination",
+    value: "Vaccinated in childhood, revaccination not required",
   },
   {
-    name: "ЭКГ и УЗИ сердца",
-    value:
-      "Последнее обследование — январь 2024, выявлена сердечная недостаточность",
+    name: "Fluorography",
+    value: "Last examination — March 2024, no pathologies",
+  },
+  {
+    name: "ECG and Heart Ultrasound",
+    value: "Last examination — January 2024, heart failure detected",
   },
 ];
 
@@ -49,7 +48,7 @@ export const PreventiveInfio = (props: PreventiveInfioProps) => {
         ))}
       </AccordionDetails>
       <AccordionActions>
-        <Button>Редактировать</Button>
+        <Button>Edit</Button>
       </AccordionActions>
     </Accordion>
   );

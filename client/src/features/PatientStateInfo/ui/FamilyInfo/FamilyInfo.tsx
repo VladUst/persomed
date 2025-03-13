@@ -13,12 +13,12 @@ import {
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 const data: HealthMeasurementData[] = [
-  { name: "Отец", value: "Артериальная гипертензия, с 45 лет" },
-  { name: "Мать", value: "Ишемическая болезнь сердца, с 50 лет" },
-  { name: "Дед по отцовской линии", value: "Инфаркт миокарда, в 60 лет" },
+  { name: "Father", value: "Arterial hypertension, since age 45" },
+  { name: "Mother", value: "Coronary heart disease, since age 50" },
+  { name: "Paternal Grandfather", value: "Myocardial infarction at age 60" },
   {
-    name: "Бабушка по материнской линии",
-    value: "Сахарный диабет 2 типа, с 55 лет",
+    name: "Maternal Grandmother",
+    value: "Type 2 diabetes, since age 55",
   },
 ];
 
@@ -38,7 +38,7 @@ export const FamilyInfo = (props: FamilyInfoProps) => {
         ))}
       </AccordionDetails>
       <AccordionActions>
-        <Button>Редактировать</Button>
+        <Button>Edit</Button>
       </AccordionActions>
     </Accordion>
   );

@@ -13,18 +13,18 @@ import {
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 const data: HealthMeasurementData[] = [
-  { name: "Антибиотики (пенициллины)", value: "Крапивница и кожный зуд" },
+  { name: "Antibiotics (Penicillins)", value: "Hives and skin itching" },
   {
-    name: "Нестероидные противовоспалительные средства (ибупрофен)",
-    value: "Отек и затрудненное дыхание",
+    name: "Non-steroidal Anti-inflammatory Drugs (Ibuprofen)",
+    value: "Swelling and difficulty breathing",
   },
   {
-    name: "Ингаляционные аллергены",
-    value: "Сезонные аллергии на цветение (пыльца амброзии)",
+    name: "Inhalation Allergens",
+    value: "Seasonal allergies to flowering (ragweed pollen)",
   },
   {
-    name: "Пищевые аллергены",
-    value: "Морепродукты: кожный зуд",
+    name: "Food Allergens",
+    value: "Seafood: skin itching",
   },
 ];
 
@@ -44,7 +44,7 @@ export const AllergiesInfo = (props: AllergiesInfoProps) => {
         ))}
       </AccordionDetails>
       <AccordionActions>
-        <Button>Редактировать</Button>
+        <Button>Edit</Button>
       </AccordionActions>
     </Accordion>
   );

@@ -53,22 +53,21 @@ export const StatusDetailsPage = () => {
     return (
       <Page>
         <article className={cls.document}>
-          <h1 className={cls.title}>Оценка рисков</h1>
+          <h1 className={cls.title}>Risk Assessment</h1>
           <section className={cls.content}>
             <div>
               <Divider textAlign="left" className={cls.divider}>
-                Сердечно-сосудистые заболевания
+                Cardiovascular Diseases
               </Divider>
               <p>
-                <span className={cls.sectionLabel}>Уровень рисков:</span>{" "}
-                Высокий
+                <span className={cls.sectionLabel}>Risk Level:</span> High
               </p>
               <p>
-                <span className={cls.sectionLabel}>Источник:</span> Модель
-                оценки рисков сердечно-сосудистых заболеваний
+                <span className={cls.sectionLabel}>Source:</span> Cardiovascular
+                Disease Risk Assessment Model
               </p>
               <p>
-                <span className={cls.sectionLabel}>Дата оценки:</span>{" "}
+                <span className={cls.sectionLabel}>Assessment Date:</span>{" "}
                 2024-11-15
               </p>
               <Button
@@ -77,30 +76,29 @@ export const StatusDetailsPage = () => {
                 variant="outlined"
                 size="large"
               >
-                Ручная оценка
+                Manual Assessment
               </Button>
               <RateForm
                 isOpen={isRateFormOpen}
                 onClose={closeRateForm}
-                title="Сердечно-сосудистые заболевания"
+                title="Cardiovascular Diseases"
                 defaultValue={75}
               />
             </div>
             <div>
               <Divider textAlign="left" className={cls.divider}>
-                Заболевания системы пищеварения
+                Digestive System Diseases
               </Divider>
               <p>
-                <span className={cls.sectionLabel}>Уровень рисков:</span>{" "}
-                Средний
+                <span className={cls.sectionLabel}>Risk Level:</span> Medium
               </p>
               <p>
-                <span className={cls.sectionLabel}>Источник:</span> Ручная
-                оценка. Обоснование: Стабильно высокий уровень дисфункций
-                желчного пузыря, сопровождаемый...
+                <span className={cls.sectionLabel}>Source:</span> Manual
+                Assessment. Justification: Consistently high level of
+                gallbladder dysfunction, accompanied by...
               </p>
               <p>
-                <span className={cls.sectionLabel}>Дата оценки:</span>{" "}
+                <span className={cls.sectionLabel}>Assessment Date:</span>{" "}
                 2024-11-15
               </p>
               <Button
@@ -109,22 +107,22 @@ export const StatusDetailsPage = () => {
                 variant="outlined"
                 size="large"
               >
-                Ручная оценка
+                Manual Assessment
               </Button>
             </div>
             <div>
               <Divider textAlign="left" className={cls.divider}>
-                Заболевания органов дыхания
+                Respiratory Diseases
               </Divider>
               <p>
-                <span className={cls.sectionLabel}>Уровень рисков:</span> Низкий
+                <span className={cls.sectionLabel}>Risk Level:</span> Low
               </p>
               <p>
-                <span className={cls.sectionLabel}>Источник:</span> Ручная
-                оценка. Обоснование: ...
+                <span className={cls.sectionLabel}>Source:</span> Manual
+                Assessment. Justification: ...
               </p>
               <p>
-                <span className={cls.sectionLabel}>Дата оценки:</span>{" "}
+                <span className={cls.sectionLabel}>Assessment Date:</span>{" "}
                 2024-11-15
               </p>
               <Button
@@ -133,7 +131,7 @@ export const StatusDetailsPage = () => {
                 variant="outlined"
                 size="large"
               >
-                Ручная оценка
+                Manual Assessment
               </Button>
             </div>
           </section>

@@ -13,23 +13,25 @@ import {
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 const data: HealthMeasurementData[] = [
-  { name: "Курение", value: "Курит с 20 лет, около 10 сигарет в день" },
   {
-    name: "Употребление алкоголя",
-    value: "Редкое, 1-2 раза в месяц, умеренные дозы",
+    name: "Smoking",
+    value: "Smokes since age 20, about 10 cigarettes per day",
   },
   {
-    name: "Физическая активность",
-    value: "Минимальная, прогулки 2-3 раза в неделю по 30 минут",
+    name: "Alcohol Consumption",
+    value: "Rare, 1-2 times per month, moderate doses",
   },
   {
-    name: "Режим сна",
-    value: "Нарушен, средняя продолжительность сна 5-6 часов",
+    name: "Physical Activity",
+    value: "Minimal, walks 2-3 times per week for 30 minutes",
   },
   {
-    name: "Питание",
-    value:
-      "Преобладание жирной пищи, недостаточное количество овощей и фруктов",
+    name: "Sleep Pattern",
+    value: "Disturbed, average sleep duration 5-6 hours",
+  },
+  {
+    name: "Diet",
+    value: "Predominance of fatty foods, insufficient vegetables and fruits",
   },
 ];
 
@@ -49,7 +51,7 @@ export const LifestyleInfo = (props: LifestyleInfoProps) => {
         ))}
       </AccordionDetails>
       <AccordionActions>
-        <Button>Редактировать</Button>
+        <Button>Edit</Button>
       </AccordionActions>
     </Accordion>
   );

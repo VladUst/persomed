@@ -14,53 +14,53 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 const data: HealthMeasurementData[] = [
   {
-    name: "Холестерин",
-    unit: "ммоль/л",
+    name: "Cholesterol",
+    unit: "mmol/L",
   },
   {
-    name: "Глюкоза",
+    name: "Glucose",
     value: "7.5",
-    unit: "ммоль/л",
+    unit: "mmol/L",
     date: "10-20-2024",
   },
   {
-    name: "Калий",
+    name: "Potassium",
     value: "3.0",
-    unit: "ммоль/л",
+    unit: "mmol/L",
     date: "10-20-2024",
   },
   {
-    name: "Витамин D",
+    name: "Vitamin D",
     value: "38",
-    unit: "нг/мл",
+    unit: "ng/mL",
     date: "10-20-2024",
   },
   {
-    name: "Триглицериды",
-    unit: "ммоль/л",
+    name: "Triglycerides",
+    unit: "mmol/L",
   },
   {
-    name: "Креатинин крови",
-    unit: "ммоль/л",
+    name: "Blood Creatinine",
+    unit: "mmol/L",
   },
   {
-    name: "Гликированный гемоглобин",
+    name: "Glycated Hemoglobin",
     unit: "%",
   },
   {
-    name: "Суточная протеинурия",
-    unit: "мг/сут",
+    name: "24-hour Proteinuria",
+    unit: "mg/day",
   },
   {
-    name: "pH артериальной крови",
+    name: "Arterial Blood pH",
     unit: "pH",
   },
   {
-    name: "Натрий крови",
-    unit: "ммоль/л",
+    name: "Blood Sodium",
+    unit: "mmol/L",
   },
   {
-    name: "Гематокрит",
+    name: "Hematocrit",
     unit: "%",
   },
   {
@@ -71,14 +71,14 @@ const data: HealthMeasurementData[] = [
   },
   {
     name: "PaO2",
-    unit: "мм. рт.ст.",
+    unit: "mmHg",
   },
   {
-    name: "Атеросклеротический стеноз любой артерии",
+    name: "Atherosclerotic Stenosis of Any Artery",
     unit: "%",
   },
   {
-    name: "Фракция выброса левого желудочка",
+    name: "Left Ventricular Ejection Fraction",
     unit: "%",
   },
 ];
@@ -98,7 +98,7 @@ export const DetailedInfo = (props: DetailedInfoProps) => {
         ))}
       </AccordionDetails>
       <AccordionActions>
-        <Button>Редактировать</Button>
+        <Button>Edit</Button>
       </AccordionActions>
     </Accordion>
   );

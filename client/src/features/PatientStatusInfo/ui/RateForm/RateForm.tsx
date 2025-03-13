@@ -13,29 +13,29 @@ interface RateFormProps {
 const rateMarks = [
   {
     value: 0,
-    label: "Неизвестно",
+    label: "Unknown",
   },
   {
     value: 25,
-    label: "Низкий",
+    label: "Low",
   },
   {
     value: 50,
-    label: "Средний",
+    label: "Medium",
   },
   {
     value: 75,
-    label: "Высокий",
+    label: "High",
   },
   {
     value: 100,
-    label: "Критический",
+    label: "Critical",
   },
 ];
 
 function valueToText(value: number) {
   const rate = rateMarks.find((rate) => rate.value === value);
-  return rate ? rate.label : "Неизвестно";
+  return rate ? rate.label : "Unknown";
 }
 
 export const RateForm = (props: RateFormProps) => {
@@ -56,13 +56,13 @@ export const RateForm = (props: RateFormProps) => {
         </Box>
         <TextField
           className={cls.input}
-          label="Обоснование"
+          label="Justification"
           variant="outlined"
           rows={2}
           multiline
         />
         <Button type="submit" variant="contained" size="large">
-          Сохранить
+          Save
         </Button>
       </form>
     </Modal>
