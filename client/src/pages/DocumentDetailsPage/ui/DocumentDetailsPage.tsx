@@ -5,12 +5,36 @@ import cls from "./DocumentDetailsPage.module.scss";
 import { Button, Divider } from "@mui/material";
 import PlagiarismIcon from "@mui/icons-material/Plagiarism";
 
-const document = {
+interface HistoryDocumentDetails {
+  title: string;
+  meta: HistoryDocumentMeta;
+  sections: HistoryDocumentSections;
+}
+
+interface HistoryDocumentMeta {
+  icdCode: string;
+  diagnosisDate: string;
+  doctor: string;
+  specialty: string;
+  nosology: string;
+  diseaseType: string;
+  clinicName: string;
+}
+
+interface HistoryDocumentSections {
+  anamnesis: string;
+  clinicalFindings: string;
+  diagnosis: string;
+  treatmentPlan: string;
+  conclusion: string;
+}
+
+const document: HistoryDocumentDetails = {
   title: "Артериальная гипертензия",
   meta: {
     icdCode: "I10",
     diagnosisDate: "2024-11-20",
-    physicianName: "Иванов Петр Сергеевич",
+    doctor: "Иванов Петр Сергеевич",
     specialty: "Терапевт",
     nosology: "Сердечно-сосудистые заболевания",
     diseaseType: "Хроническое",
@@ -57,7 +81,7 @@ const document = {
 const metaKeyMapper: Record<string, string> = {
   icdCode: "Код МКБ",
   diagnosisDate: "Дата постановки",
-  physicianName: "Врач",
+  doctor: "Врач",
   specialty: "Специальность",
   nosology: "Нозология",
   diseaseType: "Тип заболевания",

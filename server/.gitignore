@@ -1,5 +1,4 @@
 venv
-tasks.db
+persomed.db
 .idea
-.vscode
 __pycache__
