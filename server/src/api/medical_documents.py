@@ -115,9 +115,9 @@ async def get_analyzes_doc(id: str, session: AsyncSession = Depends(get_session)
     return item
 
 
-@analyzes_router.post("/", response_model=AnalyzesDoc, status_code=status.HTTP_201_CREATED, summary="Создать документ анализа")
+@analyzes_router.post("/", response_model=AnalyzesDoc, status_code=status.HTTP_201_CREATED, summary="Создать документ с результатами анализов")
 async def create_analyzes_doc(
-    data: Annotated[AnalyzesDocCreate, Depends()],
+    data: AnalyzesDocCreate,
     session: AsyncSession = Depends(get_session)
 ):
     """
@@ -202,9 +202,9 @@ async def get_other_doc(id: str, session: AsyncSession = Depends(get_session)):
     return item
 
 
-@other_router.post("/", response_model=OtherDoc, status_code=status.HTTP_201_CREATED, summary="Создать прочий документ")
+@other_router.post("/", response_model=OtherDoc, status_code=status.HTTP_201_CREATED, summary="Создать другой документ")
 async def create_other_doc(
-    data: Annotated[OtherDocCreate, Depends()],
+    data: OtherDocCreate,
     session: AsyncSession = Depends(get_session)
 ):
     """
@@ -289,9 +289,9 @@ async def get_diseases_history_doc(id: str, session: AsyncSession = Depends(get_
     return item
 
 
-@diseases_history_router.post("/", response_model=DiseasesHistoryDoc, status_code=status.HTTP_201_CREATED, summary="Создать документ истории болезни")
+@diseases_history_router.post("/", response_model=DiseasesHistoryDoc, status_code=status.HTTP_201_CREATED, summary="Создать документ с историей болезни")
 async def create_diseases_history_doc(
-    data: Annotated[DiseasesHistoryDocCreate, Depends()],
+    data: DiseasesHistoryDocCreate,
     session: AsyncSession = Depends(get_session)
 ):
     """
@@ -366,9 +366,10 @@ async def get_diseases_history_doc_details(document_id: str, session: AsyncSessi
     return item
 
 
-@diseases_history_router.post("/details", response_model=DiseasesHistoryDocDetails, status_code=status.HTTP_201_CREATED, summary="Создать детали документа истории болезни")
-async def create_diseases_history_doc_details(
-    data: Annotated[DiseasesHistoryDocDetailsCreate, Depends()],
+@diseases_history_router.post("/{document_id}/details", response_model=DiseasesHistoryDocDetails, status_code=status.HTTP_201_CREATED, summary="Добавить детали к истории болезни")
+async def add_diseases_history_details(
+    document_id: str,
+    data: DiseasesHistoryDocDetailsCreate,
     session: AsyncSession = Depends(get_session)
 ):
     """
@@ -395,23 +396,27 @@ async def create_diseases_history_doc_details(
     """
     # Проверяем, существует ли документ
     doc_repository = DiseasesHistoryDocRepository(session)
-    document = await doc_repository.get_by_id(data.document_id)
+    document = await doc_repository.get_by_id(document_id)
     if not document:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Документ истории болезни с ID {data.document_id} не найден"
+            detail=f"Документ истории болезни с ID {document_id} не найден"
         )
     
     # Проверяем, не существуют ли уже детали
     details_repository = DiseasesHistoryDocDetailsRepository(session)
-    existing_details = await details_repository.get_by_document_id(data.document_id)
+    existing_details = await details_repository.get_by_document_id(document_id)
     if existing_details:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail=f"Детали для документа истории болезни с ID {data.document_id} уже существуют"
+            detail=f"Детали для документа истории болезни с ID {document_id} уже существуют"
         )
     
-    return await details_repository.create(data.model_dump())
+    # Устанавливаем document_id из пути в данные
+    data_dict = data.model_dump()
+    data_dict["document_id"] = document_id
+    
+    return await details_repository.create(data_dict)
 
 
 @diseases_history_router.put("/{document_id}/details", response_model=DiseasesHistoryDocDetails, summary="Обновить детали документа истории болезни")
@@ -495,9 +500,9 @@ async def get_recommendations_doc(id: str, session: AsyncSession = Depends(get_s
     return item
 
 
-@recommendations_router.post("/", response_model=RecommendationsDoc, status_code=status.HTTP_201_CREATED, summary="Создать документ рекомендаций")
+@recommendations_router.post("/", response_model=RecommendationsDoc, status_code=status.HTTP_201_CREATED, summary="Создать документ с рекомендациями")
 async def create_recommendations_doc(
-    data: Annotated[RecommendationsDocCreate, Depends()],
+    data: RecommendationsDocCreate,
     session: AsyncSession = Depends(get_session)
 ):
     """

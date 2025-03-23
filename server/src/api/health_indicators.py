@@ -99,9 +99,9 @@ async def get_general_info(id: str, session: AsyncSession = Depends(get_session)
     return item
 
 
-@general_router.post("/", response_model=GeneralInfo, status_code=status.HTTP_201_CREATED, summary="Создать базовую информацию о здоровье")
+@general_router.post("/", response_model=GeneralInfo, status_code=status.HTTP_201_CREATED, summary="Создать общий показатель здоровья")
 async def create_general_info(
-    data: Annotated[GeneralInfoCreate, Depends()],
+    data: GeneralInfoCreate,
     session: AsyncSession = Depends(get_session)
 ):
     """
@@ -190,7 +190,7 @@ async def get_detailed_info(id: str, session: AsyncSession = Depends(get_session
 
 @detailed_router.post("/", response_model=DetailedInfo, status_code=status.HTTP_201_CREATED, summary="Создать лабораторное измерение")
 async def create_detailed_info(
-    data: Annotated[DetailedInfoCreate, Depends()],
+    data: DetailedInfoCreate,
     session: AsyncSession = Depends(get_session)
 ):
     """
@@ -284,9 +284,9 @@ async def get_preventive_info(id: str, session: AsyncSession = Depends(get_sessi
     return item
 
 
-@preventive_router.post("/", response_model=PreventiveInfo, status_code=status.HTTP_201_CREATED, summary="Создать запись о прививке/профилактике")
+@preventive_router.post("/", response_model=PreventiveInfo, status_code=status.HTTP_201_CREATED, summary="Создать профилактический показатель")
 async def create_preventive_info(
-    data: Annotated[PreventiveInfoCreate, Depends()],
+    data: PreventiveInfoCreate,
     session: AsyncSession = Depends(get_session)
 ):
     """
@@ -373,9 +373,9 @@ async def get_allergies_info(id: str, session: AsyncSession = Depends(get_sessio
     return item
 
 
-@allergies_router.post("/", response_model=AllergiesInfo, status_code=status.HTTP_201_CREATED, summary="Создать запись об аллергии")
+@allergies_router.post("/", response_model=AllergiesInfo, status_code=status.HTTP_201_CREATED, summary="Создать информацию об аллергии")
 async def create_allergies_info(
-    data: Annotated[AllergiesInfoCreate, Depends()],
+    data: AllergiesInfoCreate,
     session: AsyncSession = Depends(get_session)
 ):
     """
@@ -462,9 +462,9 @@ async def get_family_history_info(id: str, session: AsyncSession = Depends(get_s
     return item
 
 
-@family_history_router.post("/", response_model=FamilyHistoryInfo, status_code=status.HTTP_201_CREATED, summary="Создать запись о семейном анамнезе")
+@family_history_router.post("/", response_model=FamilyHistoryInfo, status_code=status.HTTP_201_CREATED, summary="Создать информацию о семейном анамнезе")
 async def create_family_history_info(
-    data: Annotated[FamilyHistoryInfoCreate, Depends()],
+    data: FamilyHistoryInfoCreate,
     session: AsyncSession = Depends(get_session)
 ):
     """
@@ -551,9 +551,9 @@ async def get_lifestyle_info(id: str, session: AsyncSession = Depends(get_sessio
     return item
 
 
-@lifestyle_router.post("/", response_model=LifestyleInfo, status_code=status.HTTP_201_CREATED, summary="Создать запись об образе жизни")
+@lifestyle_router.post("/", response_model=LifestyleInfo, status_code=status.HTTP_201_CREATED, summary="Создать информацию об образе жизни")
 async def create_lifestyle_info(
-    data: Annotated[LifestyleInfoCreate, Depends()],
+    data: LifestyleInfoCreate,
     session: AsyncSession = Depends(get_session)
 ):
     """
