@@ -1,7 +1,7 @@
 import { HealthIndicatorCard } from "@/entities/HealthIndicator";
 import { useState } from "react";
 import { IndicatorChart } from "../IndicatorChart/IndicatorChart";
-import { IndicatorForm } from "../../../IndicatorForm/IndicatorForm";
+import { IndicatorForm } from "../../../IndicatorForm/ui/IndicatorForm";
 import { type HealthMeasurementData } from "@/entities/HealthMeasurement";
 
 interface InteractiveIndicatorCardProps {
