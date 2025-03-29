@@ -3,29 +3,36 @@
     top: 50%;
     left: 50%;
     display: flex;
-    width: 600px;
+    width: 500px;
     flex-direction: column;
-    align-items: center;
-    padding: 40px;
+    padding: 25px;
     border-radius: 10px;
-    background-color: var(--inverted-bg-color);
-
-    h2 {
-        font-weight: 700;
-    }
-
-    gap: 20px;
+    background-color: #fff;
+    gap: 15px;
     transform: translate(-50%, -50%);
+}
+
+.input {
+    width: 100%;
+}
+
+.inputWithTooltip {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    gap: 8px;
 
     .input {
-        width: 80%;
+        flex-grow: 1;
     }
+}
 
-    .horizontalWrapper {
-        display: flex;
-        width: 80%;
-        align-items: center;
-        justify-content: space-between;
-        gap: 20px;
-    }
+.horizontalWrapper {
+    display: flex;
+    margin-top: 10px;
+    gap: 15px;
+}
+
+.btn {
+    margin-top: 15px;
 }

@@ -11,8 +11,10 @@ import {
   Button,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { useState } from "react";
+import { IndicatorForm } from "@/features/IndicatorForm";
 
-const data: HealthMeasurementData[] = [
+const initialData: HealthMeasurementData[] = [
   {
     id: "1",
     name: "Противогриппозная вакцина",
@@ -46,19 +48,71 @@ interface PreventiveInfioProps {
 }
 
 export const PreventiveInfio = (props: PreventiveInfioProps) => {
+  const [data, setData] = useState<HealthMeasurementData[]>(initialData);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [selectedIndicator, setSelectedIndicator] = useState<
+    HealthMeasurementData | undefined
+  >(undefined);
+
+  const handleOpenForm = () => {
+    setSelectedIndicator(undefined);
+    setIsFormOpen(true);
+  };
+
+  const handleCloseForm = () => {
+    setIsFormOpen(false);
+    setSelectedIndicator(undefined);
+  };
+
+  const handleEdit = (indicator: HealthMeasurementData) => {
+    setSelectedIndicator(indicator);
+    setIsFormOpen(true);
+  };
+
+  const handleDelete = (id: string) => {
+    setData(data.filter((item) => item.id !== id));
+  };
+
+  const handleSave = (indicator: HealthMeasurementData) => {
+    if (selectedIndicator) {
+      // Update existing indicator
+      setData(
+        data.map((item) => (item.id === indicator.id ? indicator : item)),
+      );
+    } else {
+      // Add new indicator
+      setData([...data, { ...indicator, id: String(Date.now()) }]);
+    }
+    handleCloseForm();
+  };
+
   return (
-    <Accordion>
-      <AccordionSummary className={cls.title} expandIcon={<ExpandMoreIcon />}>
-        Вакцинации и профилактические мероприятия
-      </AccordionSummary>
-      <AccordionDetails className={cls.content}>
-        {data.map((measurement) => (
-          <HealthMeasurement data={measurement} key={measurement.name} />
-        ))}
-      </AccordionDetails>
-      <AccordionActions>
-        <Button>Редактировать</Button>
-      </AccordionActions>
-    </Accordion>
+    <>
+      <Accordion>
+        <AccordionSummary className={cls.title} expandIcon={<ExpandMoreIcon />}>
+          Вакцинации и профилактические мероприятия
+        </AccordionSummary>
+        <AccordionDetails className={cls.content}>
+          {data.map((measurement) => (
+            <HealthMeasurement
+              data={measurement}
+              key={measurement.id}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
+          ))}
+        </AccordionDetails>
+        <AccordionActions>
+          <Button onClick={handleOpenForm}>Добавить</Button>
+        </AccordionActions>
+      </Accordion>
+
+      <IndicatorForm
+        isOpen={isFormOpen}
+        onClose={handleCloseForm}
+        indicatorData={selectedIndicator}
+        onSave={handleSave}
+      />
+    </>
   );
 };
