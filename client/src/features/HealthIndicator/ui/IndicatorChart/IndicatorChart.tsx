@@ -11,8 +11,8 @@ import {
 } from "recharts";
 import { classNames } from "@/shared/lib/classNames";
 import { useState } from "react";
-import type { HealthIndicator } from "@/entities/HealthIndicator";
 import { getMeasurment } from "@/entities/HealthIndicator";
+import { type HealthMeasurementData } from "@/entities/HealthMeasurement";
 
 const data = [
   {
@@ -39,7 +39,7 @@ const data = [
 
 interface IndicatorChartProps {
   className?: string;
-  indicatorData: HealthIndicator;
+  indicatorData: HealthMeasurementData;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -59,7 +59,8 @@ export const IndicatorChart = (props: IndicatorChartProps) => {
           <h2>{indicatorData.name}</h2>
           {getMeasurment(
             indicatorData.unit,
-            indicatorData.targetLevel,
+            indicatorData.targetLevelMin,
+            indicatorData.targetLevelMax,
             indicatorData.value,
           )}
         </div>
@@ -82,12 +83,12 @@ export const IndicatorChart = (props: IndicatorChartProps) => {
           {isLevelsVisible && (
             <>
               <ReferenceLine
-                y={indicatorData.targetLevel[1]}
+                y={indicatorData.targetLevelMax}
                 label="Max"
                 stroke="red"
               />
               <ReferenceLine
-                y={indicatorData.targetLevel[0]}
+                y={indicatorData.targetLevelMin}
                 label="Min"
                 stroke="red"
               />

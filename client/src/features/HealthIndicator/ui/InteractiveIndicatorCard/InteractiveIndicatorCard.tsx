@@ -1,14 +1,13 @@
-import type { HealthIndicator } from "@/entities/HealthIndicator";
-
 import { HealthIndicatorCard } from "@/entities/HealthIndicator";
 import { useState } from "react";
 import { IndicatorChart } from "../IndicatorChart/IndicatorChart";
-import { IndicatorForm } from "../IndicatorForm/IndicatorForm";
+import { IndicatorForm } from "../../../IndicatorForm/IndicatorForm";
+import { type HealthMeasurementData } from "@/entities/HealthMeasurement";
 
 interface InteractiveIndicatorCardProps {
   className?: string;
   icon: React.FunctionComponent<React.SVGAttributes<SVGElement>>;
-  data: HealthIndicator;
+  data: HealthMeasurementData;
 }
 
 export const InteractiveIndicatorCard = (

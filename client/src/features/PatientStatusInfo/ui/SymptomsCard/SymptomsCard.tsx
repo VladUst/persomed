@@ -24,7 +24,7 @@ export const SymptomsCard = (props: SymptomsCardProps) => {
   return (
     <PatientStatusCard
       icon={EyeIcon}
-      id={"1"}
+      id="symptoms"
       title="Симптомы"
       className={className}
       variant={PatientStatusCardVariant.ORANGE}

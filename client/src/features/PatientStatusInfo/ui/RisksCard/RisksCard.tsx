@@ -33,7 +33,7 @@ export const RisksCard = (props: RisksCardProps) => {
   return (
     <PatientStatusCard
       icon={FireIcon}
-      id="5"
+      id="risks"
       title="Факторы риска"
       className={className}
       variant={PatientStatusCardVariant.RED}

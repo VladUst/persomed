@@ -22,7 +22,7 @@ export const SuspicionsCard = (props: SuspicionsCardProps) => {
   return (
     <PatientStatusCard
       icon={SearchIcon}
-      id="4"
+      id="suspicions"
       title="Подозрения"
       className={className}
       variant={PatientStatusCardVariant.RED}

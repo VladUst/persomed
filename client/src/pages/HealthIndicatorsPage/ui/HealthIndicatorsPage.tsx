@@ -1,24 +1,26 @@
 import { Page } from "@/widgets/Page";
 import cls from "./HealthIndicatorsPage.module.scss";
-import type { HealthIndicator } from "@/entities/HealthIndicator";
 import HeartPulseIcon from "@/shared/assets/icons/heart-pulse.svg";
 import {
   AddIndicatorCard,
   InteractiveIndicatorCard,
 } from "@/features/HealthIndicator";
+import { type HealthMeasurementData } from "@/entities/HealthMeasurement";
 
-const healthIndicators: HealthIndicator[] = [
+const healthIndicators: HealthMeasurementData[] = [
   {
     id: "1",
     name: "Холестерин",
-    targetLevel: [3.6, 5.2],
+    targetLevelMin: 3.6,
+    targetLevelMax: 5.2,
     unit: "ммоль/л",
   },
   {
     id: "2",
     name: "Индекс массы тела",
     value: "24.2",
-    targetLevel: [18.5, 24.9],
+    targetLevelMin: 18.5,
+    targetLevelMax: 24.9,
     date: "10-20-2024",
     unit: "кг/м3",
     targetReached: true,
@@ -27,7 +29,8 @@ const healthIndicators: HealthIndicator[] = [
     id: "3",
     name: "Артериальное давление",
     value: "160/100",
-    targetLevel: [120, 80],
+    targetLevelMin: 120,
+    targetLevelMax: 80,
     date: "10-20-2024",
     unit: "мм рт.ст.",
     targetReached: false,
@@ -36,7 +39,8 @@ const healthIndicators: HealthIndicator[] = [
     id: "4",
     name: "Частота сердечных сокращений",
     value: "90",
-    targetLevel: [60, 80],
+    targetLevelMin: 60,
+    targetLevelMax: 80,
     date: "10-20-2024",
     unit: "уд/мин",
     targetReached: false,
@@ -45,7 +49,8 @@ const healthIndicators: HealthIndicator[] = [
     id: "5",
     name: "Глюкоза",
     value: "7.5",
-    targetLevel: [3.9, 5.6],
+    targetLevelMin: 3.9,
+    targetLevelMax: 5.6,
     date: "10-20-2024",
     unit: "ммоль/л",
     targetReached: false,
@@ -54,7 +59,8 @@ const healthIndicators: HealthIndicator[] = [
     id: "6",
     name: "Калий",
     value: "3.0",
-    targetLevel: [3.5, 5.1],
+    targetLevelMin: 3.5,
+    targetLevelMax: 5.1,
     date: "10-20-2024",
     unit: "ммоль/л",
     targetReached: false,
@@ -63,7 +69,8 @@ const healthIndicators: HealthIndicator[] = [
     id: "7",
     name: "Витамин D",
     value: "38",
-    targetLevel: [20, 50],
+    targetLevelMin: 20,
+    targetLevelMax: 50,
     date: "10-20-2024",
     unit: "нг/мл",
     targetReached: true,
@@ -72,7 +79,8 @@ const healthIndicators: HealthIndicator[] = [
     id: "8",
     name: "SpO2",
     value: "98",
-    targetLevel: [95, 100],
+    targetLevelMin: 95,
+    targetLevelMax: 100,
     date: "10-20-2024",
     unit: "%",
     targetReached: true,

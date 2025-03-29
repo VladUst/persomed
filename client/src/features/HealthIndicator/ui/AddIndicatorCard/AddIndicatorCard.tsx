@@ -2,7 +2,7 @@ import { classNames } from "@/shared/lib/classNames";
 import cls from "./AddIndicatorCard.module.scss";
 import { Icon } from "@/shared/ui/Icon";
 import AddIcon from "@/shared/assets/icons/add.svg";
-import { IndicatorForm } from "../IndicatorForm/IndicatorForm";
+import { IndicatorForm } from "../../../IndicatorForm/IndicatorForm";
 import { useState } from "react";
 
 interface AddIndicatorCardProps {

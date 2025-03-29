@@ -51,7 +51,7 @@ export const RateCard = (props: RateCardProps) => {
   return (
     <PatientStatusCard
       icon={WarnIcon}
-      id="3"
+      id="rates"
       title="Оценка рисков"
       className={className}
       variant={PatientStatusCardVariant.ORANGE}

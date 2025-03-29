@@ -1,4 +1,3 @@
-export type { HealthIndicator } from "./model/types/HealthIndicator";
 export {
   HealthIndicatorCard,
   getMeasurment,

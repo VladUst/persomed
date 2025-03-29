@@ -1,16 +1,16 @@
 import { Button, Divider, Modal, TextField } from "@mui/material";
 import cls from "./IndicatorForm.module.scss";
 import { classNames } from "@/shared/lib/classNames";
-import type { HealthIndicator } from "@/entities/HealthIndicator";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import type { Dayjs } from "dayjs";
 import { useState } from "react";
 import dayjs from "dayjs";
+import { type HealthMeasurementData } from "@/entities/HealthMeasurement";
 
 interface IndicatorFormProps {
   className?: string;
-  indicatorData?: HealthIndicator;
+  indicatorData?: HealthMeasurementData;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -23,10 +23,10 @@ export const IndicatorForm = (props: IndicatorFormProps) => {
   const [unit, setUnit] = useState(indicatorData?.unit);
   const [date, setDate] = useState<Dayjs | null>(dayjs(indicatorData?.date));
   const [minTargetLevel, setMinTargetLevel] = useState<number>(
-    indicatorData?.targetLevel ? indicatorData.targetLevel[0] : 0,
+    indicatorData?.targetLevelMin ? indicatorData.targetLevelMin : 0,
   );
   const [maxTargetLevel, setMaxTargetLevel] = useState(
-    indicatorData?.targetLevel ? indicatorData.targetLevel[1] : 0,
+    indicatorData?.targetLevelMax ? indicatorData.targetLevelMax : 0,
   );
 
   return (

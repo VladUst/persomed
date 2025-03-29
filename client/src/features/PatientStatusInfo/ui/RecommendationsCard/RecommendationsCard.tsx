@@ -36,7 +36,7 @@ export const RecommendationsCard = (props: RecommendationsCardProps) => {
   return (
     <PatientStatusCard
       icon={PencilIcon}
-      id="7"
+      id="recommendations"
       title="Рекомендации"
       className={className}
       variant={PatientStatusCardVariant.GREEN}

@@ -1,33 +1,15 @@
 .document {
     display: flex;
-    flex-direction: column;
-    padding: 20px;
-    border-radius: 20px;
-    background-color: var(--inverted-bg-color);
-    box-shadow: -8px 12px 18px 0 #dadee8;
-    gap: 20px;
+    width: 100vw;
+    height: 100vh;
+    align-items: center;
+    justify-content: center;
 
-    .title {
-        text-align: center;
+    .message {
+        padding: 20px;
+        border-radius: 20px;
+        background-color: var(--inverted-bg-color);
+        box-shadow: -8px 12px 18px 0 #dadee8;
     }
-
-    .sectionLabel {
-        font-weight: 700;
-    }
-
-    .content {
-        display: flex;
-        flex-direction: column;
-        gap: 30px;
-    }
-
-    .divider {
-        margin-bottom: 10px;
-        font: var(--font-m);
-        font-weight: 700;
-    }
-
-    .btn {
-        margin-top: 20px;
-    }
+    
 }

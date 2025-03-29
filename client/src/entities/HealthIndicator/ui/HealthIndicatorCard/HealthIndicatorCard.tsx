@@ -1,29 +1,29 @@
 import { classNames } from "@/shared/lib/classNames";
-import type { HealthIndicator } from "../../model/types/HealthIndicator";
 import cls from "./HealthIndicatorCard.module.scss";
 import { Icon } from "@/shared/ui/Icon";
 import EditIcon from "@/shared/assets/icons/edit.svg";
 import ChartIcon from "@/shared/assets/icons/chart.svg";
 import { IconButton } from "@mui/material";
-
+import { type HealthMeasurementData } from "@/entities/HealthMeasurement";
 interface HealthIndicatorCardProps {
   className?: string;
   icon: React.FunctionComponent<React.SVGAttributes<SVGElement>>;
-  data: HealthIndicator;
+  data: HealthMeasurementData;
   onShowChart?: () => void;
   onShowForm?: () => void;
 }
 
 export const getMeasurment = (
-  unit: string,
-  targetLevel: [number, number],
+  unit?: string,
+  targetLevelMin?: number,
+  targetLevelMax?: number,
   value?: string,
 ) => {
   if (!value) {
     return <p>Нет данных</p>;
   }
   const val = parseInt(value);
-  if (val >= targetLevel[0] && val <= targetLevel[1]) {
+  if (val >= targetLevelMin! && val <= targetLevelMax!) {
     return (
       <p className={cls.success}>
         {value} {unit}
@@ -66,7 +66,12 @@ export const HealthIndicatorCard = (props: HealthIndicatorCardProps) => {
         </div>
       </div>
       <div className={cls.content}>
-        {getMeasurment(data.unit, data.targetLevel, data.value)}
+        {getMeasurment(
+          data.unit,
+          data.targetLevelMin,
+          data.targetLevelMax,
+          data.value,
+        )}
       </div>
       <div className={cls.footer}>
         <div className={cls.date}>
@@ -76,7 +81,7 @@ export const HealthIndicatorCard = (props: HealthIndicatorCardProps) => {
         <div className={cls.target}>
           <span className={cls.label}>Целевой уровень</span>
           <span>
-            {data.targetLevel[0]}-{data.targetLevel[1]}
+            {data.targetLevelMin}-{data.targetLevelMax}
           </span>
         </div>
       </div>
