@@ -2,32 +2,44 @@ from typing import List, Optional
 from pydantic import BaseModel, Field
 
 
-# Base schemas for health indicators with common fields
+# Base health indicator model
 class HealthIndicatorBase(BaseModel):
-    name: str = Field(description="Indicator name")
-    orig_name: str = Field(description="Original indicator name")
-    value: Optional[str] = Field(None, description="Indicator value")
-    unit: Optional[str] = Field(None, description="Measurement unit")
-    date: Optional[str] = Field(None, description="Date of measurement")
+    name: str = Field(description="Название показателя")
+    canonical_name: Optional[str] = Field(None, description="Каноническое название показателя")
+    value: str = Field(description="Значение показателя")
+    unit: Optional[str] = Field(None, description="Единица измерения")
+    date: Optional[str] = Field(None, description="Дата измерения")
+    target_level_min: Optional[float] = Field(None, description="Минимальное целевое значение")
+    target_level_max: Optional[float] = Field(None, description="Максимальное целевое значение")
 
 
-class HealthIndicatorCreate(HealthIndicatorBase):
-    pass
-
-
-class HealthIndicator(HealthIndicatorBase):
-    id: int = Field(description="Unique identifier")
+# Base health indicator for responses
+class HealthIndicatorResponse(HealthIndicatorBase):
+    id: int
+    target_reached: Optional[bool] = None
     
     class Config:
         from_attributes = True
 
 
-# Detailed info with additional fields
-class DetailedInfoBase(HealthIndicatorBase):
-    unit: str = Field(description="Measurement unit")
-    value: Optional[float] = Field(None, description="Indicator value")
-    target_level_min: float = Field(description="Minimum target level")
-    target_level_max: float = Field(description="Maximum target level")
+# General info
+class GeneralInfoCreate(HealthIndicatorBase):
+    pass
+
+
+class GeneralInfo(HealthIndicatorResponse):
+    pass
+
+
+# Detailed info with special value field
+class DetailedInfoBase(BaseModel):
+    name: str = Field(description="Название показателя")
+    canonical_name: Optional[str] = Field(None, description="Каноническое название показателя")
+    value: float = Field(description="Числовое значение показателя")
+    unit: Optional[str] = Field(None, description="Единица измерения")
+    date: Optional[str] = Field(None, description="Дата измерения")
+    target_level_min: Optional[float] = Field(None, description="Минимальное целевое значение")
+    target_level_max: Optional[float] = Field(None, description="Максимальное целевое значение")
 
 
 class DetailedInfoCreate(DetailedInfoBase):
@@ -35,49 +47,44 @@ class DetailedInfoCreate(DetailedInfoBase):
 
 
 class DetailedInfo(DetailedInfoBase):
-    id: int = Field(description="Unique identifier")
-    target_reached: Optional[bool] = Field(None, description="Whether target level is reached")
+    id: int
+    target_reached: Optional[bool] = None
     
     class Config:
         from_attributes = True
 
 
-# Specific schemas for each health indicator type
-class GeneralInfoCreate(HealthIndicatorCreate):
+# Preventive info
+class PreventiveInfoCreate(HealthIndicatorBase):
     pass
 
 
-class GeneralInfo(HealthIndicator):
+class PreventiveInfo(HealthIndicatorResponse):
     pass
 
 
-class PreventiveInfoCreate(HealthIndicatorCreate):
+# Allergies info
+class AllergiesInfoCreate(HealthIndicatorBase):
     pass
 
 
-class PreventiveInfo(HealthIndicator):
+class AllergiesInfo(HealthIndicatorResponse):
     pass
 
 
-class AllergiesInfoCreate(HealthIndicatorCreate):
+# Family history info
+class FamilyHistoryInfoCreate(HealthIndicatorBase):
     pass
 
 
-class AllergiesInfo(HealthIndicator):
+class FamilyHistoryInfo(HealthIndicatorResponse):
     pass
 
 
-class FamilyHistoryInfoCreate(HealthIndicatorCreate):
+# Lifestyle info
+class LifestyleInfoCreate(HealthIndicatorBase):
     pass
 
 
-class FamilyHistoryInfo(HealthIndicator):
-    pass
-
-
-class LifestyleInfoCreate(HealthIndicatorCreate):
-    pass
-
-
-class LifestyleInfo(HealthIndicator):
+class LifestyleInfo(HealthIndicatorResponse):
     pass 

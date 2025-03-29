@@ -5,73 +5,45 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.database import Model
 
 
-class GeneralInfo(Model):
-    __tablename__ = "general_info"
-    
+# Базовый класс только для общих полей, не будет создавать таблицу
+class HealthIndicatorBase:
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String)
-    orig_name: Mapped[str] = mapped_column(String)
-    value: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    canonical_name: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    value: Mapped[str] = mapped_column(String)
     unit: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     date: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    target_level_min: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    target_level_max: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    target_reached: Mapped[Optional[bool]] = mapped_column(Boolean, nullable=True)
 
 
-class DetailedInfo(Model):
+# Конкретные реализации для каждого типа показателя
+class GeneralInfo(Model, HealthIndicatorBase):
+    __tablename__ = "general_info"
+
+
+class DetailedInfo(Model, HealthIndicatorBase):
     __tablename__ = "detailed_info"
     
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    name: Mapped[str] = mapped_column(String)
-    orig_name: Mapped[str] = mapped_column(String)
-    unit: Mapped[str] = mapped_column(String)
-    value: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
-    date: Mapped[Optional[str]] = mapped_column(String, nullable=True)
-    target_reached: Mapped[Optional[bool]] = mapped_column(Boolean, nullable=True)
-    target_level_min: Mapped[float] = mapped_column(Float)
-    target_level_max: Mapped[float] = mapped_column(Float)
+    # Переопределяем поле value для DetailedInfo как float
+    value: Mapped[float] = mapped_column(Float)
 
 
-class PreventiveInfo(Model):
+class PreventiveInfo(Model, HealthIndicatorBase):
     __tablename__ = "preventive_info"
-    
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    name: Mapped[str] = mapped_column(String)
-    orig_name: Mapped[str] = mapped_column(String)
-    value: Mapped[Optional[str]] = mapped_column(String, nullable=True)
-    unit: Mapped[Optional[str]] = mapped_column(String, nullable=True)
-    date: Mapped[Optional[str]] = mapped_column(String, nullable=True)
 
 
-class AllergiesInfo(Model):
+class AllergiesInfo(Model, HealthIndicatorBase):
     __tablename__ = "allergies_info"
-    
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    name: Mapped[str] = mapped_column(String)
-    orig_name: Mapped[str] = mapped_column(String)
-    value: Mapped[Optional[str]] = mapped_column(String, nullable=True)
-    unit: Mapped[Optional[str]] = mapped_column(String, nullable=True)
-    date: Mapped[Optional[str]] = mapped_column(String, nullable=True)
 
 
-class FamilyHistoryInfo(Model):
+class FamilyHistoryInfo(Model, HealthIndicatorBase):
     __tablename__ = "family_history_info"
-    
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    name: Mapped[str] = mapped_column(String)
-    orig_name: Mapped[str] = mapped_column(String)
-    value: Mapped[Optional[str]] = mapped_column(String, nullable=True)
-    unit: Mapped[Optional[str]] = mapped_column(String, nullable=True)
-    date: Mapped[Optional[str]] = mapped_column(String, nullable=True)
 
 
-class LifestyleInfo(Model):
+class LifestyleInfo(Model, HealthIndicatorBase):
     __tablename__ = "lifestyle_info"
-    
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    name: Mapped[str] = mapped_column(String)
-    orig_name: Mapped[str] = mapped_column(String)
-    value: Mapped[Optional[str]] = mapped_column(String, nullable=True)
-    unit: Mapped[Optional[str]] = mapped_column(String, nullable=True)
-    date: Mapped[Optional[str]] = mapped_column(String, nullable=True)
 
 
  

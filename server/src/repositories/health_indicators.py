@@ -1,80 +1,108 @@
+from typing import List, Dict, Any, Optional, Type
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 
 from src.models import (
-    GeneralInfo, 
-    DetailedInfo, 
-    PreventiveInfo, 
-    AllergiesInfo, 
-    FamilyHistoryInfo, 
+    GeneralInfo,
+    DetailedInfo,
+    PreventiveInfo,
+    AllergiesInfo,
+    FamilyHistoryInfo,
     LifestyleInfo
 )
 from src.repositories.base_repository import BaseRepository
 
 
-class GeneralInfoRepository(BaseRepository[GeneralInfo]):
-    def __init__(self, session: AsyncSession):
-        super().__init__(session, GeneralInfo)
-
-
-class DetailedInfoRepository(BaseRepository[DetailedInfo]):
-    def __init__(self, session: AsyncSession):
-        super().__init__(session, DetailedInfo)
+class HealthIndicatorRepository(BaseRepository):
+    """
+    Базовый класс репозитория для показателей здоровья
+    """
     
-    async def create(self, data: dict) -> DetailedInfo:
-        # Вычисляем target_reached на основе value и диапазона
-        data["target_reached"] = self._calculate_target_reached(
-            data.get("value"), 
-            data.get("target_level_min"), 
-            data.get("target_level_max")
-        )
+    def _calculate_target_reached(self, data: Dict[str, Any]) -> Optional[bool]:
+        """
+        Рассчитывает достижение целевого показателя на основе данных.
+        
+        Возвращает:
+            - True, если value в пределах [target_level_min, target_level_max]
+            - False, если value вне пределов или невозможно определить
+            - None, если необходимые значения отсутствуют
+        """
+        value = data.get('value')
+        target_min = data.get('target_level_min')
+        target_max = data.get('target_level_max')
+        
+        # Если нет целевых показателей, результат неопределен
+        if target_min is None or target_max is None:
+            return None
+        
+        try:
+            # Для DetailedInfo value уже float, для других типов нужно преобразовать
+            if isinstance(value, (int, float)):
+                float_value = float(value)
+            else:
+                float_value = float(value)
+            
+            return target_min <= float_value <= target_max
+        except (ValueError, TypeError):
+            return False
+    
+    async def create(self, data: Dict[str, Any]) -> Any:
+        """
+        Создает новую запись с расчетом target_reached
+        """
+        # Расчет target_reached
+        target_reached = self._calculate_target_reached(data)
+        if target_reached is not None:
+            data['target_reached'] = target_reached
+        
         return await super().create(data)
     
-    async def update(self, id: int, data: dict) -> DetailedInfo:
-        # Если обновляется value или границы диапазона, пересчитываем target_reached
-        if "value" in data or "target_level_min" in data or "target_level_max" in data:
-            # Получаем текущий объект, чтобы иметь полные данные для расчета
-            current_item = await self.get_by_id(id)
-            if current_item:
-                # Определяем значения для расчета (новые или текущие)
-                value = data.get("value", current_item.value)
-                target_min = data.get("target_level_min", current_item.target_level_min)
-                target_max = data.get("target_level_max", current_item.target_level_max)
-                
-                # Вычисляем target_reached
-                data["target_reached"] = self._calculate_target_reached(value, target_min, target_max)
+    async def update(self, id: str, data: Dict[str, Any]) -> Any:
+        """
+        Обновляет запись с перерасчетом target_reached
+        """
+        # Получаем существующую запись
+        item = await self.get_by_id(id)
+        if not item:
+            return None
+        
+        # Объединяем существующие данные с новыми для полного расчета
+        full_data = item.__dict__.copy()
+        full_data.update(data)
+        
+        # Пересчитываем target_reached
+        target_reached = self._calculate_target_reached(full_data)
+        if target_reached is not None:
+            data['target_reached'] = target_reached
         
         return await super().update(id, data)
-    
-    def _calculate_target_reached(self, value, target_min, target_max):
-        """
-        Вычисляет target_reached на основе значения и диапазона.
-        
-        - Если value не определено, возвращает False
-        - Если value определено и находится в диапазоне [target_min, target_max], возвращает True
-        - Иначе возвращает False
-        """
-        if value is None:
-            return False
-            
-        # Значение уже является float, поэтому преобразовывать не нужно
-        return target_min <= value <= target_max
 
 
-class PreventiveInfoRepository(BaseRepository[PreventiveInfo]):
+class GeneralInfoRepository(HealthIndicatorRepository):
     def __init__(self, session: AsyncSession):
-        super().__init__(session, PreventiveInfo)
+        super().__init__(GeneralInfo, session)
 
 
-class AllergiesInfoRepository(BaseRepository[AllergiesInfo]):
+class DetailedInfoRepository(HealthIndicatorRepository):
     def __init__(self, session: AsyncSession):
-        super().__init__(session, AllergiesInfo)
+        super().__init__(DetailedInfo, session)
 
 
-class FamilyHistoryInfoRepository(BaseRepository[FamilyHistoryInfo]):
+class PreventiveInfoRepository(HealthIndicatorRepository):
     def __init__(self, session: AsyncSession):
-        super().__init__(session, FamilyHistoryInfo)
+        super().__init__(PreventiveInfo, session)
 
 
-class LifestyleInfoRepository(BaseRepository[LifestyleInfo]):
+class AllergiesInfoRepository(HealthIndicatorRepository):
     def __init__(self, session: AsyncSession):
-        super().__init__(session, LifestyleInfo) 
+        super().__init__(AllergiesInfo, session)
+
+
+class FamilyHistoryInfoRepository(HealthIndicatorRepository):
+    def __init__(self, session: AsyncSession):
+        super().__init__(FamilyHistoryInfo, session)
+
+
+class LifestyleInfoRepository(HealthIndicatorRepository):
+    def __init__(self, session: AsyncSession):
+        super().__init__(LifestyleInfo, session) 
