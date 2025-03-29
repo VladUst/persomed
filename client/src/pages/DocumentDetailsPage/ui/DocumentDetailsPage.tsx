@@ -1,9 +1,10 @@
 import { Page } from "@/widgets/Page";
-import { useEffect } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import cls from "./DocumentDetailsPage.module.scss";
 import { Button, Divider } from "@mui/material";
 import PlagiarismIcon from "@mui/icons-material/Plagiarism";
+import { MedicalTermsHighlighter } from "@/features/MedicalTermsHighlighter";
 
 interface HistoryDocumentDetails {
   title: string;
@@ -42,8 +43,7 @@ const document: HistoryDocumentDetails = {
   },
   sections: {
     anamnesis: `
-      Пациент обратился с жалобами на периодические головные боли, учащенное сердцебиение, 
-      повышенное давление до 160/100 мм рт. ст., ощущение усталости. 
+      Пациент обратился с жалобами на периодические головные боли, учащенное сердцебиение, повышенное давление до 160/100 мм рт. ст., ощущение усталости. 
       История болезни: гипертония у пациента диагностирована впервые 5 лет назад. 
       Семейный анамнез отягощен: у отца и матери артериальная гипертензия.
       Обострение состояния отмечается на фоне стрессов и нерегулярного образа жизни.
@@ -98,9 +98,16 @@ const sectionKeyMapper: Record<string, string> = {
 
 export const DocumentDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
+  const [isHighlightingActive, setIsHighlightingActive] = useState(false);
+
   useEffect(() => {
     console.log(id);
   }, [id]);
+
+  // Convert sections to Record<string, string> for MedicalTermsHighlighter
+  const sectionsRecord = useMemo<Record<string, string>>(() => {
+    return document.sections as unknown as Record<string, string>;
+  }, []);
 
   const renderMeta = () => (
     <ul>
@@ -124,19 +131,36 @@ export const DocumentDetailsPage = () => {
         <p>{value}</p>
       </div>
     ));
+
+  const toggleHighlighting = () => {
+    setIsHighlightingActive((prev) => !prev);
+  };
+
   return (
     <Page>
       <article className={cls.document}>
         <h1 className={cls.title}>{document.title}</h1>
         <section>{renderMeta()}</section>
-        <section className={cls.content}>{renderSections()}</section>
+        <section className={cls.content}>
+          {isHighlightingActive ? (
+            <MedicalTermsHighlighter
+              sections={sectionsRecord}
+              sectionTitles={sectionKeyMapper}
+              isActive={isHighlightingActive}
+            />
+          ) : (
+            renderSections()
+          )}
+        </section>
         <Button
           variant="contained"
           size="large"
           className={cls.button}
           endIcon={<PlagiarismIcon />}
+          onClick={toggleHighlighting}
+          color={isHighlightingActive ? "secondary" : "primary"}
         >
-          Анализ текста
+          {isHighlightingActive ? "Завершить анализ" : "Анализ текста"}
         </Button>
       </article>
     </Page>

@@ -123,6 +123,7 @@ export const IndicatorForm = (props: IndicatorFormProps) => {
           variant="outlined"
           value={value}
           onChange={(e) => setValue(e.target.value)}
+          multiline
         />
 
         <TextField

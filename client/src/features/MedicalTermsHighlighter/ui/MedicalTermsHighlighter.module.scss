@@ -1,0 +1,79 @@
+.highlighter {
+    position: relative;
+    
+    .sectionContainer {
+        margin-bottom: 20px;
+    }
+
+    .divider {
+        margin-bottom: 10px;
+        font: var(--font-l);
+        font-weight: 700;
+    }
+
+    .textContainer {
+        white-space: pre-wrap;
+    }
+
+    .term {
+        position: relative;
+        display: inline;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+
+        &:hover {
+            background-color: rgb(144 202 249 / 50%);
+        }
+    }
+
+    .highlighted {
+        padding: 0 2px;
+        border: 2px solid #1976d2;
+        margin: 0 2px;
+        background-color: rgb(144 202 249 / 30%);
+    }
+
+    .selectedTerm {
+        background-color: rgb(144 202 249 / 70%);
+    }
+}
+
+.detailsPanel {
+    position: fixed;
+    z-index: 1000;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    overflow: auto;
+    width: 350px;
+    max-width: 30vw;
+    padding: 16px;
+    background-color: #fff;
+    box-shadow: -2px 0 10px rgb(0 0 0 / 10%);
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+
+    &.visible {
+        transform: translateX(0);
+    }
+
+    .closeButton {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+    }
+
+    .detailsGrid {
+        display: grid;
+        align-items: center;
+        margin-top: 24px;
+        gap: 8px 16px;
+        grid-template-columns: auto 1fr;
+    }
+
+    .label {
+        color: #1976d2;
+        font-weight: bold;
+    }
+}
