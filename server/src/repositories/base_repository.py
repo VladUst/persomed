@@ -8,7 +8,7 @@ T = TypeVar("T", bound=Model)
 
 
 class BaseRepository(Generic[T]):
-    def __init__(self, model: Type[T], session: AsyncSession):
+    def __init__(self, session: AsyncSession, model: Type[T]):
         self.session = session
         self.model = model
     
