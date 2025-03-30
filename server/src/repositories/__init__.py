@@ -1,4 +1,5 @@
 from src.repositories.health_indicators import (
+    HealthIndicatorRepository,
     GeneralInfoRepository,
     DetailedInfoRepository,
     PreventiveInfoRepository,
@@ -6,17 +7,22 @@ from src.repositories.health_indicators import (
     FamilyHistoryInfoRepository,
     LifestyleInfoRepository
 )
-
 from src.repositories.medical_documents import (
     AnalyzesDocRepository,
     OtherDocRepository,
     DiseasesHistoryDocRepository,
-    RecommendationsDocRepository,
-    DiseasesHistoryDocDetailsRepository
+    DiseasesHistoryDocDetailsRepository,
+    RecommendationsDocRepository
 )
+from src.repositories.tasks import TaskRepository
+from src.repositories.base_repository import BaseRepository
 
 __all__ = [
-    # Health indicators repositories
+    # Base repository
+    "BaseRepository",
+    
+    # Health indicators
+    "HealthIndicatorRepository",
     "GeneralInfoRepository",
     "DetailedInfoRepository",
     "PreventiveInfoRepository",
@@ -24,10 +30,13 @@ __all__ = [
     "FamilyHistoryInfoRepository",
     "LifestyleInfoRepository",
     
-    # Medical documents repositories
+    # Medical documents
     "AnalyzesDocRepository",
     "OtherDocRepository",
     "DiseasesHistoryDocRepository",
+    "DiseasesHistoryDocDetailsRepository",
     "RecommendationsDocRepository",
-    "DiseasesHistoryDocDetailsRepository"
+    
+    # Tasks
+    "TaskRepository"
 ] 

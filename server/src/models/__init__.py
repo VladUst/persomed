@@ -1,12 +1,3 @@
-from src.models.health_indicators import (
-    GeneralInfo,
-    DetailedInfo,
-    PreventiveInfo,
-    AllergiesInfo,
-    FamilyHistoryInfo,
-    LifestyleInfo,
-)
-
 from src.models.medical_documents import (
     AnalyzesDoc,
     OtherDoc,
@@ -14,17 +5,29 @@ from src.models.medical_documents import (
     RecommendationsDoc,
     DiseasesHistoryDocDetails
 )
+from src.models.health_indicators import (
+    HealthIndicatorBase,
+    GeneralInfo,
+    DetailedInfo,
+    PreventiveInfo,
+    AllergiesInfo,
+    FamilyHistoryInfo,
+    LifestyleInfo
+)
+from src.models.tasks import TaskOrm
 
 __all__ = [
+    "AnalyzesDoc",
+    "OtherDoc",
+    "DiseasesHistoryDoc",
+    "RecommendationsDoc",
+    "DiseasesHistoryDocDetails",
+    "HealthIndicatorBase",
     "GeneralInfo",
     "DetailedInfo",
     "PreventiveInfo",
     "AllergiesInfo",
     "FamilyHistoryInfo",
     "LifestyleInfo",
-    "AnalyzesDoc",
-    "OtherDoc",
-    "DiseasesHistoryDoc",
-    "RecommendationsDoc",
-    "DiseasesHistoryDocDetails"
+    "TaskOrm"
 ] 

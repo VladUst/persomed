@@ -1,23 +1,6 @@
 from typing import Optional
 from pydantic import BaseModel, Field
-
-
-# Base schemas for medical documents with common fields
-class MedicalDocumentBase(BaseModel):
-    name: str = Field(description="Document name")
-    type: str = Field(description="Document type")
-    date: str = Field(description="Document date")
-
-
-class MedicalDocumentCreate(MedicalDocumentBase):
-    pass
-
-
-class MedicalDocument(MedicalDocumentBase):
-    id: int = Field(description="Unique identifier")
-    
-    class Config:
-        from_attributes = True
+from src.schemas.medical_documents.base import MedicalDocumentBase, MedicalDocument
 
 
 # Disease history document with ICD code
@@ -34,40 +17,6 @@ class DiseasesHistoryDoc(DiseasesHistoryDocBase):
     
     class Config:
         from_attributes = True
-
-
-# Recommendations document with specialty
-class RecommendationsDocBase(MedicalDocumentBase):
-    specialty: str = Field(description="Doctor specialty")
-
-
-class RecommendationsDocCreate(RecommendationsDocBase):
-    pass
-
-
-class RecommendationsDoc(RecommendationsDocBase):
-    id: int = Field(description="Unique identifier")
-    
-    class Config:
-        from_attributes = True
-
-
-# Analyses document
-class AnalyzesDocCreate(MedicalDocumentCreate):
-    pass
-
-
-class AnalyzesDoc(MedicalDocument):
-    pass
-
-
-# Other documents
-class OtherDocCreate(MedicalDocumentCreate):
-    pass
-
-
-class OtherDoc(MedicalDocument):
-    pass
 
 
 # Diseases history document meta information

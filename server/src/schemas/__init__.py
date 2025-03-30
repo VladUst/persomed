@@ -6,30 +6,37 @@ from src.schemas.health_indicators import (
     FamilyHistoryInfo, FamilyHistoryInfoCreate,
     LifestyleInfo, LifestyleInfoCreate
 )
-
 from src.schemas.medical_documents import (
-    AnalyzesDoc, AnalyzesDocCreate,
-    OtherDoc, OtherDocCreate,
-    DiseasesHistoryDoc, DiseasesHistoryDocCreate,
-    RecommendationsDoc, RecommendationsDocCreate,
-    DiseasesHistoryDocDetails, DiseasesHistoryDocDetailsCreate,
-    DiseasesHistoryDocWithDetails
+    MedicalDocumentBase, MedicalDocumentCreate, MedicalDocument,
+    AnalyzesDocCreate, AnalyzesDoc,
+    OtherDocCreate, OtherDoc,
+    DiseasesHistoryDocBase, DiseasesHistoryDocCreate, DiseasesHistoryDoc,
+    DiseasesHistoryDocMetaInfo, DiseasesHistoryDocSections,
+    DiseasesHistoryDocDetailsBase, DiseasesHistoryDocDetailsCreate, 
+    DiseasesHistoryDocDetails, DiseasesHistoryDocWithDetails,
+    RecommendationsDocBase, RecommendationsDocCreate, RecommendationsDoc
 )
+from src.schemas.tasks import STaskAdd, STask, STaskId
 
 __all__ = [
     # Health indicators
     "GeneralInfo", "GeneralInfoCreate",
-    "DetailedInfo", "DetailedInfoCreate", 
+    "DetailedInfo", "DetailedInfoCreate",
     "PreventiveInfo", "PreventiveInfoCreate",
     "AllergiesInfo", "AllergiesInfoCreate",
     "FamilyHistoryInfo", "FamilyHistoryInfoCreate",
     "LifestyleInfo", "LifestyleInfoCreate",
     
     # Medical documents
-    "AnalyzesDoc", "AnalyzesDocCreate",
-    "OtherDoc", "OtherDocCreate",
-    "DiseasesHistoryDoc", "DiseasesHistoryDocCreate",
-    "RecommendationsDoc", "RecommendationsDocCreate",
-    "DiseasesHistoryDocDetails", "DiseasesHistoryDocDetailsCreate",
-    "DiseasesHistoryDocWithDetails"
+    "MedicalDocumentBase", "MedicalDocumentCreate", "MedicalDocument",
+    "AnalyzesDocCreate", "AnalyzesDoc",
+    "OtherDocCreate", "OtherDoc",
+    "DiseasesHistoryDocBase", "DiseasesHistoryDocCreate", "DiseasesHistoryDoc",
+    "DiseasesHistoryDocMetaInfo", "DiseasesHistoryDocSections",
+    "DiseasesHistoryDocDetailsBase", "DiseasesHistoryDocDetailsCreate", 
+    "DiseasesHistoryDocDetails", "DiseasesHistoryDocWithDetails",
+    "RecommendationsDocBase", "RecommendationsDocCreate", "RecommendationsDoc",
+    
+    # Tasks
+    "STaskAdd", "STask", "STaskId"
 ] 
