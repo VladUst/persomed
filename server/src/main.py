@@ -5,14 +5,11 @@ from src.api import router
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
-    # Clear the database and recreate tables on startup
-    await delete_tables()
-    print("База очищена")
-    await create_tables()
-    print("База готова к работе")
+async def lifespan(app: FastAPI): 
+    """ await delete_tables()
+    print("База очищена") """
+    await create_tables() 
     yield
-    print("Выключение")
 
 
 app = FastAPI(
@@ -20,8 +17,8 @@ app = FastAPI(
     description="""
     API для работы с цифровым профилем пациента медицинской информационной системы.
     
-    Профиль содержит информацию о показателях здоровья пациента и медицинские документы.
-    
+    Цифровой профиль пациента содержит информацию о показателях здоровья пациента и медицинские документы.
+
     ### Показатели здоровья
     * Базовая информация
     * Лабораторные измерения
@@ -32,7 +29,7 @@ app = FastAPI(
     
     ### Медицинские документы
     * История болезней со списком диагнозов
-    * Документы анализов
+    * Документы анализов 
     * Рекомендации и назначения врачей
     * Прочие документы
     """,
