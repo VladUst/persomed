@@ -1,50 +1,59 @@
-# React + TypeScript + Vite
+# Persomed
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Платформа для создания интеллектуальных персонализированных медицинских информационных систем
 
-Currently, two official plugins are available:
+## Руководство по запуску клиента
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Это руководство поможет вам настроить и запустить клиентскую (фронтенд) часть проекта Persomed.
 
-## Expanding the ESLint configuration
+### Предварительные требования
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- **Node.js**: Версия 18 или выше
+  - Скачать с [официального сайта Node.js](https://nodejs.org/)
+  - Проверка установки: `node -v` и `npm -v`
+- **Git**: Для клонирования репозитория
+  - Скачать с [официального сайта Git](https://git-scm.com/downloads)
+  - Проверка установки: `git --version`
 
-- Configure the top-level `parserOptions` property like this:
+### Начало работы
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+1. **Клонирование репозитория**. Перейдите в директорию для клонирования, откройте терминал и выполните:
+
+```bash
+git clone https://github.com/VladUst/persomed.git
+
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+А затем перейдите в директорию `client` - `cd persomed/client`
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+2. **Установка зависимостей**. Для установки зависимости выполните:
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+```bash
+npm install
 ```
+
+### Запуск
+
+В директории `persomed/client` выполните:
+
+```bash
+npm run dev
+```
+
+После запуска откройте [http://localhost:5173](http://localhost:5173) для просмотра в браузере.
+
+### Используемые библиотеки
+
+- React 18
+- TypeScript
+- Material UI для компонентов
+- SCSS для стилизации
+- Vite в качестве инструмента сборки
+
+## Лицензия
+
+Исходный код проекта является открытым
+
+## Контакты
+
+По любым вопросам или для получения поддержки вы можете связаться с владельцем репозитория - vladustyugo@gmail.com
