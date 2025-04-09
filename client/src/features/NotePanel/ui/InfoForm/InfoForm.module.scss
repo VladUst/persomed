@@ -14,10 +14,18 @@
         font-weight: 700;
     }
 
-    gap: 20px;
     transform: translate(-50%, -50%);
 
     .input {
         min-width: 80%;
+    }
+}
+
+.wrapper {
+    display: flex;
+    gap: 20px;
+
+    .input {
+        max-width: 40%;
     }
 }
