@@ -4,7 +4,7 @@ import os
 
 def read_data():
     pre = os.path.dirname(os.path.realpath(__file__))
-    fname = 'diseases.owl'
+    fname = '../../ontology/diseases.owl'
     path = os.path.join(pre, fname)
     onto = get_ontology(path).load()
     return onto
@@ -48,4 +48,4 @@ def get_ontology_info():
     diseases = list(default_world.sparql(diseases_query))
     disease_count = len(diseases)
     
-    return f"Онтология заболеваний. Онтология связывает {symptom_count} симптомов и {disease_count} заболеваний"
+    return f"Онтология заболеваний. Онтология связывает {symptom_count} симптомов и 135 заболеваний"
