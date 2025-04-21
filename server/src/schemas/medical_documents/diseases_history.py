@@ -1,5 +1,5 @@
-from typing import Optional
-from pydantic import BaseModel, Field
+from typing import Optional, Any, Dict
+from pydantic import BaseModel, Field, model_validator
 from src.schemas.medical_documents.base import MedicalDocumentBase, MedicalDocument
 
 
@@ -15,8 +15,9 @@ class DiseasesHistoryDocCreate(DiseasesHistoryDocBase):
 class DiseasesHistoryDoc(DiseasesHistoryDocBase):
     id: int = Field(description="Unique identifier")
     
-    class Config:
-        from_attributes = True
+    model_config = {
+        "from_attributes": True
+    }
 
 
 # Diseases history document meta information
@@ -47,15 +48,45 @@ class DiseasesHistoryDocDetailsBase(BaseModel):
 
 
 class DiseasesHistoryDocDetailsCreate(DiseasesHistoryDocDetailsBase):
-    document_id: int = Field(description="ID of the related document")
+    pass
 
 
 class DiseasesHistoryDocDetails(DiseasesHistoryDocDetailsBase):
     id: int = Field(description="Unique identifier")
     document_id: int = Field(description="ID of the related document")
     
-    class Config:
-        from_attributes = True
+    model_config = {
+        "from_attributes": True
+    }
+    
+    @model_validator(mode='before')
+    @classmethod
+    def validate_to_json(cls, data: Any) -> Dict[str, Any]:
+        if hasattr(data, "__dict__") and not isinstance(data, dict):
+            # Если это объект ORM, создаем вложенную структуру
+            db_obj_dict = data.__dict__
+            return {
+                "id": db_obj_dict.get("id"),
+                "document_id": db_obj_dict.get("document_id"),
+                "title": db_obj_dict.get("title"),
+                "meta": {
+                    "icd_code": db_obj_dict.get("icd_code"),
+                    "diagnosis_date": db_obj_dict.get("diagnosis_date"),
+                    "doctor": db_obj_dict.get("doctor"),
+                    "specialty": db_obj_dict.get("specialty"),
+                    "nosology": db_obj_dict.get("nosology"),
+                    "disease_type": db_obj_dict.get("disease_type"),
+                    "clinic_name": db_obj_dict.get("clinic_name")
+                },
+                "sections": {
+                    "anamnesis": db_obj_dict.get("anamnesis"),
+                    "clinical_findings": db_obj_dict.get("clinical_findings"),
+                    "diagnosis": db_obj_dict.get("diagnosis"),
+                    "treatment_plan": db_obj_dict.get("treatment_plan"),
+                    "conclusion": db_obj_dict.get("conclusion")
+                }
+            }
+        return data
 
 
 # Combined disease history document with details for direct API response

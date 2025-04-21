@@ -1,5 +1,5 @@
 from typing import List
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Body
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.medical_documents.session import get_session
@@ -174,9 +174,26 @@ async def add_diseases_history_details(
             detail=f"Детали для документа истории болезни с ID {document_id} уже существуют"
         )
     
-    # Устанавливаем document_id из пути в данные
-    data_dict = data.model_dump()
-    data_dict["document_id"] = document_id
+    # Преобразуем вложенную структуру в плоскую для БД
+    data_dict = {
+        "id": document_id,  # Важно! id должен совпадать с document_id
+        "document_id": document_id,
+        "title": data.title,
+        # Метаданные
+        "icd_code": data.meta.icd_code,
+        "diagnosis_date": data.meta.diagnosis_date,
+        "doctor": data.meta.doctor,
+        "specialty": data.meta.specialty,
+        "nosology": data.meta.nosology,
+        "disease_type": data.meta.disease_type,
+        "clinic_name": data.meta.clinic_name,
+        # Разделы
+        "anamnesis": data.sections.anamnesis,
+        "clinical_findings": data.sections.clinical_findings,
+        "diagnosis": data.sections.diagnosis,
+        "treatment_plan": data.sections.treatment_plan,
+        "conclusion": data.sections.conclusion
+    }
     
     return await details_repository.create(data_dict)
 
@@ -199,9 +216,26 @@ async def update_diseases_history_doc_details(document_id: int, data: DiseasesHi
             detail=f"Детали для документа истории болезни с ID {document_id} не найдены"
         )
     
-    # Обеспечиваем соответствие document_id
-    update_data = data.model_dump()
-    update_data["document_id"] = document_id
+    # Преобразуем вложенную структуру в плоскую для БД
+    update_data = {
+        "id": document_id,  # Важно! id должен совпадать с document_id
+        "document_id": document_id,
+        "title": data.title,
+        # Метаданные
+        "icd_code": data.meta.icd_code,
+        "diagnosis_date": data.meta.diagnosis_date,
+        "doctor": data.meta.doctor,
+        "specialty": data.meta.specialty,
+        "nosology": data.meta.nosology,
+        "disease_type": data.meta.disease_type,
+        "clinic_name": data.meta.clinic_name,
+        # Разделы
+        "anamnesis": data.sections.anamnesis,
+        "clinical_findings": data.sections.clinical_findings,
+        "diagnosis": data.sections.diagnosis,
+        "treatment_plan": data.sections.treatment_plan,
+        "conclusion": data.sections.conclusion
+    }
     
     return await repository.update(item.id, update_data)
 

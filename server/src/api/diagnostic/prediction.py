@@ -45,7 +45,7 @@ router = APIRouter(
 async def predict_disease(
     data: SymptomsList = Body(
         ...,
-        example={"symptoms": ["головная боль", "тошнота", "высокая температура"]},
+        example={"symptoms": ["cough", "hoarseness", "stridor"]},
     )
 ):
     """

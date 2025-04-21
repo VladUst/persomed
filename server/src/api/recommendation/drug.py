@@ -18,7 +18,7 @@ router = APIRouter(
 async def recommend_drugs(
     data: DiseaseRequest = Body(
         ...,
-        example={"disease": "Грипп"},
+        example={"disease": "Pneumonia"},
     )
 ):
     """

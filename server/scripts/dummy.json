@@ -323,6 +323,7 @@
   ],
   "document_details": {
     "hypertension": {
+      "documentId": "3",
       "title": "Артериальная гипертензия",
       "meta": {
         "icdCode": "I10",
