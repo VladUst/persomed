@@ -6,7 +6,8 @@ import os
 # Добавляем корневую директорию в путь импорта
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.database import new_session
+# Используем патч с правильным путем к БД вместо стандартного модуля
+from scripts.db_patch import new_session, create_tables
 from src.models.health_indicators import (
     GeneralInfo,
     DetailedInfo,
@@ -14,6 +15,13 @@ from src.models.health_indicators import (
     FamilyHistoryInfo,
     PreventiveInfo,
     LifestyleInfo
+)
+# Добавляем импорты для медицинских документов
+from src.models.medical_documents import (
+    DiseasesHistoryDoc,
+    AnalyzesDoc,
+    RecommendationsDoc,
+    OtherDoc
 )
 
 def calculate_target_reached(value, min_level, max_level):
@@ -127,8 +135,64 @@ async def insert_lifestyle_info(session, items):
     await session.commit()
     print(f"Added {len(items)} lifestyle records")
 
+# Простые функции для добавления документов
+async def insert_diseases_history_docs(session, items):
+    for item in items:
+        model = DiseasesHistoryDoc(
+            name=item.get('name'),
+            type=item.get('type'),
+            date=item.get('date'),
+            icd_code=item.get('icdCode', '')
+        )
+        session.add(model)
+    
+    await session.commit()
+    print(f"Added {len(items)} disease history documents")
+
+async def insert_analyzes_docs(session, items):
+    for item in items:
+        model = AnalyzesDoc(
+            name=item.get('name'),
+            type=item.get('type'),
+            date=item.get('date')
+        )
+        session.add(model)
+    
+    await session.commit()
+    print(f"Added {len(items)} analysis documents")
+
+async def insert_recommendations_docs(session, items):
+    for item in items:
+        model = RecommendationsDoc(
+            name=item.get('name'),
+            type=item.get('type'),
+            date=item.get('date'),
+            specialty=item.get('specialty', '')
+        )
+        session.add(model)
+    
+    await session.commit()
+    print(f"Added {len(items)} recommendation documents")
+
+async def insert_other_docs(session, items):
+    for item in items:
+        model = OtherDoc(
+            name=item.get('name'),
+            type=item.get('type'),
+            date=item.get('date')
+        )
+        session.add(model)
+    
+    await session.commit()
+    print(f"Added {len(items)} other documents")
+
 async def fill_database():
-    # Путь к файлу относительно текущего скрипта
+    # Создаем таблицы, используя правильный путь к БД
+    print("Инициализация таблиц в базе данных в корне проекта...")
+    await create_tables()
+    print("Таблицы инициализированы")
+    
+    # Путь к файлу JSON относительно текущего скрипта
     script_dir = os.path.dirname(os.path.abspath(__file__))
     json_path = os.path.join(script_dir, 'dummy.json')
     
@@ -145,6 +209,12 @@ async def fill_database():
         await insert_family_history_info(session, data['family_history'])
         await insert_preventive_info(session, data['preventive'])
         await insert_lifestyle_info(session, data['lifestyle'])
+        
+        # Добавляем медицинские документы
+        await insert_diseases_history_docs(session, data['diseases_history'])
+        await insert_analyzes_docs(session, data['analyzes'])
+        await insert_recommendations_docs(session, data['recommendations'])
+        await insert_other_docs(session, data['other_docs'])
     
     print("Database filled successfully!")
 
