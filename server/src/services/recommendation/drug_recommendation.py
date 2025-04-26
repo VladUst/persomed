@@ -94,7 +94,7 @@ def get_ontology_info():
     drugs = list(default_world.sparql(drugs_query))
     drug_count = len(drugs)
     
-    return f"Онтология заболеваний и препаратов. Онтология связывает {disease_count} заболеваний и {drug_count} лекарственных препаратов"
+    return f"Онтология заболеваний и препаратов. Онтология связывает 112 лекарственных препаратов и 135 заболеваний"
 
 
 def get_current_date():

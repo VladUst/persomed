@@ -8,6 +8,7 @@ from src.services.diagnostic.ml_disease_prediction.get_prediction import get_pre
 from src.services.diagnostic.ontology_diseases_prediction.get_prediction import get_prediction as ontology_get_prediction
 from src.services.diagnostic.ml_disease_prediction.get_prediction import get_model_info
 from src.services.diagnostic.ontology_diseases_prediction.get_prediction import get_ontology_info
+from src.services.translate import translate_to_english, translate_to_russian
 
 # Создаем роутер для предсказания заболеваний
 router = APIRouter(
@@ -45,7 +46,7 @@ router = APIRouter(
 async def predict_disease(
     data: SymptomsList = Body(
         ...,
-        example={"symptoms": ["cough", "hoarseness", "stridor"]},
+        example={"symptoms": ["кашель", "охриплость", "стридор"]},
     )
 ):
     """
@@ -56,26 +57,33 @@ async def predict_disease(
     2. Медицинскую онтологию для выявления всех заболеваний, связанных с указанными симптомами
     
     Входные параметры:
-    - **symptoms**: Список симптомов пациента в текстовом формате
+    - **symptoms**: Список симптомов пациента в текстовом формате (на русском языке)
     
     Выходные параметры:
     - **ml**: Результаты предсказания с использованием машинного обучения
-      - prediction: До трех наиболее вероятных заболеваний
+      - prediction: До трех наиболее вероятных заболеваний (на русском языке)
       - info: Информация о модели и её метриках
       - date: Дата предсказания
     - **ontology**: Результаты предсказания с использованием онтологии
-      - prediction: Список заболеваний, соответствующих симптомам
+      - prediction: Список заболеваний, соответствующих симптомам (на русском языке)
       - info: Информация об онтологии
       - date: Дата предсказания
     """
     # Получаем текущую дату
     current_date = datetime.now().strftime("%d.%m.%Y")
     
-    # Получаем предсказания от модели машинного обучения
-    ml_results = ml_get_prediction(data.symptoms)
+    # Переводим симптомы с русского на английский
+    english_symptoms = await translate_to_english(data.symptoms)
     
-    # Получаем предсказания на основе онтологии
-    ontology_results = ontology_get_prediction(data.symptoms)
+    # Получаем предсказания от модели машинного обучения (на английском)
+    ml_results_en = ml_get_prediction(english_symptoms)
+    
+    # Получаем предсказания на основе онтологии (на английском)
+    ontology_results_en = ontology_get_prediction(english_symptoms)
+    
+    # Переводим результаты обратно на русский
+    ml_results_ru = await translate_to_russian(ml_results_en)
+    ontology_results_ru = await translate_to_russian(ontology_results_en)
     
     # Получаем информацию о модели и онтологии
     model_info = get_model_info()
@@ -83,12 +91,12 @@ async def predict_disease(
     
     return {
         "ml": {
-            "prediction": ml_results,
+            "prediction": ml_results_ru,
             "info": model_info,
             "date": current_date
         },
         "ontology": {
-            "prediction": ontology_results,
+            "prediction": ontology_results_ru,
             "info": ontology_info,
             "date": current_date
         }
