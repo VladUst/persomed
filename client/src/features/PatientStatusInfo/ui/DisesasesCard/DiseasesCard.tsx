@@ -8,16 +8,16 @@ import { PatientStatusInfoList } from "../PatientStatusInfoList/PatientStatusInf
 
 const data: PatientStatusInfo = [
   {
+    text: "ОРВИ",
+    label: "J00-J02",
+  },
+  {
     text: "Артериальная гипертензия",
     label: "I11",
   },
   {
     text: "Сердечная недостаточность",
     label: "I50.0",
-  },
-  {
-    text: "ОРВИ",
-    label: "J00-J02",
   },
 ];
 

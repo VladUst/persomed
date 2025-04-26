@@ -8,10 +8,16 @@ import EyeIcon from "@/shared/assets/icons/eye.svg";
 
 const data: PatientStatusInfo = [
   {
-    text: "Повышенная глюкоза крови",
+    text: "Сильная жажда",
   },
   {
-    text: "Высокие уровни кетонов",
+    text: "Полифагия",
+  },
+  {
+    text: "Потеря веса",
+  },
+  {
+    text: "Слабость",
   },
 ];
 
