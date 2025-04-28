@@ -4,6 +4,7 @@ from src.services.diagnostic.ml_disease_prediction.get_prediction import get_mod
 from src.services.diagnostic.ontology_diseases_prediction.get_prediction import get_ontology_info
 from src.services.recommendation.drug_recommendation import get_drug_recommendations, get_ontology_info as get_drug_ontology_info, get_current_date
 from src.services.risk_analysis import get_risk_factors, find_abnormal_health_indicators, find_chronic_diseases
+from src.services.text_processing import process_medical_text
 
 __all__ = [
     "ml_disease_prediction", 
@@ -15,5 +16,6 @@ __all__ = [
     "get_current_date",
     "get_risk_factors",
     "find_abnormal_health_indicators",
-    "find_chronic_diseases"
+    "find_chronic_diseases",
+    "process_medical_text"
 ] 

@@ -1,4 +1,6 @@
 venv
+venv-medcat
+src/services/text_processing/models
 persomed.db
 .idea
 __pycache__

@@ -17,6 +17,7 @@ from src.schemas.medical_documents import (
     RecommendationsDocBase, RecommendationsDocCreate, RecommendationsDoc
 )
 from src.schemas.tasks import STaskAdd, STask, STaskId
+from src.schemas.text_process import MedicalTextRequest, NamedEntity, TextProcessingResponse
 
 __all__ = [
     # Health indicators
@@ -38,5 +39,8 @@ __all__ = [
     "RecommendationsDocBase", "RecommendationsDocCreate", "RecommendationsDoc",
     
     # Tasks
-    "STaskAdd", "STask", "STaskId"
+    "STaskAdd", "STask", "STaskId",
+    
+    # Text Processing
+    "MedicalTextRequest", "NamedEntity", "TextProcessingResponse"
 ] 

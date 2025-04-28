@@ -6,6 +6,7 @@ from src.api.tasks import router as tasks_router
 from src.api.diagnostic import router as diagnostic_router
 from src.api.recommendation import router as recommendation_router
 from src.api.risk_analysis import router as risk_analysis_router
+from src.api.text_process import router as text_process_router
 
 # Создаем основной роутер API
 router = APIRouter(
@@ -19,5 +20,6 @@ router.include_router(tasks_router)
 router.include_router(diagnostic_router)
 router.include_router(recommendation_router)
 router.include_router(risk_analysis_router)
+router.include_router(text_process_router)
 
 __all__ = ["router"]
