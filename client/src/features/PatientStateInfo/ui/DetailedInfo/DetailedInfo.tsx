@@ -124,11 +124,11 @@ const initialData: HealthMeasurementData[] = [
     unit: "%",
   },
 ];
-interface DetailedInfoProps {
+/* interface DetailedInfoProps {
   className?: string;
-}
+} */
 
-export const DetailedInfo = (props: DetailedInfoProps) => {
+export const DetailedInfo = () => {
   const [data, setData] = useState<HealthMeasurementData[]>(initialData);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedIndicator, setSelectedIndicator] = useState<

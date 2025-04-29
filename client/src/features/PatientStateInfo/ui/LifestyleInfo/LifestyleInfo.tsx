@@ -43,11 +43,11 @@ const initialData: HealthMeasurementData[] = [
   },
 ];
 
-interface LifestyleInfoProps {
+/* interface LifestyleInfoProps {
   className?: string;
-}
+} */
 
-export const LifestyleInfo = (props: LifestyleInfoProps) => {
+export const LifestyleInfo = () => {
   const [data, setData] = useState<HealthMeasurementData[]>(initialData);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedIndicator, setSelectedIndicator] = useState<

@@ -75,6 +75,17 @@ class TextProcessingService:
         # Отключаем режим обучения
         cat.train = False
         
+        # Словарь соответствия CUI для кашля
+        # Из C3815497 (Pharmacologic Substance) в C0010200 (Sign or Symptom)
+        self.cui_mapping = {
+            "C3815497": {
+                "preferred_cui": "C0010200",  # CUI симптома "кашель"
+                "preferred_name": "Cough",
+                "preferred_type_ids": ["T184"],
+                "preferred_types": ["Sign or Symptom"]
+            }
+        }
+        
         print("Модель UMLS успешно загружена!")
         return cat
     
@@ -89,27 +100,51 @@ class TextProcessingService:
             List[Dict[str, Any]]: List of named entities with their attributes (CUI, TUI, name, definition, ICD code)
         """
         try:
-            # Обрабатываем текст с помощью MedCAT
-            entities = self.cat.get_entities(text)
+            print(f"Обрабатываем текст: '{text}'")
+            
+            # Получаем все сущности без ограничений
+            entities = self.cat.get_entities(text, only_cui=False)
+            
+            # Логируем что получили
+            raw_entities_count = len(entities.get('entities', {}))
+            print(f"Найдено {raw_entities_count} сущностей")
+            
+            if raw_entities_count == 0:
+                print("Внимание: не найдено ни одной сущности в тексте")
+                return []
             
             # Создаем результат
             result = []
             
-            # Обрабатываем сущности
-            for entity_id, entity_data in entities.get('entities').items():
+            # Обрабатываем сущности с пост-обработкой
+            for entity_id, entity_data in entities.get('entities', {}).items():
                 try:
-                    # Проверяем уверенность
-                    confidence = entity_data.get('acc', 0)
-                    
-                    # Получаем основные данные
+                    # Логируем сущность
+                    source_text = entity_data.get('source_value', '')
                     cui = entity_data.get('cui', '')
-                    pretty_name = entity_data.get('pretty_name', '')
-                    detected_name = entity_data.get('detected_name', '')
-                    name = pretty_name if pretty_name else detected_name
-                    
-                    # Получаем типы (TUI) и types
                     type_ids = entity_data.get('type_ids', [])
                     types = entity_data.get('types', [])
+                    
+                    print(f"Обработка сущности: {source_text} (CUI: {cui}, типы: {types})")
+                    
+                    # Если это кашель как фармакологическая субстанция, заменяем на симптом
+                    if cui in self.cui_mapping and source_text.lower() in ["cough", "кашель"]:
+                        mapping = self.cui_mapping[cui]
+                        print(f"Заменяем CUI {cui} на {mapping['preferred_cui']} ({mapping['preferred_types'][0]})")
+                        
+                        # Меняем данные сущности на предпочтительные значения
+                        cui = mapping['preferred_cui']
+                        type_ids = mapping['preferred_type_ids']
+                        types = mapping['preferred_types']
+                        name = mapping['preferred_name']
+                    else:
+                        # Если нет замены, используем оригинальные данные
+                        pretty_name = entity_data.get('pretty_name', '')
+                        detected_name = entity_data.get('detected_name', '')
+                        name = pretty_name if pretty_name else detected_name
+                    
+                    # Проверяем уверенность
+                    confidence = entity_data.get('acc', 0)
                     
                     # Получаем определение (если доступно)
                     definition = ""
@@ -120,7 +155,6 @@ class TextProcessingService:
                     # Получаем позиции
                     start_index = entity_data.get('start', 0)
                     end_index = entity_data.get('end', 0)
-                    source_text = entity_data.get('source_value', '')
                     
                     # Создаем объект сущности
                     entity_obj = {
@@ -137,11 +171,13 @@ class TextProcessingService:
                     }
                     
                     result.append(entity_obj)
+                    print(f"Добавлена сущность: {name} ({cui})")
                     
                 except Exception as e:
                     print(f"Ошибка при обработке сущности {entity_id}: {e}")
                     continue
-        
+            
+            print(f"Всего обработано сущностей: {len(result)}")
             return result
             
         except Exception as e:

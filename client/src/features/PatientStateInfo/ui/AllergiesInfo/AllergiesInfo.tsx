@@ -37,11 +37,11 @@ const initialData: HealthMeasurementData[] = [
   },
 ];
 
-interface AllergiesInfoProps {
+/* interface AllergiesInfoProps {
   className?: string;
-}
+} */
 
-export const AllergiesInfo = (props: AllergiesInfoProps) => {
+export const AllergiesInfo = () => {
   const [data, setData] = useState<HealthMeasurementData[]>(initialData);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedIndicator, setSelectedIndicator] = useState<

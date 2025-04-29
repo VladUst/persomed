@@ -43,11 +43,11 @@ const initialData: HealthMeasurementData[] = [
   },
 ];
 
-interface PreventiveInfioProps {
+/* interface PreventiveInfioProps {
   className?: string;
-}
+} */
 
-export const PreventiveInfio = (props: PreventiveInfioProps) => {
+export const PreventiveInfio = () => {
   const [data, setData] = useState<HealthMeasurementData[]>(initialData);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedIndicator, setSelectedIndicator] = useState<

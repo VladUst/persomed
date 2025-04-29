@@ -171,7 +171,7 @@ export const RecommendationsForm = (props: RecommendationsFormProps) => {
           Препараты
         </Typography>
 
-        {formState.medications.map((medication, index) => (
+        {formState.medications.map((medication) => (
           <Stack
             key={medication.id}
             direction="row"

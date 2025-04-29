@@ -32,11 +32,11 @@ const initialData: HealthMeasurementData[] = [
   },
 ];
 
-interface FamilyInfoProps {
+/* interface FamilyInfoProps {
   className?: string;
-}
+} */
 
-export const FamilyInfo = (props: FamilyInfoProps) => {
+export const FamilyInfo = () => {
   const [data, setData] = useState<HealthMeasurementData[]>(initialData);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedIndicator, setSelectedIndicator] = useState<

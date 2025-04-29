@@ -104,11 +104,11 @@ const initialData: HealthMeasurementData[] = [
     date: "10-20-2024",
   },
 ];
-interface GeneralInfoProps {
+/* interface GeneralInfoProps {
   className?: string;
-}
+} */
 
-export const GeneralInfo = (props: GeneralInfoProps) => {
+export const GeneralInfo = () => {
   const [data, setData] = useState<HealthMeasurementData[]>(initialData);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedIndicator, setSelectedIndicator] = useState<
