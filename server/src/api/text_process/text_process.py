@@ -14,12 +14,12 @@ router = APIRouter(
     "/entities",
     response_model=TextProcessingResponse,
     status_code=status.HTTP_200_OK,
-    summary="Извлечь именованные медицинские сущности из текста"
+    summary="Извлечь именованные медицинские сущности из текста" 
 )
 async def extract_entities(
     data: MedicalTextRequest = Body(
         ...,
-        example={"text": "Patient has cough, stridor and hoarseness."}
+        example={"text": "У пациента наблюдаются покашливание, хриплость и стридор."}
     )
 ):
     """
@@ -45,13 +45,14 @@ async def extract_entities(
     
     Входные параметры:
     - **text**: Медицинский текст для анализа и извлечения сущностей
+    - **language**: Язык текста ("en" или "ru"), по умолчанию "en"
     
     Выходные параметры:
     - **entities**: Список извлеченных именованных сущностей с их атрибутами
     - **count**: Общее количество найденных сущностей
     """
     # Process the text and extract entities
-    entities = process_medical_text(data.text)
+    entities = await process_medical_text(data.text, data.language)
     
     # Convert to Pydantic models
     entity_models = [NamedEntity(**entity) for entity in entities]

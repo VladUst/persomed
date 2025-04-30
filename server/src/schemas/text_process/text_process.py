@@ -9,11 +9,16 @@ class MedicalTextRequest(BaseModel):
     text: str = Field(
         description="Медицинский текст для обработки и извлечения именованных сущностей"
     )
+    language: str = Field(
+        description="Язык текста (en или ru)",
+        default="ru"
+    )
     
     class Config:
         json_schema_extra = {
             "example": {
-                "text": "Пациент имеет диагноз хроническая обструктивная болезнь легких и принимает будесонид ингаляционно."
+                "text": "Пациент имеет диагноз хроническая обструктивная болезнь легких и принимает будесонид ингаляционно.",
+                "language": "ru"
             }
         }
 
@@ -54,9 +59,6 @@ class NamedEntity(BaseModel):
     )
     end_index: int = Field(
         description="Индекс конца сущности в исходном тексте"
-    )
-    source_text: str = Field(
-        description="Исходный текст сущности в документе"
     )
     confidence: float = Field(
         description="Уровень уверенности модели в обнаружении сущности (от 0 до 1)"

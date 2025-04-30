@@ -2,6 +2,7 @@ from typing import List, Dict, Optional, Any
 import os
 import json
 from medcat.cat import CAT
+from src.services.translate.translate import translate_to_english, translate_to_russian
 
 
 class TextProcessingService:
@@ -78,19 +79,27 @@ class TextProcessingService:
         print("Модель UMLS успешно загружена!")
         return cat
     
-    def process_medical_text(self, text: str) -> List[Dict[str, Any]]:
+    async def process_medical_text(self, text: str, language: str = "ru") -> List[Dict[str, Any]]:
         """
         Process medical text using MedCAT and extract named entities with their attributes.
+        Support both English and Russian texts.
         
         Args:
             text (str): Medical text to process
+            language (str): Input text language ("en" or "ru")
             
         Returns:
             List[Dict[str, Any]]: List of named entities with their attributes (CUI, TUI, name, definition, ICD code)
         """
         try:
+            processed_text = text
+            
+            # Если текст на русском, переводим его на английский
+            if language == "ru":
+                processed_text = await translate_to_english(text)
+            
             # Обрабатываем текст с помощью MedCAT
-            entities = self.cat.get_entities(text)
+            entities = self.cat.get_entities(processed_text)
             
             # Создаем результат
             result = []
@@ -102,7 +111,7 @@ class TextProcessingService:
                     confidence = entity_data.get('acc', 0)
                     
                     # Получаем основные данные
-                    cui = entity_data.get('cui', '')
+                    cui = entity_data.get('cui', '') 
                     pretty_name = entity_data.get('pretty_name', '')
                     detected_name = entity_data.get('detected_name', '')
                     name = pretty_name if pretty_name else detected_name
@@ -110,7 +119,7 @@ class TextProcessingService:
                     # Получаем типы (TUI) и types
                     type_ids = entity_data.get('type_ids', [])
                     types = entity_data.get('types', [])
-                    
+
                     # Получаем определение (если доступно)
                     definition = ""
                     
@@ -120,7 +129,20 @@ class TextProcessingService:
                     # Получаем позиции
                     start_index = entity_data.get('start', 0)
                     end_index = entity_data.get('end', 0)
-                    source_text = entity_data.get('source_value', '')
+                    
+                    # Если язык русский, переводим name и types на русский
+                    if language == "ru":
+                        name = await translate_to_russian(name)
+                        if types:
+                            types = await translate_to_russian(types)
+                        
+                        # Переводим name в объектах icd10
+                        if icd10:
+                            # Если icd10 это список словарей
+                            if isinstance(icd10, list) and len(icd10) > 0 and isinstance(icd10[0], dict):
+                                for icd_entry in icd10:
+                                    if "name" in icd_entry:
+                                        icd_entry["name"] = await translate_to_russian(icd_entry["name"])
                     
                     # Создаем объект сущности
                     entity_obj = {
@@ -132,7 +154,6 @@ class TextProcessingService:
                         "icd10": icd10,
                         "start_index": start_index,
                         "end_index": end_index,
-                        "source_text": source_text,
                         "confidence": confidence
                     }
                     
@@ -150,15 +171,16 @@ class TextProcessingService:
 
 
 # Глобальная функция-обёртка для совместимости с существующим кодом
-def process_medical_text(text: str) -> List[Dict[str, Any]]:
+async def process_medical_text(text: str, language: str = "ru") -> List[Dict[str, Any]]:
     """
     Global wrapper function for processing medical text (for backward compatibility).
     
     Args:
         text (str): Medical text to process
+        language (str): Input text language ("en" or "ru")
         
     Returns:
         List[Dict[str, Any]]: List of named entities with their attributes
     """
     service = TextProcessingService.get_instance()
-    return service.process_medical_text(text)
+    return await service.process_medical_text(text, language)

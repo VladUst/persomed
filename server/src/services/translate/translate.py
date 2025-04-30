@@ -20,6 +20,7 @@ class CustomBaseTranslator(ABC):
 
 # Медицинский словарь для частых терминов, которые плохо переводятся
 MED_DICT_EN_RU = {
+    "sign or symptom": "Признак или Симптом",
     "cough": "кашель",
     "fever": "лихорадка",
     "shortness of breath": "одышка",
