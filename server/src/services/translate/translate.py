@@ -1,5 +1,22 @@
-from deep_translator import GoogleTranslator, BaseTranslator
+from deep_translator import GoogleTranslator
+from abc import ABC, abstractmethod
 from typing import List, Union, Dict, Optional
+
+# Create a custom base class to replace BaseTranslator
+class CustomBaseTranslator(ABC):
+    """
+    Custom abstract base class for translator implementations
+    """
+    def __init__(self, source: str, target: str):
+        self.source = source
+        self.target = target
+    
+    @abstractmethod
+    def translate(self, text: str) -> str:
+        """
+        Abstract method that should be implemented by translator classes
+        """
+        pass
 
 # Медицинский словарь для частых терминов, которые плохо переводятся
 MED_DICT_EN_RU = {
@@ -38,7 +55,7 @@ MED_DICT_EN_RU = {
 # Обратный словарь
 MED_DICT_RU_EN = {v.lower(): k for k, v in MED_DICT_EN_RU.items()}
 
-class MedicalTranslator(BaseTranslator):
+class MedicalTranslator(CustomBaseTranslator):
     """
     Кастомный переводчик для медицинских терминов, использующий словарь и GoogleTranslator
     """
