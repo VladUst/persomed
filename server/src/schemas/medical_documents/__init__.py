@@ -7,7 +7,12 @@ from src.schemas.medical_documents.diseases_history import (
     DiseasesHistoryDocDetailsBase, DiseasesHistoryDocDetailsCreate, 
     DiseasesHistoryDocDetails, DiseasesHistoryDocWithDetails
 )
-from src.schemas.medical_documents.recommendations import RecommendationsDocBase, RecommendationsDocCreate, RecommendationsDoc
+from src.schemas.medical_documents.recommendations import (
+    RecommendationsDocBase, RecommendationsDocCreate, RecommendationsDoc,
+    RecommendationsDocMetaInfo, RecommendationsDocSections,
+    RecommendationsDocDetailsBase, RecommendationsDocDetailsCreate,
+    RecommendationsDocDetails, RecommendationsDocWithDetails
+)
 
 __all__ = [
     "MedicalDocumentBase", "MedicalDocumentCreate", "MedicalDocument",
@@ -17,5 +22,8 @@ __all__ = [
     "DiseasesHistoryDocMetaInfo", "DiseasesHistoryDocSections",
     "DiseasesHistoryDocDetailsBase", "DiseasesHistoryDocDetailsCreate", 
     "DiseasesHistoryDocDetails", "DiseasesHistoryDocWithDetails",
-    "RecommendationsDocBase", "RecommendationsDocCreate", "RecommendationsDoc"
+    "RecommendationsDocBase", "RecommendationsDocCreate", "RecommendationsDoc",
+    "RecommendationsDocMetaInfo", "RecommendationsDocSections", 
+    "RecommendationsDocDetailsBase", "RecommendationsDocDetailsCreate",
+    "RecommendationsDocDetails", "RecommendationsDocWithDetails"
 ] 
