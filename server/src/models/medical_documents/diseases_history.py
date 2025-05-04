@@ -1,5 +1,6 @@
 from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from typing import Optional
 
 from src.database import Model
 from src.models.medical_documents.base import MedicalDocumentBase
@@ -38,10 +39,10 @@ class DiseasesHistoryDocDetails(Model):
     
     # Sections
     anamnesis: Mapped[str] = mapped_column(String)
-    clinical_findings: Mapped[str] = mapped_column(String)
-    diagnosis: Mapped[str] = mapped_column(String)
-    treatment_plan: Mapped[str] = mapped_column(String)
-    conclusion: Mapped[str] = mapped_column(String)
+    clinical_findings: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    diagnosis: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    treatment_plan: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    conclusion: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     
     # Relationship with document
     document: Mapped[DiseasesHistoryDoc] = relationship(

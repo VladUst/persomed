@@ -18,3 +18,14 @@ async def create_tables():
 async def delete_tables():
     async with engine.begin() as conn:
         await conn.run_sync(Model.metadata.drop_all)
+
+async def recreate_tables():
+    """
+    Удаляет и заново создает все таблицы в базе данных.
+    ВНИМАНИЕ: Это приведет к потере всех данных.
+    Используйте только при необходимости полного сброса базы данных.
+    """
+    async with engine.begin() as conn:
+        await conn.run_sync(Model.metadata.drop_all)
+        await conn.run_sync(Model.metadata.create_all)
+    print("База данных успешно пересоздана")

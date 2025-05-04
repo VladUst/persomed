@@ -34,10 +34,10 @@ class DiseasesHistoryDocMetaInfo(BaseModel):
 # Diseases history document sections
 class DiseasesHistoryDocSections(BaseModel):
     anamnesis: str = Field(description="Patient anamnesis")
-    clinical_findings: str = Field(description="Clinical findings")
-    diagnosis: str = Field(description="Diagnosis")
-    treatment_plan: str = Field(description="Treatment plan")
-    conclusion: str = Field(description="Conclusion")
+    clinical_findings: Optional[str] = Field(None, description="Clinical findings")
+    diagnosis: Optional[str] = Field(None, description="Diagnosis")
+    treatment_plan: Optional[str] = Field(None, description="Treatment plan")
+    conclusion: Optional[str] = Field(None, description="Conclusion")
 
 
 # Disease history document details

@@ -135,14 +135,6 @@ class TextProcessingService:
                         name = await translate_to_russian(name)
                         if types:
                             types = await translate_to_russian(types)
-                        
-                        # Переводим name в объектах icd10
-                        if icd10:
-                            # Если icd10 это список словарей
-                            if isinstance(icd10, list) and len(icd10) > 0 and isinstance(icd10[0], dict):
-                                for icd_entry in icd10:
-                                    if "name" in icd_entry:
-                                        icd_entry["name"] = await translate_to_russian(icd_entry["name"])
                     
                     # Создаем объект сущности
                     entity_obj = {
