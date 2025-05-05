@@ -9,6 +9,7 @@ from src.repositories.medical_documents import (
     RecommendationsDocRepository
 )
 from src.services.risk_analysis.get_risk_factors import get_risk_factors
+from src.services.text_processing.process_text import process_medical_text
 
 
 async def get_symptoms(session: AsyncSession) -> List[Dict[str, str]]:
@@ -21,26 +22,42 @@ async def get_symptoms(session: AsyncSession) -> List[Dict[str, str]]:
     Returns:
         List[Dict[str, str]]: Список симптомов
     """
-    # Симптомы для демонстрации (в реальном приложении извлекались бы из анамнезов)
-    current_date = datetime.now().strftime("%Y-%m-%d")
+    # Получаем все документы из истории болезней
+    repository = DiseasesHistoryDocRepository(session)
+    documents = await repository.get_all_with_details()
     
-    return [
-        {
-            "name": "Полиурия",
-            "source": "Автоматически извлеченный из анамнезов",
-            "date": current_date
-        },
-        {
-            "name": "Головокружение",
-            "source": "Автоматически извлеченный из анамнезов",
-            "date": current_date
-        },
-        {
-            "name": "Астения",
-            "source": "Автоматически извлеченный из анамнезов",
-            "date": current_date
-        }
+    # Фильтруем только анамнезы с деталями
+    anamnesis_docs = [
+        doc for doc in documents 
+        if doc.type == "Анамнез" and doc.details is not None
     ]
+    
+    symptoms = []
+    
+    # Для каждого анамнеза
+    for doc in anamnesis_docs:
+        # Проверяем наличие anamnesis непосредственно в details
+        if not hasattr(doc.details, "anamnesis"):
+            continue
+        
+        anamnesis_text = doc.details.anamnesis
+        
+        if not anamnesis_text:
+            continue
+        
+        # Обрабатываем текст через сервис обработки текстов
+        concepts = await process_medical_text(anamnesis_text)
+        
+        # Извлекаем только симптомы (type_ids содержит T184)
+        for concept in concepts:
+            if "T184" in concept.get("type_ids", []):
+                symptoms.append({
+                    "name": concept.get("name", ""),
+                    "source": f"Автоматически извлечен из анамнеза: {doc.name}",
+                    "date": doc.date
+                })
+    
+    return symptoms
 
 
 async def get_diseases(session: AsyncSession) -> List[Dict[str, Any]]:
@@ -208,15 +225,22 @@ async def get_drugs(session: AsyncSession) -> List[Dict[str, str]]:
             
             if match:
                 name, dosage = match.groups()
+                name = name.strip()
+                # Делаем первую букву названия препарата заглавной
+                capitalized_name = name[0].upper() + name[1:] if name else ""
+                
                 drugs.append({
-                    "name": name.strip(),
+                    "name": capitalized_name,
                     "dosage": dosage.strip(),
                     "date": prescription.details.date if hasattr(prescription.details, "date") else prescription.date
                 })
             else:
                 # Если не удалось разделить, просто берем всю строку как название
+                # Делаем первую букву заглавной
+                capitalized_name = drug_info[0].upper() + drug_info[1:] if drug_info else ""
+                
                 drugs.append({
-                    "name": drug_info,
+                    "name": capitalized_name,
                     "dosage": "Не указано",
                     "date": prescription.details.date if hasattr(prescription.details, "date") else prescription.date
                 })
@@ -256,8 +280,11 @@ async def get_recommendations(session: AsyncSession) -> List[Dict[str, str]]:
         for rec_text in rec_list:
             rec_text = rec_text.strip()
             if rec_text:  # Проверка, что рекомендация не пустая
+                # Делаем первую букву заглавной
+                capitalized_rec = rec_text[0].upper() + rec_text[1:] if rec_text else ""
+                
                 recommendations.append({
-                    "name": rec_text,
+                    "name": capitalized_rec,
                     "source": rec_doc.name,
                     "date": rec_doc.details.date if hasattr(rec_doc.details, "date") else rec_doc.date
                 })
