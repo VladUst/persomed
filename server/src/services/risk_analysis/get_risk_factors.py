@@ -89,7 +89,7 @@ async def get_risk_factors(session: AsyncSession):
         dict: Словарь с факторами риска по категориям
     """
     # Получаем текущую дату
-    current_date = datetime.now().strftime("%d.%m.%Y")
+    current_date = datetime.now().strftime("%Y-%m-%d")
     
     # Получаем показатели, выходящие за нормы
     abnormal_indicators = await find_abnormal_health_indicators(session)
