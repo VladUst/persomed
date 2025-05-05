@@ -26,6 +26,7 @@ class Rate(BaseModel):
 class Suspicion(BaseModel):
     name: str = Field(description="Название подозреваемого заболевания")
     date: str = Field(description="Дата подозрения")
+    source: str = Field(description="Источник подозрения")
     icd: str = Field(description="Код заболевания по МКБ-10")
 
 

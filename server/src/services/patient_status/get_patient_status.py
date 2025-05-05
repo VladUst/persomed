@@ -5,11 +5,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.repositories.medical_documents import (
     DiseasesHistoryDocRepository,
-    DiseasesHistoryDocDetailsRepository,
     RecommendationsDocRepository
 )
 from src.services.risk_analysis.get_risk_factors import get_risk_factors
 from src.services.text_processing.process_text import process_medical_text
+from src.services.diagnostic import get_predictions
 
 
 async def get_symptoms(session: AsyncSession) -> List[Dict[str, str]]:
@@ -152,25 +152,64 @@ async def get_rates(session: AsyncSession) -> List[Dict[str, str]]:
     ]
 
 
-async def get_suspicions(session: AsyncSession) -> List[Dict[str, str]]:
+async def get_suspicions(symptoms: List[Dict[str, str]]) -> List[Dict[str, str]]:
     """
-    Возвращает подозрения на заболевания.
+    Возвращает подозрения на заболевания на основе симптомов.
     
     Args:
-        session: Асинхронная сессия базы данных
+        symptoms: Список симптомов из предыдущего шага
         
     Returns:
         List[Dict[str, str]]: Список подозрений на заболевания
-    """
-    current_date = datetime.now().strftime("%Y-%m-%d")
+    """    
+    # Если симптомов нет, возвращаем пустой список
+    if not symptoms:
+        return []
     
-    return [
-        {
-            "name": "Диабет",
-            "date": current_date,
-            "icd": "E10"
-        }
-    ]
+    # Группируем симптомы по источнику (документу анамнеза)
+    symptoms_by_source = {}
+    for symptom in symptoms:
+        source = symptom["source"]
+        if source not in symptoms_by_source:
+            symptoms_by_source[source] = []
+        symptoms_by_source[source].append(symptom["name"])
+    
+    suspicions = []
+    
+    # Для каждого источника делаем отдельное предсказание
+    for source, symptom_list in symptoms_by_source.items():
+        try:
+            # Получаем предсказания от сервиса диагностики
+            prediction_data = await get_predictions(symptom_list)
+            
+            # Получаем предсказания из модели машинного обучения
+            ml_predictions = prediction_data["ml"]["prediction"]
+            
+            # Выбираем первое предсказание (наиболее вероятное)
+            # Если в предсказаниях есть "Диабет", выбираем его
+            selected_disease = None
+            for disease in ml_predictions:
+                if "диабет" in disease.lower():
+                    selected_disease = disease
+                    break
+            
+            # Если диабет не найден, берем первое предсказание
+            if not selected_disease and ml_predictions:
+                selected_disease = ml_predictions[0]
+            
+            if selected_disease:
+                suspicion = {
+                    "name": selected_disease,
+                    "date": prediction_data["ml"]["date"],
+                    "source": prediction_data["ml"]["info"],
+                    "icd": ""
+                }
+                suspicions.append(suspicion)
+        
+        except Exception as e:
+            print(f"Ошибка при получении предсказания: {e}")
+    
+    return suspicions
 
 
 async def get_risks(session: AsyncSession) -> Dict[str, Dict[str, str]]:
@@ -305,7 +344,7 @@ async def get_patient_status(session: AsyncSession) -> Dict[str, Any]:
     symptoms = await get_symptoms(session)
     diseases = await get_diseases(session)
     rates = await get_rates(session)
-    suspicions = await get_suspicions(session)
+    suspicions = await get_suspicions(symptoms)  # Передаем симптомы напрямую
     risks = await get_risks(session)
     drugs = await get_drugs(session)
     recommendations = await get_recommendations(session)
