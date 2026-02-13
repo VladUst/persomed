@@ -1,6 +1,8 @@
 venv
 venv-medcat
+venv-pyctd
 src/services/text_processing/models
 persomed.db
+pyctd.db
 .idea
 __pycache__
