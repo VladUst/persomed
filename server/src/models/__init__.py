@@ -8,8 +8,8 @@ from src.models.medical_documents import (
 from src.models.health_indicators import (
     HealthIndicatorBase,
     GeneralInfo,
-    DetailedInfo,
-    PreventiveInfo,
+    LaboratoryInfo,
+    VaccinationsInfo,
     AllergiesInfo,
     FamilyHistoryInfo,
     LifestyleInfo
@@ -23,8 +23,8 @@ __all__ = [
     "DiseasesHistoryDocDetails",
     "HealthIndicatorBase",
     "GeneralInfo",
-    "DetailedInfo",
-    "PreventiveInfo",
+    "LaboratoryInfo",
+    "VaccinationsInfo",
     "AllergiesInfo",
     "FamilyHistoryInfo",
     "LifestyleInfo",

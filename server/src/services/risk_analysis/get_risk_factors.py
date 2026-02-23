@@ -1,6 +1,6 @@
 from datetime import datetime
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.repositories.health_indicators import GeneralInfoRepository, DetailedInfoRepository
+from src.repositories.health_indicators import GeneralInfoRepository, LaboratoryInfoRepository
 from src.repositories.medical_documents import DiseasesHistoryDocRepository
 
 
@@ -21,7 +21,7 @@ async def find_abnormal_health_indicators(session: AsyncSession):
     general_indicators = await general_repo.get_all()
     
     # Получаем детальные показатели здоровья
-    detailed_repo = DetailedInfoRepository(session)
+    detailed_repo = LaboratoryInfoRepository(session)
     detailed_indicators = await detailed_repo.get_all()
     
     # Объединяем все показатели

@@ -5,15 +5,12 @@ from src.db_depends import get_async_db
 from src.schemas.patient_status import PatientStatusResponse
 from src.services.patient_status import get_patient_status
 
-# Создаем роутер для статуса пациента
 patient_status_router = APIRouter(
-    prefix="/patient-status",
     tags=["Статус пациента"]
 )
 
-
 @patient_status_router.get(
-    "/", 
+    "/",
     response_model=PatientStatusResponse, 
     status_code=status.HTTP_200_OK,
     summary="Получить полный статус пациента"

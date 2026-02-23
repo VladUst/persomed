@@ -1,7 +1,7 @@
 from src.schemas.health_indicators import (
     GeneralInfo, GeneralInfoCreate,
     DetailedInfo, DetailedInfoCreate,
-    PreventiveInfo, PreventiveInfoCreate,
+    VaccinationsInfo, VaccinationsInfoCreate,
     AllergiesInfo, AllergiesInfoCreate,
     FamilyHistoryInfo, FamilyHistoryInfoCreate,
     LifestyleInfo, LifestyleInfoCreate
@@ -16,14 +16,13 @@ from src.schemas.medical_documents import (
     DiseasesHistoryDocDetails, DiseasesHistoryDocWithDetails,
     RecommendationsDocBase, RecommendationsDocCreate, RecommendationsDoc
 )
-from src.schemas.tasks import STaskAdd, STask, STaskId
 from src.schemas.text_process import MedicalTextRequest, NamedEntity, TextProcessingResponse
 
 __all__ = [
     # Health indicators
     "GeneralInfo", "GeneralInfoCreate",
     "DetailedInfo", "DetailedInfoCreate",
-    "PreventiveInfo", "PreventiveInfoCreate",
+    "VaccinationsInfo", "VaccinationsInfoCreate",
     "AllergiesInfo", "AllergiesInfoCreate",
     "FamilyHistoryInfo", "FamilyHistoryInfoCreate",
     "LifestyleInfo", "LifestyleInfoCreate",
@@ -37,10 +36,7 @@ __all__ = [
     "DiseasesHistoryDocDetailsBase", "DiseasesHistoryDocDetailsCreate", 
     "DiseasesHistoryDocDetails", "DiseasesHistoryDocWithDetails",
     "RecommendationsDocBase", "RecommendationsDocCreate", "RecommendationsDoc",
-    
-    # Tasks
-    "STaskAdd", "STask", "STaskId",
-    
+
     # Text Processing
     "MedicalTextRequest", "NamedEntity", "TextProcessingResponse"
 ] 

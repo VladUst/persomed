@@ -3,30 +3,29 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.db_depends import get_async_db
-from src.schemas.health_indicators import PreventiveInfo, PreventiveInfoCreate
-from src.repositories.health_indicators import PreventiveInfoRepository
+from src.schemas.health_indicators import VaccinationsInfo, VaccinationsInfoCreate
+from src.repositories.health_indicators import VaccinationsInfoRepository
 
 
-# Создаем роутер для прививок и профилактических мероприятий
-preventive_router = APIRouter(
-    prefix="/preventive",
+vaccinations_router = APIRouter(
+    prefix="/vaccinations",
     tags=["Вакцинации и профилактические мероприятия"]
 )
 
 
-@preventive_router.get("/", response_model=List[PreventiveInfo], summary="Получить всю информацию о прививках и профилактике")
-async def get_all_preventive_info(db: AsyncSession = Depends(get_async_db)):
+@vaccinations_router.get("/", response_model=List[VaccinationsInfo], summary="Получить всю информацию о прививках")
+async def get_all_vaccinations_info(db: AsyncSession = Depends(get_async_db)):
     """
     Получение всех записей о прививках и профилактических мероприятиях.
     
     Возвращает список всех записей о прививках и профилактических мероприятиях.
     """
-    repository = PreventiveInfoRepository(db)
+    repository = VaccinationsInfoRepository(db)
     return await repository.get_all()
 
 
-@preventive_router.get("/{id}", response_model=PreventiveInfo, summary="Получить информацию о прививке по ID")
-async def get_preventive_info(id: int, db: AsyncSession = Depends(get_async_db)):
+@vaccinations_router.get("/{id}", response_model=VaccinationsInfo, summary="Получить информацию о прививке по ID")
+async def get_vaccinations_info(id: int, db: AsyncSession = Depends(get_async_db)):
     """
     Получение конкретной записи о прививке/профилактике по её ID.
     
@@ -34,7 +33,7 @@ async def get_preventive_info(id: int, db: AsyncSession = Depends(get_async_db))
     
     Возвращает запись о прививке/профилактике, если она найдена, иначе выдает ошибку 404.
     """
-    repository = PreventiveInfoRepository(db)
+    repository = VaccinationsInfoRepository(db)
     item = await repository.get_by_id(id)
     if not item:
         raise HTTPException(
@@ -44,9 +43,9 @@ async def get_preventive_info(id: int, db: AsyncSession = Depends(get_async_db))
     return item
 
 
-@preventive_router.post("/", response_model=PreventiveInfo, status_code=status.HTTP_201_CREATED, summary="Создать профилактический показатель")
-async def create_preventive_info(
-    data: PreventiveInfoCreate,
+@vaccinations_router.post("/", response_model=VaccinationsInfo, status_code=status.HTTP_201_CREATED, summary="Создать информацию о прививке")
+async def create_vaccinations_info(
+    data: VaccinationsInfoCreate,
     db: AsyncSession = Depends(get_async_db)
 ):
     """
@@ -62,12 +61,12 @@ async def create_preventive_info(
     
     Возвращает созданный профилактический показатель с присвоенным ID.
     """
-    repository = PreventiveInfoRepository(db)
+    repository = VaccinationsInfoRepository(db)
     return await repository.create(data.model_dump())
 
 
-@preventive_router.put("/{id}", response_model=PreventiveInfo, summary="Обновить запись о прививке/профилактике")
-async def update_preventive_info(id: int, data: PreventiveInfoCreate, db: AsyncSession = Depends(get_async_db)):
+@vaccinations_router.put("/{id}", response_model=VaccinationsInfo, summary="Обновить информацию о прививке")
+async def update_vaccinations_info(id: int, data: VaccinationsInfoCreate, db: AsyncSession = Depends(get_async_db)):
     """
     Обновление существующей записи о прививке/профилактике.
     
@@ -76,7 +75,7 @@ async def update_preventive_info(id: int, data: PreventiveInfoCreate, db: AsyncS
     
     Возвращает обновленную запись о прививке/профилактике, если она найдена, иначе выдает ошибку 404.
     """
-    repository = PreventiveInfoRepository(db)
+    repository = VaccinationsInfoRepository(db)
     item = await repository.get_by_id(id)
     if not item:
         raise HTTPException(
@@ -86,8 +85,8 @@ async def update_preventive_info(id: int, data: PreventiveInfoCreate, db: AsyncS
     return await repository.update(id, data.model_dump())
 
 
-@preventive_router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT, summary="Удалить запись о прививке/профилактике")
-async def delete_preventive_info(id: int, db: AsyncSession = Depends(get_async_db)):
+@vaccinations_router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT, summary="Удалить информацию о прививке")
+async def delete_vaccinations_info(id: int, db: AsyncSession = Depends(get_async_db)):
     """
     Удаление записи о прививке/профилактике.
     
@@ -95,10 +94,10 @@ async def delete_preventive_info(id: int, db: AsyncSession = Depends(get_async_d
     
     Возвращает статус 204 No Content при успешном удалении, иначе выдает ошибку 404.
     """
-    repository = PreventiveInfoRepository(db)
+    repository = VaccinationsInfoRepository(db)
     success = await repository.delete(id)
     if not success:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Запись о прививке с ID {id} не найдена"
-        ) 
+        )

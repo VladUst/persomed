@@ -4,14 +4,13 @@ from typing import List
 from src.schemas.text_process import MedicalTextRequest, TextProcessingResponse, NamedEntity
 from src.services.text_processing import process_medical_text
 
-# Create router for entity extraction endpoints
-router = APIRouter(
+text_processing_router = APIRouter(
     tags=["Сервис обработки текстов"]
 )
 
 
-@router.post(
-    "/entities",
+@text_processing_router.post(
+    "/extract-entities",
     response_model=TextProcessingResponse,
     status_code=status.HTTP_200_OK,
     summary="Извлечь именованные медицинские сущности из текста" 

@@ -1,13 +1,11 @@
 from fastapi import APIRouter
 
-from src.api.risk_analysis.risk_factors import router as risk_factors_router
+from src.api.risk_analysis.risk_analysis import risk_analysis_router
 
-# Create a router for risk analysis
 router = APIRouter(
     prefix="/risk-analysis",
 )
 
-# Include sub-routers
-router.include_router(risk_factors_router)
+router.include_router(risk_analysis_router)
 
 __all__ = ["router"] 

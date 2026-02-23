@@ -5,13 +5,12 @@ from src.db_depends import get_async_db
 from src.schemas.risk_analysis import RiskAnalysisResponse
 from src.services.risk_analysis import get_risk_factors
 
-# Создаем роутер для факторов риска
-router = APIRouter(
-    tags=["Анализ факторов риска"]
+risk_analysis_router = APIRouter(
+    tags=["Сервис анализа рисков"]
 )
 
 
-@router.get(
+@risk_analysis_router.get(
     "/risk-factors", 
     response_model=RiskAnalysisResponse, 
     status_code=status.HTTP_200_OK, 
@@ -43,7 +42,7 @@ router = APIRouter(
         }
     }
 )
-async def get_user_risk_factors(db: AsyncSession = Depends(get_async_db)):
+async def get_risks(db: AsyncSession = Depends(get_async_db)):
     """
     Анализ факторов риска пациента на основе показателей здоровья и хронических заболеваний.
     

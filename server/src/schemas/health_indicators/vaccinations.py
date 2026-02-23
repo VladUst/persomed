@@ -1,9 +1,9 @@
 from src.schemas.health_indicators.base import HealthIndicatorBase, HealthIndicatorResponse
 
 
-class PreventiveInfoCreate(HealthIndicatorBase):
+class VaccinationsInfoCreate(HealthIndicatorBase):
     pass
 
 
-class PreventiveInfo(HealthIndicatorResponse):
+class VaccinationsInfo(HealthIndicatorResponse):
     pass 

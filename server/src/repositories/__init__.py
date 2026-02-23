@@ -1,8 +1,8 @@
 from src.repositories.health_indicators import (
     HealthIndicatorRepository,
     GeneralInfoRepository,
-    DetailedInfoRepository,
-    PreventiveInfoRepository,
+    LaboratoryInfoRepository,
+    VaccinationsInfoRepository,
     AllergiesInfoRepository,
     FamilyHistoryInfoRepository,
     LifestyleInfoRepository
@@ -23,8 +23,8 @@ __all__ = [
     # Health indicators
     "HealthIndicatorRepository",
     "GeneralInfoRepository",
-    "DetailedInfoRepository",
-    "PreventiveInfoRepository",
+    "LaboratoryInfoRepository",
+    "VaccinationsInfoRepository",
     "AllergiesInfoRepository",
     "FamilyHistoryInfoRepository",
     "LifestyleInfoRepository",

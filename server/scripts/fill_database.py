@@ -10,7 +10,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from scripts.db_patch import new_session, create_tables
 from src.models.health_indicators import (
     GeneralInfo,
-    DetailedInfo,
+    LaboratoryInfo,
     AllergiesInfo,
     FamilyHistoryInfo,
     PreventiveInfo,
@@ -64,7 +64,7 @@ async def insert_detailed_info(session, items):
             # For DetailedInfo, value must be float
             value = float(item.get('value', 0))
             
-            model = DetailedInfo(
+            model = LaboratoryInfo(
                 name=item.get('name'),
                 canonical_name=item.get('canonicalName'),
                 value=value,

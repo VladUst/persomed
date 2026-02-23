@@ -1,7 +1,5 @@
 from fastapi import APIRouter, status, Body
-from typing import List, Dict, Any
 from datetime import datetime
-from fastapi.responses import JSONResponse
 
 from src.schemas.diagnostic import SymptomsList, PredictionResponse
 from src.services.diagnostic.ml_disease_prediction.get_prediction import get_prediction as ml_get_prediction
@@ -10,14 +8,13 @@ from src.services.diagnostic.ml_disease_prediction.get_prediction import get_mod
 from src.services.diagnostic.ontology_diseases_prediction.get_prediction import get_ontology_info
 from src.services.translate import translate_to_english, translate_to_russian
 
-# Создаем роутер для предсказания заболеваний
-router = APIRouter(
+diagnostic_router = APIRouter(
     tags=["Сервис диагностики"]
 )
 
 
-@router.post(
-    "/predict", 
+@diagnostic_router.post(
+    "/diseases", 
     response_model=PredictionResponse, 
     status_code=status.HTTP_200_OK, 
     summary="Предсказать заболевания по симптомам",
@@ -43,7 +40,7 @@ router = APIRouter(
         }
     }
 )
-async def predict_disease(
+async def diseases(
     data: SymptomsList = Body(
         ...,
         example={"symptoms": ["кашель", "охриплость", "стридор"]},

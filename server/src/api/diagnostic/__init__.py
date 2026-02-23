@@ -1,14 +1,12 @@
 from fastapi import APIRouter
 
-from src.api.diagnostic.prediction import router as prediction_router
+from src.api.diagnostic.diagnostic import diagnostic_router
 
-# Создаем роутер для диагностики
 router = APIRouter(
     prefix="/diagnostic",
 )
 
-# Подключаем роутеры
-router.include_router(prediction_router)
+router.include_router(diagnostic_router)
 
 
 __all__ = ["router"] 

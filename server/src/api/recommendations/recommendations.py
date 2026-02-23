@@ -4,19 +4,17 @@ from src.schemas.recommendation import DiseaseRequest, DrugRecommendationRespons
 from src.services.recommendation.drug_recommendation import get_drug_recommendations, get_ontology_info, get_current_date
 from src.services.translate import translate_to_english, translate_to_russian
 
-# Создаем роутер для рекомендаций препаратов
-router = APIRouter(
+recommendations_router = APIRouter(
     tags=["Сервис рекомендаций"]
 )
 
-
-@router.post(
+@recommendations_router.post(
     "/drugs", 
     response_model=DrugRecommendationResponse, 
     status_code=status.HTTP_200_OK, 
     summary="Получить рекомендации препаратов по заболеванию"
 )
-async def recommend_drugs(
+async def drugs(
     data: DiseaseRequest = Body(
         ...,
         example={"disease": "Пневмония"},
