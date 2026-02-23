@@ -1,12 +1,11 @@
 from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from typing import Optional
 
 from src.database import Base
 from src.models.medical_documents.base import MedicalDocumentBase
 
 
-class RecommendationsDoc(Base, MedicalDocumentBase):
+class RecommendationsDoc(MedicalDocumentBase):
     __tablename__ = "recommendations_docs"
     
     specialty: Mapped[str] = mapped_column(String)

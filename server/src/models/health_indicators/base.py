@@ -6,7 +6,8 @@ from src.database import Base
 
 
 # Базовый класс только для общих полей, не будет создавать таблицу
-class HealthIndicatorBase:
+class HealthIndicatorBase(Base):
+    __abstract__ = True
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String)
     canonical_name: Mapped[Optional[str]] = mapped_column(String, nullable=True)

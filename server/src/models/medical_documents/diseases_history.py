@@ -6,7 +6,7 @@ from src.database import Base
 from src.models.medical_documents.base import MedicalDocumentBase
 
 
-class DiseasesHistoryDoc(Base, MedicalDocumentBase):
+class DiseasesHistoryDoc(MedicalDocumentBase):
     __tablename__ = "diseases_history_docs"
     
     icd_code: Mapped[str] = mapped_column(String)
