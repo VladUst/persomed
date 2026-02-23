@@ -2,12 +2,10 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.api.health_indicators.session import get_session
+from src.db_depends import get_async_db
 from src.schemas.health_indicators import AllergiesInfo, AllergiesInfoCreate
 from src.repositories.health_indicators import AllergiesInfoRepository
 
-
-# Создаем роутер для аллергий
 allergies_router = APIRouter(
     prefix="/allergies",
     tags=["Аллергии и непереносимости"]
@@ -15,18 +13,18 @@ allergies_router = APIRouter(
 
 
 @allergies_router.get("/", response_model=List[AllergiesInfo], summary="Получить всю информацию об аллергиях")
-async def get_all_allergies_info(session: AsyncSession = Depends(get_session)):
+async def get_all_allergies_info(db: AsyncSession = Depends(get_async_db),):
     """
     Получение всех записей об аллергиях.
     
     Возвращает список всех записей об аллергиях.
     """
-    repository = AllergiesInfoRepository(session)
+    repository = AllergiesInfoRepository(db)
     return await repository.get_all()
 
 
 @allergies_router.get("/{id}", response_model=AllergiesInfo, summary="Получить информацию об аллергии по ID")
-async def get_allergies_info(id: int, session: AsyncSession = Depends(get_session)):
+async def get_allergies_info(id: int, db: AsyncSession = Depends(get_async_db),):
     """
     Получение конкретной записи об аллергии по её ID.
     
@@ -34,7 +32,7 @@ async def get_allergies_info(id: int, session: AsyncSession = Depends(get_sessio
     
     Возвращает запись об аллергии, если она найдена, иначе выдает ошибку 404.
     """
-    repository = AllergiesInfoRepository(session)
+    repository = AllergiesInfoRepository(db)
     item = await repository.get_by_id(id)
     if not item:
         raise HTTPException(
@@ -47,29 +45,27 @@ async def get_allergies_info(id: int, session: AsyncSession = Depends(get_sessio
 @allergies_router.post("/", response_model=AllergiesInfo, status_code=status.HTTP_201_CREATED, summary="Создать информацию об аллергии")
 async def create_allergies_info(
     data: AllergiesInfoCreate,
-    session: AsyncSession = Depends(get_session)
+    db: AsyncSession = Depends(get_async_db),
 ):
     """
     Создание новой записи об аллергии.
     
     - **name**: Название аллергии (обязательно)
-    - **value**: Тяжесть реакции (обязательно)
+    - **value**: Измерение (обязательно)
     - **canonical_name**: Каноническое название аллергии (опционально)
     - **unit**: Единица измерения (опционально)
     - **date**: Дата выявления (опционально)
-    - **target_level_min**: Минимальное целевое значение (опционально)
-    - **target_level_max**: Максимальное целевое значение (опционально)
-    
-    Поле target_reached вычисляется автоматически по тем же правилам, как и для других показателей.
+    - **target_level_min**: Минимальное допустимое значение (опционально)
+    - **target_level_max**: Максимальное допустимое значение (опционально)
     
     Возвращает созданную запись об аллергии с присвоенным ID.
     """
-    repository = AllergiesInfoRepository(session)
+    repository = AllergiesInfoRepository(db)
     return await repository.create(data.model_dump())
 
 
 @allergies_router.put("/{id}", response_model=AllergiesInfo, summary="Обновить запись об аллергии")
-async def update_allergies_info(id: int, data: AllergiesInfoCreate, session: AsyncSession = Depends(get_session)):
+async def update_allergies_info(id: int, data: AllergiesInfoCreate, db: AsyncSession = Depends(get_async_db),):
     """
     Обновление существующей записи об аллергии.
     
@@ -78,7 +74,7 @@ async def update_allergies_info(id: int, data: AllergiesInfoCreate, session: Asy
     
     Возвращает обновленную запись об аллергии, если она найдена, иначе выдает ошибку 404.
     """
-    repository = AllergiesInfoRepository(session)
+    repository = AllergiesInfoRepository(db)
     item = await repository.get_by_id(id)
     if not item:
         raise HTTPException(
@@ -89,7 +85,7 @@ async def update_allergies_info(id: int, data: AllergiesInfoCreate, session: Asy
 
 
 @allergies_router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT, summary="Удалить запись об аллергии")
-async def delete_allergies_info(id: int, session: AsyncSession = Depends(get_session)):
+async def delete_allergies_info(id: int, db: AsyncSession = Depends(get_async_db),):
     """
     Удаление записи об аллергии.
     
@@ -97,7 +93,7 @@ async def delete_allergies_info(id: int, session: AsyncSession = Depends(get_ses
     
     Возвращает статус 204 No Content при успешном удалении, иначе выдает ошибку 404.
     """
-    repository = AllergiesInfoRepository(session)
+    repository = AllergiesInfoRepository(db)
     success = await repository.delete(id)
     if not success:
         raise HTTPException(

@@ -2,7 +2,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status, Body
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.api.medical_documents.session import get_session
+from src.db_depends import get_async_db
 from src.schemas.medical_documents import (
     RecommendationsDoc, RecommendationsDocCreate,
     RecommendationsDocDetails, RecommendationsDocDetailsCreate,
@@ -22,18 +22,18 @@ recommendations_router = APIRouter(
 
 
 @recommendations_router.get("/", response_model=List[RecommendationsDocWithDetails], summary="Получить все документы рекомендаций")
-async def get_all_recommendations_docs(session: AsyncSession = Depends(get_session)):
+async def get_all_recommendations_docs(db: AsyncSession = Depends(get_async_db)):
     """
     Получение всех документов рекомендаций и назначений с их деталями (если доступны).
     
     Возвращает список всех документов рекомендаций и назначений.
     """
-    repository = RecommendationsDocRepository(session)
+    repository = RecommendationsDocRepository(db)
     return await repository.get_all_with_details()
 
 
 @recommendations_router.get("/{id}", response_model=RecommendationsDocWithDetails, summary="Получить документ рекомендаций по ID")
-async def get_recommendations_doc(id: int, session: AsyncSession = Depends(get_session)):
+async def get_recommendations_doc(id: int, db: AsyncSession = Depends(get_async_db)):
     """
     Получение конкретного документа рекомендаций по его ID с деталями (если доступны).
     
@@ -41,7 +41,7 @@ async def get_recommendations_doc(id: int, session: AsyncSession = Depends(get_s
     
     Возвращает документ рекомендаций, если он найден, иначе выдает ошибку 404.
     """
-    repository = RecommendationsDocRepository(session)
+    repository = RecommendationsDocRepository(db)
     item = await repository.get_by_id_with_details(id)
     if not item:
         raise HTTPException(
@@ -54,7 +54,7 @@ async def get_recommendations_doc(id: int, session: AsyncSession = Depends(get_s
 @recommendations_router.post("/", response_model=RecommendationsDoc, status_code=status.HTTP_201_CREATED, summary="Создать документ с рекомендациями")
 async def create_recommendations_doc(
     data: RecommendationsDocCreate,
-    session: AsyncSession = Depends(get_session)
+    db: AsyncSession = Depends(get_async_db)
 ):
     """
     Создание нового документа рекомендаций.
@@ -66,12 +66,12 @@ async def create_recommendations_doc(
     
     Возвращает созданный документ рекомендаций с присвоенным ID.
     """
-    repository = RecommendationsDocRepository(session)
+    repository = RecommendationsDocRepository(db)
     return await repository.create(data.model_dump())
 
 
 @recommendations_router.put("/{id}", response_model=RecommendationsDoc, summary="Обновить документ рекомендаций")
-async def update_recommendations_doc(id: int, data: RecommendationsDocCreate, session: AsyncSession = Depends(get_session)):
+async def update_recommendations_doc(id: int, data: RecommendationsDocCreate, db: AsyncSession = Depends(get_async_db)):
     """
     Обновление существующего документа рекомендаций.
     
@@ -80,7 +80,7 @@ async def update_recommendations_doc(id: int, data: RecommendationsDocCreate, se
     
     Возвращает обновленный документ рекомендаций, если он найден, иначе выдает ошибку 404.
     """
-    repository = RecommendationsDocRepository(session)
+    repository = RecommendationsDocRepository(db)
     item = await repository.get_by_id(id)
     if not item:
         raise HTTPException(
@@ -91,7 +91,7 @@ async def update_recommendations_doc(id: int, data: RecommendationsDocCreate, se
 
 
 @recommendations_router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT, summary="Удалить документ рекомендаций")
-async def delete_recommendations_doc(id: int, session: AsyncSession = Depends(get_session)):
+async def delete_recommendations_doc(id: int, db: AsyncSession = Depends(get_async_db)):
     """
     Удаление документа рекомендаций.
     
@@ -99,7 +99,7 @@ async def delete_recommendations_doc(id: int, session: AsyncSession = Depends(ge
     
     Возвращает статус 204 No Content при успешном удалении, иначе выдает ошибку 404.
     """
-    repository = RecommendationsDocRepository(session)
+    repository = RecommendationsDocRepository(db)
     success = await repository.delete(id)
     if not success:
         raise HTTPException(
@@ -110,7 +110,7 @@ async def delete_recommendations_doc(id: int, session: AsyncSession = Depends(ge
 
 # Recommendations Document Details endpoints
 @recommendations_router.get("/{document_id}/details", response_model=RecommendationsDocDetails, summary="Получить детали документа рекомендаций")
-async def get_recommendations_doc_details(document_id: int, session: AsyncSession = Depends(get_session)):
+async def get_recommendations_doc_details(document_id: int, db: AsyncSession = Depends(get_async_db)):
     """
     Получение деталей для конкретного документа рекомендаций.
     
@@ -118,7 +118,7 @@ async def get_recommendations_doc_details(document_id: int, session: AsyncSessio
     
     Возвращает детали документа рекомендаций, если они найдены, иначе выдает ошибку 404.
     """
-    repository = RecommendationsDocDetailsRepository(session)
+    repository = RecommendationsDocDetailsRepository(db)
     item = await repository.get_by_document_id(document_id)
     if not item:
         raise HTTPException(
@@ -132,7 +132,7 @@ async def get_recommendations_doc_details(document_id: int, session: AsyncSessio
 async def add_recommendations_details(
     document_id: int,
     data: RecommendationsDocDetailsCreate,
-    session: AsyncSession = Depends(get_session)
+    db: AsyncSession = Depends(get_async_db)
 ):
     """
     Создание деталей для документа рекомендаций.
@@ -152,7 +152,7 @@ async def add_recommendations_details(
     Возвращает созданные детали документа рекомендаций с присвоенным ID.
     """
     # Проверяем, существует ли документ
-    doc_repository = RecommendationsDocRepository(session)
+    doc_repository = RecommendationsDocRepository(db)
     document = await doc_repository.get_by_id(document_id)
     if not document:
         raise HTTPException(
@@ -161,7 +161,7 @@ async def add_recommendations_details(
         )
     
     # Проверяем, не существуют ли уже детали
-    details_repository = RecommendationsDocDetailsRepository(session)
+    details_repository = RecommendationsDocDetailsRepository(db)
     existing_details = await details_repository.get_by_document_id(document_id)
     if existing_details:
         raise HTTPException(
@@ -189,7 +189,7 @@ async def add_recommendations_details(
 
 
 @recommendations_router.put("/{document_id}/details", response_model=RecommendationsDocDetails, summary="Обновить детали документа рекомендаций")
-async def update_recommendations_doc_details(document_id: int, data: RecommendationsDocDetailsCreate, session: AsyncSession = Depends(get_session)):
+async def update_recommendations_doc_details(document_id: int, data: RecommendationsDocDetailsCreate, db: AsyncSession = Depends(get_async_db)):
     """
     Обновление деталей для документа рекомендаций.
     
@@ -198,7 +198,7 @@ async def update_recommendations_doc_details(document_id: int, data: Recommendat
     
     Возвращает обновленные детали документа рекомендаций, если они найдены, иначе выдает ошибку 404.
     """
-    repository = RecommendationsDocDetailsRepository(session)
+    repository = RecommendationsDocDetailsRepository(db)
     item = await repository.get_by_document_id(document_id)
     if not item:
         raise HTTPException(
@@ -226,7 +226,7 @@ async def update_recommendations_doc_details(document_id: int, data: Recommendat
 
 
 @recommendations_router.delete("/{document_id}/details", status_code=status.HTTP_204_NO_CONTENT, summary="Удалить детали документа рекомендаций")
-async def delete_recommendations_doc_details(document_id: int, session: AsyncSession = Depends(get_session)):
+async def delete_recommendations_doc_details(document_id: int, db: AsyncSession = Depends(get_async_db)):
     """
     Удаление деталей для документа рекомендаций.
     
@@ -234,7 +234,7 @@ async def delete_recommendations_doc_details(document_id: int, session: AsyncSes
     
     Возвращает статус 204 No Content при успешном удалении, иначе выдает ошибку 404.
     """
-    repository = RecommendationsDocDetailsRepository(session)
+    repository = RecommendationsDocDetailsRepository(db)
     item = await repository.get_by_document_id(document_id)
     if not item:
         raise HTTPException(
@@ -247,4 +247,4 @@ async def delete_recommendations_doc_details(document_id: int, session: AsyncSes
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Не удалось удалить детали документа рекомендаций"
-        ) 
+        )

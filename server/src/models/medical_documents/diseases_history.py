@@ -2,11 +2,11 @@ from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from typing import Optional
 
-from src.database import Model
+from src.database import Base
 from src.models.medical_documents.base import MedicalDocumentBase
 
 
-class DiseasesHistoryDoc(Model, MedicalDocumentBase):
+class DiseasesHistoryDoc(Base, MedicalDocumentBase):
     __tablename__ = "diseases_history_docs"
     
     icd_code: Mapped[str] = mapped_column(String)
@@ -21,7 +21,7 @@ class DiseasesHistoryDoc(Model, MedicalDocumentBase):
     )
 
 
-class DiseasesHistoryDocDetails(Model):
+class DiseasesHistoryDocDetails(Base):
     __tablename__ = "diseases_history_doc_details"
     
     id: Mapped[int] = mapped_column(ForeignKey("diseases_history_docs.id", ondelete="CASCADE"), primary_key=True)

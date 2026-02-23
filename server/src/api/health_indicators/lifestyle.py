@@ -2,7 +2,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.api.health_indicators.session import get_session
+from src.db_depends import get_async_db
 from src.schemas.health_indicators import LifestyleInfo, LifestyleInfoCreate
 from src.repositories.health_indicators import LifestyleInfoRepository
 
@@ -15,18 +15,18 @@ lifestyle_router = APIRouter(
 
 
 @lifestyle_router.get("/", response_model=List[LifestyleInfo], summary="Получить всю информацию об образе жизни")
-async def get_all_lifestyle_info(session: AsyncSession = Depends(get_session)):
+async def get_all_lifestyle_info(db: AsyncSession = Depends(get_async_db)):
     """
     Получение всех записей об образе жизни.
     
     Возвращает список всех записей об образе жизни.
     """
-    repository = LifestyleInfoRepository(session)
+    repository = LifestyleInfoRepository(db)
     return await repository.get_all()
 
 
 @lifestyle_router.get("/{id}", response_model=LifestyleInfo, summary="Получить информацию об образе жизни по ID")
-async def get_lifestyle_info(id: int, session: AsyncSession = Depends(get_session)):
+async def get_lifestyle_info(id: int, db: AsyncSession = Depends(get_async_db)):
     """
     Получение конкретной записи об образе жизни по её ID.
     
@@ -34,7 +34,7 @@ async def get_lifestyle_info(id: int, session: AsyncSession = Depends(get_sessio
     
     Возвращает запись об образе жизни, если она найдена, иначе выдает ошибку 404.
     """
-    repository = LifestyleInfoRepository(session)
+    repository = LifestyleInfoRepository(db)
     item = await repository.get_by_id(id)
     if not item:
         raise HTTPException(
@@ -47,29 +47,27 @@ async def get_lifestyle_info(id: int, session: AsyncSession = Depends(get_sessio
 @lifestyle_router.post("/", response_model=LifestyleInfo, status_code=status.HTTP_201_CREATED, summary="Создать информацию об образе жизни")
 async def create_lifestyle_info(
     data: LifestyleInfoCreate,
-    session: AsyncSession = Depends(get_session)
+    db: AsyncSession = Depends(get_async_db)
 ):
     """
     Создание новой записи об образе жизни.
     
     - **name**: Название показателя (обязательно)
-    - **value**: Значение показателя (обязательно)
+    - **value**: Измерение (обязательно)
     - **canonical_name**: Каноническое название показателя (опционально)
     - **unit**: Единица измерения (опционально)
     - **date**: Дата добавления информации (опционально)
-    - **target_level_min**: Минимальное целевое значение (опционально)
-    - **target_level_max**: Максимальное целевое значение (опционально)
-    
-    Поле target_reached вычисляется автоматически по тем же правилам, как и для других показателей.
+    - **target_level_min**: Минимальное допустимое значение (опционально)
+    - **target_level_max**: Максимальное допустимое значение (опционально)
     
     Возвращает созданную запись об образе жизни с присвоенным ID.
     """
-    repository = LifestyleInfoRepository(session)
+    repository = LifestyleInfoRepository(db)
     return await repository.create(data.model_dump())
 
 
 @lifestyle_router.put("/{id}", response_model=LifestyleInfo, summary="Обновить запись об образе жизни")
-async def update_lifestyle_info(id: int, data: LifestyleInfoCreate, session: AsyncSession = Depends(get_session)):
+async def update_lifestyle_info(id: int, data: LifestyleInfoCreate, db: AsyncSession = Depends(get_async_db)):
     """
     Обновление существующей записи об образе жизни.
     
@@ -78,7 +76,7 @@ async def update_lifestyle_info(id: int, data: LifestyleInfoCreate, session: Asy
     
     Возвращает обновленную запись об образе жизни, если она найдена, иначе выдает ошибку 404.
     """
-    repository = LifestyleInfoRepository(session)
+    repository = LifestyleInfoRepository(db)
     item = await repository.get_by_id(id)
     if not item:
         raise HTTPException(
@@ -89,7 +87,7 @@ async def update_lifestyle_info(id: int, data: LifestyleInfoCreate, session: Asy
 
 
 @lifestyle_router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT, summary="Удалить запись об образе жизни")
-async def delete_lifestyle_info(id: int, session: AsyncSession = Depends(get_session)):
+async def delete_lifestyle_info(id: int, db: AsyncSession = Depends(get_async_db)):
     """
     Удаление записи об образе жизни.
     
@@ -97,7 +95,7 @@ async def delete_lifestyle_info(id: int, session: AsyncSession = Depends(get_ses
     
     Возвращает статус 204 No Content при успешном удалении, иначе выдает ошибку 404.
     """
-    repository = LifestyleInfoRepository(session)
+    repository = LifestyleInfoRepository(db)
     success = await repository.delete(id)
     if not success:
         raise HTTPException(

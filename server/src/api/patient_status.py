@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.api.medical_documents.session import get_session
+from src.db_depends import get_async_db
 from src.schemas.patient_status import PatientStatusResponse
 from src.services.patient_status import get_patient_status
 
@@ -18,7 +18,7 @@ patient_status_router = APIRouter(
     status_code=status.HTTP_200_OK,
     summary="Получить полный статус пациента"
 )
-async def get_status(session: AsyncSession = Depends(get_session)):
+async def get_status(db: AsyncSession = Depends(get_async_db)):
     """
     Получение полного статуса пациента.
     
@@ -35,5 +35,5 @@ async def get_status(session: AsyncSession = Depends(get_session)):
     Returns:
       Полный набор данных о состоянии пациента в структурированном виде
     """
-    status_data = await get_patient_status(session)
+    status_data = await get_patient_status(db)
     return {"status": status_data} 

@@ -1,7 +1,7 @@
 from sqlalchemy import String, Integer
 from sqlalchemy.orm import Mapped, mapped_column
 
-from src.database import Model
+from src.database import Base
 
 class MedicalDocumentBase:
     """Базовый класс для всех медицинских документов"""

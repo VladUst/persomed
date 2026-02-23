@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.api.risk_analysis.session import get_session
+from src.db_depends import get_async_db
 from src.schemas.risk_analysis import RiskAnalysisResponse
 from src.services.risk_analysis import get_risk_factors
 
@@ -43,7 +43,7 @@ router = APIRouter(
         }
     }
 )
-async def get_user_risk_factors(session: AsyncSession = Depends(get_session)):
+async def get_user_risk_factors(db: AsyncSession = Depends(get_async_db)):
     """
     Анализ факторов риска пациента на основе показателей здоровья и хронических заболеваний.
     
@@ -67,6 +67,6 @@ async def get_user_risk_factors(session: AsyncSession = Depends(get_session)):
       - date: Дата анализа
     """
     # Получаем факторы риска из сервиса
-    risk_factors = await get_risk_factors(session)
+    risk_factors = await get_risk_factors(db)
     
     return risk_factors 

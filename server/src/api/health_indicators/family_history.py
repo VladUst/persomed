@@ -2,12 +2,11 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.api.health_indicators.session import get_session
+from src.db_depends import get_async_db
 from src.schemas.health_indicators import FamilyHistoryInfo, FamilyHistoryInfoCreate
 from src.repositories.health_indicators import FamilyHistoryInfoRepository
 
 
-# Создаем роутер для семейного анамнеза
 family_history_router = APIRouter(
     prefix="/family-history",
     tags=["Семейный анамнез"]
@@ -15,18 +14,18 @@ family_history_router = APIRouter(
 
 
 @family_history_router.get("/", response_model=List[FamilyHistoryInfo], summary="Получить всю информацию о семейном анамнезе")
-async def get_all_family_history_info(session: AsyncSession = Depends(get_session)):
+async def get_all_family_history_info(db: AsyncSession = Depends(get_async_db)):
     """
     Получение всех записей о семейном анамнезе.
     
     Возвращает список всех записей о семейном анамнезе.
     """
-    repository = FamilyHistoryInfoRepository(session)
+    repository = FamilyHistoryInfoRepository(db)
     return await repository.get_all()
 
 
 @family_history_router.get("/{id}", response_model=FamilyHistoryInfo, summary="Получить информацию о семейном анамнезе по ID")
-async def get_family_history_info(id: int, session: AsyncSession = Depends(get_session)):
+async def get_family_history_info(id: int, db: AsyncSession = Depends(get_async_db)):
     """
     Получение конкретной записи о семейном анамнезе по её ID.
     
@@ -34,7 +33,7 @@ async def get_family_history_info(id: int, session: AsyncSession = Depends(get_s
     
     Возвращает запись о семейном анамнезе, если она найдена, иначе выдает ошибку 404.
     """
-    repository = FamilyHistoryInfoRepository(session)
+    repository = FamilyHistoryInfoRepository(db)
     item = await repository.get_by_id(id)
     if not item:
         raise HTTPException(
@@ -47,7 +46,7 @@ async def get_family_history_info(id: int, session: AsyncSession = Depends(get_s
 @family_history_router.post("/", response_model=FamilyHistoryInfo, status_code=status.HTTP_201_CREATED, summary="Создать информацию о семейном анамнезе")
 async def create_family_history_info(
     data: FamilyHistoryInfoCreate,
-    session: AsyncSession = Depends(get_session)
+    db: AsyncSession = Depends(get_async_db)
 ):
     """
     Создание новой записи о семейном анамнезе.
@@ -57,19 +56,17 @@ async def create_family_history_info(
     - **canonical_name**: Каноническое название заболевания (опционально)
     - **unit**: Единица измерения (опционально)
     - **date**: Дата добавления информации (опционально)
-    - **target_level_min**: Минимальное целевое значение (опционально)
-    - **target_level_max**: Максимальное целевое значение (опционально)
-    
-    Поле target_reached вычисляется автоматически по тем же правилам, как и для других показателей.
+    - **target_level_min**: Минимальное допустимое значение (опционально)
+    - **target_level_max**: Максимальное допустимое значение (опционально)
     
     Возвращает созданную запись о семейном анамнезе с присвоенным ID.
     """
-    repository = FamilyHistoryInfoRepository(session)
+    repository = FamilyHistoryInfoRepository(db)
     return await repository.create(data.model_dump())
 
 
 @family_history_router.put("/{id}", response_model=FamilyHistoryInfo, summary="Обновить запись о семейном анамнезе")
-async def update_family_history_info(id: int, data: FamilyHistoryInfoCreate, session: AsyncSession = Depends(get_session)):
+async def update_family_history_info(id: int, data: FamilyHistoryInfoCreate, db: AsyncSession = Depends(get_async_db)):
     """
     Обновление существующей записи о семейном анамнезе.
     
@@ -78,7 +75,7 @@ async def update_family_history_info(id: int, data: FamilyHistoryInfoCreate, ses
     
     Возвращает обновленную запись о семейном анамнезе, если она найдена, иначе выдает ошибку 404.
     """
-    repository = FamilyHistoryInfoRepository(session)
+    repository = FamilyHistoryInfoRepository(db)
     item = await repository.get_by_id(id)
     if not item:
         raise HTTPException(
@@ -89,7 +86,7 @@ async def update_family_history_info(id: int, data: FamilyHistoryInfoCreate, ses
 
 
 @family_history_router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT, summary="Удалить запись о семейном анамнезе")
-async def delete_family_history_info(id: int, session: AsyncSession = Depends(get_session)):
+async def delete_family_history_info(id: int, db: AsyncSession = Depends(get_async_db)):
     """
     Удаление записи о семейном анамнезе.
     
@@ -97,7 +94,7 @@ async def delete_family_history_info(id: int, session: AsyncSession = Depends(ge
     
     Возвращает статус 204 No Content при успешном удалении, иначе выдает ошибку 404.
     """
-    repository = FamilyHistoryInfoRepository(session)
+    repository = FamilyHistoryInfoRepository(db)
     success = await repository.delete(id)
     if not success:
         raise HTTPException(

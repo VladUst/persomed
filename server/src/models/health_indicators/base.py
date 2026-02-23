@@ -2,7 +2,7 @@ from typing import Optional
 from sqlalchemy import String, Boolean, Float, Integer
 from sqlalchemy.orm import Mapped, mapped_column
 
-from src.database import Model
+from src.database import Base
 
 
 # Базовый класс только для общих полей, не будет создавать таблицу

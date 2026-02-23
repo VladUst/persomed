@@ -2,9 +2,9 @@ from typing import Generic, List, Optional, Type, TypeVar, Dict, Any
 from sqlalchemy import select, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.database import Model
+from src.database import Base
 
-T = TypeVar("T", bound=Model)
+T = TypeVar("T", bound=Base)
 
 
 class BaseRepository(Generic[T]):

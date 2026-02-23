@@ -14,7 +14,6 @@ from src.models.health_indicators import (
     FamilyHistoryInfo,
     LifestyleInfo
 )
-from src.models.tasks import TaskOrm
 
 __all__ = [
     "AnalyzesDoc",
@@ -29,5 +28,4 @@ __all__ = [
     "AllergiesInfo",
     "FamilyHistoryInfo",
     "LifestyleInfo",
-    "TaskOrm"
 ] 
