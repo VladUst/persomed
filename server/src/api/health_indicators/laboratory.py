@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.db_depends import get_async_db
-from src.schemas.health_indicators import DetailedInfo, DetailedInfoCreate
+from src.schemas.health_indicators import LaboratoryInfo, LaboratoryInfoCreate
 from src.repositories.health_indicators import LaboratoryInfoRepository
 
 
@@ -13,7 +13,7 @@ laboratory_router = APIRouter(
 )
 
 
-@laboratory_router.get("/", response_model=List[DetailedInfo], summary="Получить все лабораторные измерения")
+@laboratory_router.get("/", response_model=List[LaboratoryInfo], summary="Получить все лабораторные измерения")
 async def get_all_laboratory_info(db: AsyncSession = Depends(get_async_db),):
     """
     Получение всех записей лабораторных измерений.
@@ -24,7 +24,7 @@ async def get_all_laboratory_info(db: AsyncSession = Depends(get_async_db),):
     return await repository.get_all()
 
 
-@laboratory_router.get("/{id}", response_model=DetailedInfo, summary="Получить лабораторное измерение по ID")
+@laboratory_router.get("/{id}", response_model=LaboratoryInfo, summary="Получить лабораторное измерение по ID")
 async def get_laboratory_info(id: int, db: AsyncSession = Depends(get_async_db)):
     """
     Получение конкретной записи лабораторного измерения по её ID.
@@ -43,9 +43,9 @@ async def get_laboratory_info(id: int, db: AsyncSession = Depends(get_async_db))
     return item
 
 
-@laboratory_router.post("/", response_model=DetailedInfo, status_code=status.HTTP_201_CREATED, summary="Создать лабораторное измерение")
+@laboratory_router.post("/", response_model=LaboratoryInfo, status_code=status.HTTP_201_CREATED, summary="Создать лабораторное измерение")
 async def create_laboratory_info(
-    data: DetailedInfoCreate,
+    data: LaboratoryInfoCreate,
     db: AsyncSession = Depends(get_async_db)
 ):
     """
@@ -65,8 +65,8 @@ async def create_laboratory_info(
     return await repository.create(data.model_dump())
 
 
-@laboratory_router.put("/{id}", response_model=DetailedInfo, summary="Обновить лабораторное измерение")
-async def update_laboratory_info(id: int, data: DetailedInfoCreate, db: AsyncSession = Depends(get_async_db)):
+@laboratory_router.put("/{id}", response_model=LaboratoryInfo, summary="Обновить лабораторное измерение")
+async def update_laboratory_info(id: int, data: LaboratoryInfoCreate, db: AsyncSession = Depends(get_async_db)):
     """
     Обновление существующей записи лабораторного измерения.
     

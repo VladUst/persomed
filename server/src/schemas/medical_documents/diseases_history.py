@@ -3,7 +3,6 @@ from pydantic import BaseModel, Field, model_validator
 from src.schemas.medical_documents.base import MedicalDocumentBase, MedicalDocument
 
 
-# Disease history document with ICD code
 class DiseasesHistoryDocBase(MedicalDocumentBase):
     icd_code: str = Field(description="ICD code of the disease")
 
@@ -20,7 +19,6 @@ class DiseasesHistoryDoc(DiseasesHistoryDocBase):
     }
 
 
-# Diseases history document meta information
 class DiseasesHistoryDocMetaInfo(BaseModel):
     icd_code: str = Field(description="ICD code of the disease")
     diagnosis_date: str = Field(description="Date of diagnosis")
@@ -31,7 +29,6 @@ class DiseasesHistoryDocMetaInfo(BaseModel):
     clinic_name: str = Field(description="Clinic name")
 
 
-# Diseases history document sections
 class DiseasesHistoryDocSections(BaseModel):
     anamnesis: str = Field(description="Patient anamnesis")
     clinical_findings: Optional[str] = Field(None, description="Clinical findings")
@@ -40,7 +37,6 @@ class DiseasesHistoryDocSections(BaseModel):
     conclusion: Optional[str] = Field(None, description="Conclusion")
 
 
-# Disease history document details
 class DiseasesHistoryDocDetailsBase(BaseModel):
     title: str = Field(description="Document title")
     meta: DiseasesHistoryDocMetaInfo = Field(description="Document meta information")
@@ -88,7 +84,5 @@ class DiseasesHistoryDocDetails(DiseasesHistoryDocDetailsBase):
             }
         return data
 
-
-# Combined disease history document with details for direct API response
 class DiseasesHistoryDocWithDetails(DiseasesHistoryDoc):
     details: Optional[DiseasesHistoryDocDetails] = Field(None, description="Document details") 

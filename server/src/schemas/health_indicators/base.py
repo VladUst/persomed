@@ -2,7 +2,6 @@ from typing import Optional
 from pydantic import BaseModel, Field
 
 
-# Base health indicator model
 class HealthIndicatorBase(BaseModel):
     name: str = Field(description="Название показателя")
     canonical_name: Optional[str] = Field(None, description="Каноническое название показателя")
@@ -13,7 +12,6 @@ class HealthIndicatorBase(BaseModel):
     target_level_max: Optional[float] = Field(None, description="Максимальное целевое значение")
 
 
-# Base health indicator for responses
 class HealthIndicatorResponse(HealthIndicatorBase):
     id: int
     target_reached: Optional[bool] = None

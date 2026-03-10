@@ -1,16 +1,12 @@
 from pydantic import BaseModel, Field
-from typing import Optional
-
 
 class RiskFactorInfo(BaseModel):
-    """Базовая модель для информации о факторе риска"""
     info: str = Field(..., description="Текстовое описание факторов риска")
     source: str = Field(..., description="Источник информации о факторах риска")
     date: str = Field(..., description="Дата анализа факторов риска")
 
 
 class RiskAnalysisResponse(BaseModel):
-    """Модель ответа сервиса анализа факторов риска"""
     low_level: RiskFactorInfo = Field(
         ..., 
         description="Информация о показателях с пониженным уровнем"
@@ -23,7 +19,7 @@ class RiskAnalysisResponse(BaseModel):
         ..., 
         description="Информация о хронических заболеваниях"
     )
-    
+
     class Config:
         schema_extra = {
             "example": {

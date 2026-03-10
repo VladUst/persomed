@@ -1,7 +1,6 @@
 from pydantic import BaseModel, Field
 
 
-# Base schemas for medical documents with common fields
 class MedicalDocumentBase(BaseModel):
     name: str = Field(description="Document name")
     type: str = Field(description="Document type")

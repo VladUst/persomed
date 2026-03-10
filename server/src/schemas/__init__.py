@@ -1,6 +1,6 @@
 from src.schemas.health_indicators import (
     GeneralInfo, GeneralInfoCreate,
-    DetailedInfo, DetailedInfoCreate,
+    LaboratoryInfo, LaboratoryInfoCreate,
     VaccinationsInfo, VaccinationsInfoCreate,
     AllergiesInfo, AllergiesInfoCreate,
     FamilyHistoryInfo, FamilyHistoryInfoCreate,
@@ -17,11 +17,13 @@ from src.schemas.medical_documents import (
     RecommendationsDocBase, RecommendationsDocCreate, RecommendationsDoc
 )
 from src.schemas.text_process import MedicalTextRequest, NamedEntity, TextProcessingResponse
+from src.schemas.patient_status import PatientStatusResponse
+from src.schemas.risk_analysis.risk_analysis import RiskAnalysisResponse
 
 __all__ = [
     # Health indicators
     "GeneralInfo", "GeneralInfoCreate",
-    "DetailedInfo", "DetailedInfoCreate",
+    "LaboratoryInfo", "LaboratoryInfoCreate",
     "VaccinationsInfo", "VaccinationsInfoCreate",
     "AllergiesInfo", "AllergiesInfoCreate",
     "FamilyHistoryInfo", "FamilyHistoryInfoCreate",
@@ -38,5 +40,11 @@ __all__ = [
     "RecommendationsDocBase", "RecommendationsDocCreate", "RecommendationsDoc",
 
     # Text Processing
-    "MedicalTextRequest", "NamedEntity", "TextProcessingResponse"
+    "MedicalTextRequest", "NamedEntity", "TextProcessingResponse",
+
+    # Patient status
+    "PatientStatusResponse",
+
+    # Risk analysis
+    "RiskAnalysisResponse"
 ] 

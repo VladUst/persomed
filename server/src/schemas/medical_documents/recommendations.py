@@ -19,7 +19,6 @@ class RecommendationsDoc(RecommendationsDocBase):
     }
 
 
-# Recommendations document meta information
 class RecommendationsDocMetaInfo(BaseModel):
     icd_code: str = Field(description="ICD code of the disease")
     date: str = Field(description="Date of recommendation")
@@ -29,12 +28,10 @@ class RecommendationsDocMetaInfo(BaseModel):
     clinic_name: str = Field(description="Clinic name")
 
 
-# Recommendations document sections
 class RecommendationsDocSections(BaseModel):
     instructions: str = Field(description="Recommendation instructions")
 
 
-# Recommendations document details
 class RecommendationsDocDetailsBase(BaseModel):
     title: str = Field(description="Document title")
     meta: RecommendationsDocMetaInfo = Field(description="Document meta information")
@@ -78,6 +75,5 @@ class RecommendationsDocDetails(RecommendationsDocDetailsBase):
         return data
 
 
-# Combined recommendations document with details for direct API response
 class RecommendationsDocWithDetails(RecommendationsDoc):
     details: Optional[RecommendationsDocDetails] = Field(None, description="Document details") 

@@ -1,11 +1,8 @@
-from typing import List, Optional, Any, Dict
+from typing import List
 from pydantic import BaseModel, Field
 
 
 class MedicalTextRequest(BaseModel):
-    """
-    Request schema for processing medical text.
-    """
     text: str = Field(
         description="Медицинский текст для обработки и извлечения именованных сущностей"
     )
@@ -29,9 +26,6 @@ class ICD10Entry(BaseModel):
 
 
 class NamedEntity(BaseModel):
-    """
-    Schema for a named entity extracted from medical text.
-    """
     cui: str = Field(
         description="Концептуальный уникальный идентификатор (CUI) сущности в UMLS"
     )
@@ -66,9 +60,6 @@ class NamedEntity(BaseModel):
 
 
 class TextProcessingResponse(BaseModel):
-    """
-    Response schema for the text processing API.
-    """
     entities: List[NamedEntity] = Field(
         description="Список извлеченных именованных сущностей",
         default_factory=list
