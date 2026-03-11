@@ -10,7 +10,6 @@ class RecommendationsDoc(MedicalDocumentBase):
     
     specialty: Mapped[str] = mapped_column(String)
     
-    # Relationship with details
     details: Mapped["RecommendationsDocDetails"] = relationship(
         "RecommendationsDocDetails", 
         back_populates="document", 

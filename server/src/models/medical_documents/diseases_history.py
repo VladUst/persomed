@@ -11,7 +11,6 @@ class DiseasesHistoryDoc(MedicalDocumentBase):
     
     icd_code: Mapped[str] = mapped_column(String)
     
-    # Relationship with details
     details: Mapped["DiseasesHistoryDocDetails"] = relationship(
         "DiseasesHistoryDocDetails", 
         back_populates="document", 

@@ -4,6 +4,6 @@ from src.models.health_indicators.base import HealthIndicatorBase
 
 
 class LaboratoryInfo(HealthIndicatorBase):
-    __tablename__ = "detailed_info"
+    __tablename__ = "laboratory_indicators"
     
     value: Mapped[float] = mapped_column(Float) 
