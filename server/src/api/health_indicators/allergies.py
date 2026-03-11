@@ -3,8 +3,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.db_depends import get_async_db
-from src.schemas.health_indicators import AllergiesInfo, AllergiesInfoCreate
-from src.repositories.health_indicators import AllergiesInfoRepository
+from src.schemas.health_indicators import AllergyInfo, AllergyInfoCreate
+from src.repositories.health_indicators import AllergyInfoRepository
 
 allergies_router = APIRouter(
     prefix="/allergies",
@@ -12,30 +12,30 @@ allergies_router = APIRouter(
 )
 
 
-@allergies_router.get("/", response_model=List[AllergiesInfo], summary="Получить всю информацию об аллергиях")
+@allergies_router.get("/", response_model=List[AllergyInfo], summary="Получить всю информацию об аллергиях")
 async def get_all_allergies_info(patient_id: int, db: AsyncSession = Depends(get_async_db)):
     """
     Получение всех записей об аллергиях.
     
     Возвращает список всех записей об аллергиях.
     """
-    repository = AllergiesInfoRepository(db)
+    repository = AllergyInfoRepository(db)
     return await repository.get_all_by_patient(patient_id)
 
 
-@allergies_router.get("/{id}", response_model=AllergiesInfo, summary="Получить информацию об аллергии по ID")
+@allergies_router.get("/{id}", response_model=AllergyInfo, summary="Получить информацию об аллергии по ID")
 async def get_allergies_info(patient_id: int, id: int, db: AsyncSession = Depends(get_async_db)):
-    repository = AllergiesInfoRepository(db)
+    repository = AllergyInfoRepository(db)
     item = await repository.get_by_id(id)
     if not item or item.patient_id != patient_id:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Запись об аллергии с ID {id} не найдена")
     return item
 
 
-@allergies_router.post("/", response_model=AllergiesInfo, status_code=status.HTTP_201_CREATED, summary="Создать информацию об аллергии")
+@allergies_router.post("/", response_model=AllergyInfo, status_code=status.HTTP_201_CREATED, summary="Создать информацию об аллергии")
 async def create_allergies_info(
     patient_id: int,
-    data: AllergiesInfoCreate,
+    data: AllergyInfoCreate,
     db: AsyncSession = Depends(get_async_db),
 ):
     """
@@ -51,13 +51,13 @@ async def create_allergies_info(
     
     Возвращает созданную запись об аллергии с присвоенным ID.
     """
-    repository = AllergiesInfoRepository(db)
+    repository = AllergyInfoRepository(db)
     return await repository.create({**data.model_dump(), "patient_id": patient_id})
 
 
-@allergies_router.put("/{id}", response_model=AllergiesInfo, summary="Обновить запись об аллергии")
-async def update_allergies_info(patient_id: int, id: int, data: AllergiesInfoCreate, db: AsyncSession = Depends(get_async_db)):
-    repository = AllergiesInfoRepository(db)
+@allergies_router.put("/{id}", response_model=AllergyInfo, summary="Обновить запись об аллергии")
+async def update_allergies_info(patient_id: int, id: int, data: AllergyInfoCreate, db: AsyncSession = Depends(get_async_db)):
+    repository = AllergyInfoRepository(db)
     item = await repository.get_by_id(id)
     if not item or item.patient_id != patient_id:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Запись об аллергии с ID {id} не найдена")
@@ -66,7 +66,7 @@ async def update_allergies_info(patient_id: int, id: int, data: AllergiesInfoCre
 
 @allergies_router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT, summary="Удалить запись об аллергии")
 async def delete_allergies_info(patient_id: int, id: int, db: AsyncSession = Depends(get_async_db)):
-    repository = AllergiesInfoRepository(db)
+    repository = AllergyInfoRepository(db)
     item = await repository.get_by_id(id)
     if not item or item.patient_id != patient_id:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Запись об аллергии с ID {id} не найдена")

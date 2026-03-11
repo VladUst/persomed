@@ -1,9 +1,9 @@
 from src.schemas.health_indicators.base import HealthIndicatorBase, HealthIndicatorResponse
 
 
-class AllergiesInfoCreate(HealthIndicatorBase):
+class AllergyInfoCreate(HealthIndicatorBase):
     pass
 
 
-class AllergiesInfo(HealthIndicatorResponse):
+class AllergyInfo(HealthIndicatorResponse):
     pass 

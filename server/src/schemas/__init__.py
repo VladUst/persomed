@@ -1,8 +1,8 @@
 from src.schemas.health_indicators import (
     GeneralInfo, GeneralInfoCreate,
     LaboratoryInfo, LaboratoryInfoCreate,
-    VaccinationsInfo, VaccinationsInfoCreate,
-    AllergiesInfo, AllergiesInfoCreate,
+    VaccinationInfo, VaccinationInfoCreate,
+    AllergyInfo, AllergyInfoCreate,
     FamilyHistoryInfo, FamilyHistoryInfoCreate,
     LifestyleInfo, LifestyleInfoCreate
 )
@@ -24,8 +24,8 @@ __all__ = [
     # Health indicators
     "GeneralInfo", "GeneralInfoCreate",
     "LaboratoryInfo", "LaboratoryInfoCreate",
-    "VaccinationsInfo", "VaccinationsInfoCreate",
-    "AllergiesInfo", "AllergiesInfoCreate",
+    "VaccinationInfo", "VaccinationInfoCreate",
+    "AllergyInfo", "AllergyInfoCreate",
     "FamilyHistoryInfo", "FamilyHistoryInfoCreate",
     "LifestyleInfo", "LifestyleInfoCreate",
     

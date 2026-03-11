@@ -11,13 +11,13 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
-from src.models.patient import Patient
+from src.models.patients import Patient
 from src.models.health_indicators import (
     GeneralInfo,
     LaboratoryInfo,
-    AllergiesInfo,
+    AllergyInfo,
     FamilyHistoryInfo,
-    VaccinationsInfo,
+    VaccinationInfo,
     LifestyleInfo,
 )
 from src.models.medical_documents import (
@@ -98,7 +98,7 @@ async def insert_laboratory_info(session, items: list) -> None:
 
 async def insert_allergies_info(session, items: list) -> None:
     for item in items:
-        session.add(AllergiesInfo(
+        session.add(AllergyInfo(
             patient_id=PATIENT_ID,
             name=item["name"],
             canonical_name=item.get("canonicalName"),
@@ -122,7 +122,7 @@ async def insert_family_history_info(session, items: list) -> None:
 
 async def insert_vaccinations_info(session, items: list) -> None:
     for item in items:
-        session.add(VaccinationsInfo(
+        session.add(VaccinationInfo(
             patient_id=PATIENT_ID,
             name=item["name"],
             canonical_name=item.get("canonicalName"),

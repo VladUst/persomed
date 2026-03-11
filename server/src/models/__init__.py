@@ -1,4 +1,4 @@
-from src.models.patient import Patient
+from src.models.patients import Patient
 from src.models.medical_documents import (
     AnalyzesDoc,
     OtherDoc,
@@ -11,8 +11,8 @@ from src.models.health_indicators import (
     HealthIndicatorBase,
     GeneralInfo,
     LaboratoryInfo,
-    VaccinationsInfo,
-    AllergiesInfo,
+    VaccinationInfo,
+    AllergyInfo,
     FamilyHistoryInfo,
     LifestyleInfo,
 )
@@ -28,8 +28,8 @@ __all__ = [
     "HealthIndicatorBase",
     "GeneralInfo",
     "LaboratoryInfo",
-    "VaccinationsInfo",
-    "AllergiesInfo",
+    "VaccinationInfo",
+    "AllergyInfo",
     "FamilyHistoryInfo",
     "LifestyleInfo",
 ] 
