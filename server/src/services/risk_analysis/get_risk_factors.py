@@ -4,25 +4,24 @@ from src.repositories.health_indicators import GeneralInfoRepository, Laboratory
 from src.repositories.medical_documents import DiseasesHistoryDocRepository
 
 
-async def find_abnormal_health_indicators(session: AsyncSession):
+async def find_abnormal_health_indicators(session: AsyncSession, patient_id: int):
     """
     Находит показатели здоровья, выходящие за рамки норм.
     
     Args:
         session: Асинхронная сессия базы данных
+        patient_id: Идентификатор пациента
         
     Returns:
         dict: Словарь с двумя массивами показателей:
               - low_level: показатели ниже нормы
               - high_level: показатели выше нормы
     """
-    # Получаем общие показатели здоровья
     general_repo = GeneralInfoRepository(session)
-    general_indicators = await general_repo.get_all()
+    general_indicators = await general_repo.get_all_by_patient(patient_id)
     
-    # Получаем детальные показатели здоровья
     detailed_repo = LaboratoryInfoRepository(session)
-    detailed_indicators = await detailed_repo.get_all()
+    detailed_indicators = await detailed_repo.get_all_by_patient(patient_id)
     
     # Объединяем все показатели
     all_indicators = general_indicators + detailed_indicators
@@ -53,19 +52,19 @@ async def find_abnormal_health_indicators(session: AsyncSession):
     }
 
 
-async def find_chronic_diseases(session: AsyncSession):
+async def find_chronic_diseases(session: AsyncSession, patient_id: int):
     """
     Находит хронические заболевания из истории болезней.
     
     Args:
         session: Асинхронная сессия базы данных
+        patient_id: Идентификатор пациента
         
     Returns:
         list: Список хронических заболеваний
     """
-    # Получаем историю болезней
     disease_repo = DiseasesHistoryDocRepository(session)
-    disease_histories = await disease_repo.get_all_with_details()
+    disease_histories = await disease_repo.get_all_with_details_by_patient(patient_id)
     
     # Фильтруем хронические заболевания
     chronic_diseases = []
@@ -78,24 +77,22 @@ async def find_chronic_diseases(session: AsyncSession):
     return chronic_diseases
 
 
-async def get_risk_factors(session: AsyncSession):
+async def get_risk_factors(session: AsyncSession, patient_id: int):
     """
     Получает все факторы риска по категориям.
     
     Args:
         session: Асинхронная сессия базы данных
+        patient_id: Идентификатор пациента
         
     Returns:
         dict: Словарь с факторами риска по категориям
     """
-    # Получаем текущую дату
     current_date = datetime.now().strftime("%Y-%m-%d")
     
-    # Получаем показатели, выходящие за нормы
-    abnormal_indicators = await find_abnormal_health_indicators(session)
+    abnormal_indicators = await find_abnormal_health_indicators(session, patient_id)
     
-    # Получаем хронические заболевания
-    chronic_diseases = await find_chronic_diseases(session)
+    chronic_diseases = await find_chronic_diseases(session, patient_id)
     
     # Формируем текстовое описание для каждой категории
     low_level_info = "Пониженный уровень у показателей: " + ", ".join(abnormal_indicators["low_level"]) if abnormal_indicators["low_level"] else "Показателей с пониженным уровнем не обнаружено"

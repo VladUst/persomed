@@ -13,37 +13,28 @@ allergies_router = APIRouter(
 
 
 @allergies_router.get("/", response_model=List[AllergiesInfo], summary="Получить всю информацию об аллергиях")
-async def get_all_allergies_info(db: AsyncSession = Depends(get_async_db),):
+async def get_all_allergies_info(patient_id: int, db: AsyncSession = Depends(get_async_db)):
     """
     Получение всех записей об аллергиях.
     
     Возвращает список всех записей об аллергиях.
     """
     repository = AllergiesInfoRepository(db)
-    return await repository.get_all()
+    return await repository.get_all_by_patient(patient_id)
 
 
 @allergies_router.get("/{id}", response_model=AllergiesInfo, summary="Получить информацию об аллергии по ID")
-async def get_allergies_info(id: int, db: AsyncSession = Depends(get_async_db),):
-    """
-    Получение конкретной записи об аллергии по её ID.
-    
-    - **id**: Уникальный идентификатор записи об аллергии
-    
-    Возвращает запись об аллергии, если она найдена, иначе выдает ошибку 404.
-    """
+async def get_allergies_info(patient_id: int, id: int, db: AsyncSession = Depends(get_async_db)):
     repository = AllergiesInfoRepository(db)
     item = await repository.get_by_id(id)
-    if not item:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Запись об аллергии с ID {id} не найдена"
-        )
+    if not item or item.patient_id != patient_id:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Запись об аллергии с ID {id} не найдена")
     return item
 
 
 @allergies_router.post("/", response_model=AllergiesInfo, status_code=status.HTTP_201_CREATED, summary="Создать информацию об аллергии")
 async def create_allergies_info(
+    patient_id: int,
     data: AllergiesInfoCreate,
     db: AsyncSession = Depends(get_async_db),
 ):
@@ -61,42 +52,22 @@ async def create_allergies_info(
     Возвращает созданную запись об аллергии с присвоенным ID.
     """
     repository = AllergiesInfoRepository(db)
-    return await repository.create(data.model_dump())
+    return await repository.create({**data.model_dump(), "patient_id": patient_id})
 
 
 @allergies_router.put("/{id}", response_model=AllergiesInfo, summary="Обновить запись об аллергии")
-async def update_allergies_info(id: int, data: AllergiesInfoCreate, db: AsyncSession = Depends(get_async_db),):
-    """
-    Обновление существующей записи об аллергии.
-    
-    - **id**: Уникальный идентификатор записи для обновления
-    - **data**: Обновленные данные
-    
-    Возвращает обновленную запись об аллергии, если она найдена, иначе выдает ошибку 404.
-    """
+async def update_allergies_info(patient_id: int, id: int, data: AllergiesInfoCreate, db: AsyncSession = Depends(get_async_db)):
     repository = AllergiesInfoRepository(db)
     item = await repository.get_by_id(id)
-    if not item:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Запись об аллергии с ID {id} не найдена"
-        )
+    if not item or item.patient_id != patient_id:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Запись об аллергии с ID {id} не найдена")
     return await repository.update(id, data.model_dump())
 
 
 @allergies_router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT, summary="Удалить запись об аллергии")
-async def delete_allergies_info(id: int, db: AsyncSession = Depends(get_async_db),):
-    """
-    Удаление записи об аллергии.
-    
-    - **id**: Уникальный идентификатор записи для удаления
-    
-    Возвращает статус 204 No Content при успешном удалении, иначе выдает ошибку 404.
-    """
+async def delete_allergies_info(patient_id: int, id: int, db: AsyncSession = Depends(get_async_db)):
     repository = AllergiesInfoRepository(db)
-    success = await repository.delete(id)
-    if not success:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Запись об аллергии с ID {id} не найдена"
-        ) 
+    item = await repository.get_by_id(id)
+    if not item or item.patient_id != patient_id:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Запись об аллергии с ID {id} не найдена")
+    await repository.delete(id) 

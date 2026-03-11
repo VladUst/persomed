@@ -22,37 +22,28 @@ diseases_history_router = APIRouter(
 
 
 @diseases_history_router.get("/", response_model=List[DiseasesHistoryDocWithDetails], summary="Получить все документы истории болезней")
-async def get_all_diseases_history_docs(db: AsyncSession = Depends(get_async_db)):
+async def get_all_diseases_history_docs(patient_id: int, db: AsyncSession = Depends(get_async_db)):
     """
     Получение всех документов истории болезней с их деталями (если доступны).
     
     Возвращает список всех документов истории болезней.
     """
     repository = DiseasesHistoryDocRepository(db)
-    return await repository.get_all_with_details()
+    return await repository.get_all_with_details_by_patient(patient_id)
 
 
 @diseases_history_router.get("/{id}", response_model=DiseasesHistoryDocWithDetails, summary="Получить документ истории болезни по ID")
-async def get_diseases_history_doc(id: int, db: AsyncSession = Depends(get_async_db)):
-    """
-    Получение конкретного документа истории болезни по его ID с деталями (если доступны).
-    
-    - **id**: Уникальный идентификатор документа истории болезни
-    
-    Возвращает документ истории болезни, если он найден, иначе выдает ошибку 404.
-    """
+async def get_diseases_history_doc(patient_id: int, id: int, db: AsyncSession = Depends(get_async_db)):
     repository = DiseasesHistoryDocRepository(db)
     item = await repository.get_by_id_with_details(id)
-    if not item:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Документ истории болезни с ID {id} не найден"
-        )
+    if not item or item.patient_id != patient_id:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Документ истории болезни с ID {id} не найден")
     return item
 
 
 @diseases_history_router.post("/", response_model=DiseasesHistoryDoc, status_code=status.HTTP_201_CREATED, summary="Создать документ с историей болезни")
 async def create_diseases_history_doc(
+    patient_id: int,
     data: DiseasesHistoryDocCreate,
     db: AsyncSession = Depends(get_async_db)
 ):
@@ -67,45 +58,25 @@ async def create_diseases_history_doc(
     Возвращает созданный документ истории болезни с присвоенным ID.
     """
     repository = DiseasesHistoryDocRepository(db)
-    return await repository.create(data.model_dump())
+    return await repository.create({**data.model_dump(), "patient_id": patient_id})
 
 
 @diseases_history_router.put("/{id}", response_model=DiseasesHistoryDoc, summary="Обновить документ истории болезни")
-async def update_diseases_history_doc(id: int, data: DiseasesHistoryDocCreate, db: AsyncSession = Depends(get_async_db)):
-    """
-    Обновление существующего документа истории болезни.
-    
-    - **id**: Уникальный идентификатор документа для обновления
-    - **data**: Обновленные данные
-    
-    Возвращает обновленный документ истории болезни, если он найден, иначе выдает ошибку 404.
-    """
+async def update_diseases_history_doc(patient_id: int, id: int, data: DiseasesHistoryDocCreate, db: AsyncSession = Depends(get_async_db)):
     repository = DiseasesHistoryDocRepository(db)
     item = await repository.get_by_id(id)
-    if not item:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Документ истории болезни с ID {id} не найден"
-        )
+    if not item or item.patient_id != patient_id:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Документ истории болезни с ID {id} не найден")
     return await repository.update(id, data.model_dump())
 
 
 @diseases_history_router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT, summary="Удалить документ истории болезни")
-async def delete_diseases_history_doc(id: int, db: AsyncSession = Depends(get_async_db)):
-    """
-    Удаление документа истории болезни.
-    
-    - **id**: Уникальный идентификатор документа для удаления
-    
-    Возвращает статус 204 No Content при успешном удалении, иначе выдает ошибку 404.
-    """
+async def delete_diseases_history_doc(patient_id: int, id: int, db: AsyncSession = Depends(get_async_db)):
     repository = DiseasesHistoryDocRepository(db)
-    success = await repository.delete(id)
-    if not success:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Документ истории болезни с ID {id} не найден"
-        )
+    item = await repository.get_by_id(id)
+    if not item or item.patient_id != patient_id:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Документ истории болезни с ID {id} не найден")
+    await repository.delete(id)
 
 
 # Diseases History Document Details endpoints

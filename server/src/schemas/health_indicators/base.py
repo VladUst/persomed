@@ -14,7 +14,8 @@ class HealthIndicatorBase(BaseModel):
 
 class HealthIndicatorResponse(HealthIndicatorBase):
     id: int
+    patient_id: int
     target_reached: Optional[bool] = None
-    
+
     class Config:
         from_attributes = True 

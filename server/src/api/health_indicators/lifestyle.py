@@ -15,37 +15,28 @@ lifestyle_router = APIRouter(
 
 
 @lifestyle_router.get("/", response_model=List[LifestyleInfo], summary="Получить всю информацию об образе жизни")
-async def get_all_lifestyle_info(db: AsyncSession = Depends(get_async_db)):
+async def get_all_lifestyle_info(patient_id: int, db: AsyncSession = Depends(get_async_db)):
     """
     Получение всех записей об образе жизни.
     
     Возвращает список всех записей об образе жизни.
     """
     repository = LifestyleInfoRepository(db)
-    return await repository.get_all()
+    return await repository.get_all_by_patient(patient_id)
 
 
 @lifestyle_router.get("/{id}", response_model=LifestyleInfo, summary="Получить информацию об образе жизни по ID")
-async def get_lifestyle_info(id: int, db: AsyncSession = Depends(get_async_db)):
-    """
-    Получение конкретной записи об образе жизни по её ID.
-    
-    - **id**: Уникальный идентификатор записи об образе жизни
-    
-    Возвращает запись об образе жизни, если она найдена, иначе выдает ошибку 404.
-    """
+async def get_lifestyle_info(patient_id: int, id: int, db: AsyncSession = Depends(get_async_db)):
     repository = LifestyleInfoRepository(db)
     item = await repository.get_by_id(id)
-    if not item:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Запись об образе жизни с ID {id} не найдена"
-        )
+    if not item or item.patient_id != patient_id:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Запись об образе жизни с ID {id} не найдена")
     return item
 
 
 @lifestyle_router.post("/", response_model=LifestyleInfo, status_code=status.HTTP_201_CREATED, summary="Создать информацию об образе жизни")
 async def create_lifestyle_info(
+    patient_id: int,
     data: LifestyleInfoCreate,
     db: AsyncSession = Depends(get_async_db)
 ):
@@ -63,42 +54,22 @@ async def create_lifestyle_info(
     Возвращает созданную запись об образе жизни с присвоенным ID.
     """
     repository = LifestyleInfoRepository(db)
-    return await repository.create(data.model_dump())
+    return await repository.create({**data.model_dump(), "patient_id": patient_id})
 
 
 @lifestyle_router.put("/{id}", response_model=LifestyleInfo, summary="Обновить запись об образе жизни")
-async def update_lifestyle_info(id: int, data: LifestyleInfoCreate, db: AsyncSession = Depends(get_async_db)):
-    """
-    Обновление существующей записи об образе жизни.
-    
-    - **id**: Уникальный идентификатор записи для обновления
-    - **data**: Обновленные данные
-    
-    Возвращает обновленную запись об образе жизни, если она найдена, иначе выдает ошибку 404.
-    """
+async def update_lifestyle_info(patient_id: int, id: int, data: LifestyleInfoCreate, db: AsyncSession = Depends(get_async_db)):
     repository = LifestyleInfoRepository(db)
     item = await repository.get_by_id(id)
-    if not item:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Запись об образе жизни с ID {id} не найдена"
-        )
+    if not item or item.patient_id != patient_id:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Запись об образе жизни с ID {id} не найдена")
     return await repository.update(id, data.model_dump())
 
 
 @lifestyle_router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT, summary="Удалить запись об образе жизни")
-async def delete_lifestyle_info(id: int, db: AsyncSession = Depends(get_async_db)):
-    """
-    Удаление записи об образе жизни.
-    
-    - **id**: Уникальный идентификатор записи для удаления
-    
-    Возвращает статус 204 No Content при успешном удалении, иначе выдает ошибку 404.
-    """
+async def delete_lifestyle_info(patient_id: int, id: int, db: AsyncSession = Depends(get_async_db)):
     repository = LifestyleInfoRepository(db)
-    success = await repository.delete(id)
-    if not success:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Запись об образе жизни с ID {id} не найдена"
-        ) 
+    item = await repository.get_by_id(id)
+    if not item or item.patient_id != patient_id:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Запись об образе жизни с ID {id} не найдена")
+    await repository.delete(id) 

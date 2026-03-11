@@ -12,19 +12,19 @@ from src.services.text_processing.process_text import process_medical_text
 from src.services.diagnostic import get_predictions
 
 
-async def get_symptoms(session: AsyncSession) -> List[Dict[str, str]]:
+async def get_symptoms(session: AsyncSession, patient_id: int) -> List[Dict[str, str]]:
     """
     Извлекает симптомы из анамнезов.
     
     Args:
         session: Асинхронная сессия базы данных
+        patient_id: Идентификатор пациента
         
     Returns:
         List[Dict[str, str]]: Список симптомов
     """
-    # Получаем все документы из истории болезней
     repository = DiseasesHistoryDocRepository(session)
-    documents = await repository.get_all_with_details()
+    documents = await repository.get_all_with_details_by_patient(patient_id)
     
     # Фильтруем только анамнезы с деталями
     anamnesis_docs = [
@@ -60,18 +60,19 @@ async def get_symptoms(session: AsyncSession) -> List[Dict[str, str]]:
     return symptoms
 
 
-async def get_diseases(session: AsyncSession) -> List[Dict[str, Any]]:
+async def get_diseases(session: AsyncSession, patient_id: int) -> List[Dict[str, Any]]:
     """
     Извлекает 5 последних заболеваний из истории болезней, исключая тип "Анамнез".
     
     Args:
         session: Асинхронная сессия базы данных
+        patient_id: Идентификатор пациента
         
     Returns:
         List[Dict[str, Any]]: Список заболеваний
     """
     repository = DiseasesHistoryDocRepository(session)
-    diseases = await repository.get_all()
+    diseases = await repository.get_all_by_patient(patient_id)
     
     # Фильтруем, исключая документы типа "Анамнез"
     diseases = [d for d in diseases if d.type != "Анамнез"]
@@ -94,7 +95,7 @@ async def get_diseases(session: AsyncSession) -> List[Dict[str, Any]]:
     return result
 
 
-async def get_rates(session: AsyncSession) -> List[Dict[str, str]]:
+async def get_rates(session: AsyncSession, patient_id: int) -> List[Dict[str, str]]:
     """
     Возвращает оценки рисков заболеваний по категориям.
     
@@ -212,31 +213,33 @@ async def get_suspicions(symptoms: List[Dict[str, str]]) -> List[Dict[str, str]]
     return suspicions
 
 
-async def get_risks(session: AsyncSession) -> Dict[str, Dict[str, str]]:
+async def get_risks(session: AsyncSession, patient_id: int) -> Dict[str, Dict[str, str]]:
     """
     Возвращает факторы риска.
     
     Args:
         session: Асинхронная сессия базы данных
+        patient_id: Идентификатор пациента
         
     Returns:
         Dict[str, Dict[str, str]]: Факторы риска
     """
-    return await get_risk_factors(session)
+    return await get_risk_factors(session, patient_id)
 
 
-async def get_drugs(session: AsyncSession) -> List[Dict[str, str]]:
+async def get_drugs(session: AsyncSession, patient_id: int) -> List[Dict[str, str]]:
     """
     Возвращает назначенные препараты.
     
     Args:
         session: Асинхронная сессия базы данных
+        patient_id: Идентификатор пациента
         
     Returns:
         List[Dict[str, str]]: Список назначенных препаратов
     """
     repository = RecommendationsDocRepository(session)
-    recommendations = await repository.get_all_with_details()
+    recommendations = await repository.get_all_with_details_by_patient(patient_id)
     
     # Фильтруем рекомендации типа "Назначения" и с деталями
     prescriptions = [
@@ -287,18 +290,19 @@ async def get_drugs(session: AsyncSession) -> List[Dict[str, str]]:
     return drugs
 
 
-async def get_recommendations(session: AsyncSession) -> List[Dict[str, str]]:
+async def get_recommendations(session: AsyncSession, patient_id: int) -> List[Dict[str, str]]:
     """
     Возвращает рекомендации.
     
     Args:
         session: Асинхронная сессия базы данных
+        patient_id: Идентификатор пациента
         
     Returns:
         List[Dict[str, str]]: Список рекомендаций
     """
     repository = RecommendationsDocRepository(session)
-    recommendations_docs = await repository.get_all_with_details()
+    recommendations_docs = await repository.get_all_with_details_by_patient(patient_id)
     
     # Фильтруем рекомендации типа "Рекомендации" и с деталями
     filtered_recommendations = [
@@ -331,23 +335,24 @@ async def get_recommendations(session: AsyncSession) -> List[Dict[str, str]]:
     return recommendations
 
 
-async def get_patient_status(session: AsyncSession) -> Dict[str, Any]:
+async def get_patient_status(session: AsyncSession, patient_id: int) -> Dict[str, Any]:
     """
     Возвращает полный статус пациента.
     
     Args:
         session: Асинхронная сессия базы данных
+        patient_id: Идентификатор пациента
         
     Returns:
         Dict[str, Any]: Полный статус пациента
     """
-    symptoms = await get_symptoms(session)
-    diseases = await get_diseases(session)
-    rates = await get_rates(session)
-    suspicions = await get_suspicions(symptoms)  # Передаем симптомы напрямую
-    risks = await get_risks(session)
-    drugs = await get_drugs(session)
-    recommendations = await get_recommendations(session)
+    symptoms = await get_symptoms(session, patient_id)
+    diseases = await get_diseases(session, patient_id)
+    rates = await get_rates(session, patient_id)
+    suspicions = await get_suspicions(symptoms)
+    risks = await get_risks(session, patient_id)
+    drugs = await get_drugs(session, patient_id)
+    recommendations = await get_recommendations(session, patient_id)
     
     return {
         "symptoms": symptoms,

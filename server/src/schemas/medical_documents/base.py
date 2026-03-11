@@ -13,6 +13,7 @@ class MedicalDocumentCreate(MedicalDocumentBase):
 
 class MedicalDocument(MedicalDocumentBase):
     id: int = Field(description="Unique identifier")
-    
+    patient_id: int = Field(description="Patient identifier")
+
     class Config:
         from_attributes = True 

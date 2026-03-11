@@ -22,37 +22,28 @@ recommendations_router = APIRouter(
 
 
 @recommendations_router.get("/", response_model=List[RecommendationsDocWithDetails], summary="Получить все документы рекомендаций")
-async def get_all_recommendations_docs(db: AsyncSession = Depends(get_async_db)):
+async def get_all_recommendations_docs(patient_id: int, db: AsyncSession = Depends(get_async_db)):
     """
     Получение всех документов рекомендаций и назначений с их деталями (если доступны).
     
     Возвращает список всех документов рекомендаций и назначений.
     """
     repository = RecommendationsDocRepository(db)
-    return await repository.get_all_with_details()
+    return await repository.get_all_with_details_by_patient(patient_id)
 
 
 @recommendations_router.get("/{id}", response_model=RecommendationsDocWithDetails, summary="Получить документ рекомендаций по ID")
-async def get_recommendations_doc(id: int, db: AsyncSession = Depends(get_async_db)):
-    """
-    Получение конкретного документа рекомендаций по его ID с деталями (если доступны).
-    
-    - **id**: Уникальный идентификатор документа рекомендаций
-    
-    Возвращает документ рекомендаций, если он найден, иначе выдает ошибку 404.
-    """
+async def get_recommendations_doc(patient_id: int, id: int, db: AsyncSession = Depends(get_async_db)):
     repository = RecommendationsDocRepository(db)
     item = await repository.get_by_id_with_details(id)
-    if not item:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Документ рекомендаций с ID {id} не найден"
-        )
+    if not item or item.patient_id != patient_id:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Документ рекомендаций с ID {id} не найден")
     return item
 
 
 @recommendations_router.post("/", response_model=RecommendationsDoc, status_code=status.HTTP_201_CREATED, summary="Создать документ с рекомендациями")
 async def create_recommendations_doc(
+    patient_id: int,
     data: RecommendationsDocCreate,
     db: AsyncSession = Depends(get_async_db)
 ):
@@ -67,45 +58,25 @@ async def create_recommendations_doc(
     Возвращает созданный документ рекомендаций с присвоенным ID.
     """
     repository = RecommendationsDocRepository(db)
-    return await repository.create(data.model_dump())
+    return await repository.create({**data.model_dump(), "patient_id": patient_id})
 
 
 @recommendations_router.put("/{id}", response_model=RecommendationsDoc, summary="Обновить документ рекомендаций")
-async def update_recommendations_doc(id: int, data: RecommendationsDocCreate, db: AsyncSession = Depends(get_async_db)):
-    """
-    Обновление существующего документа рекомендаций.
-    
-    - **id**: Уникальный идентификатор документа для обновления
-    - **data**: Обновленные данные
-    
-    Возвращает обновленный документ рекомендаций, если он найден, иначе выдает ошибку 404.
-    """
+async def update_recommendations_doc(patient_id: int, id: int, data: RecommendationsDocCreate, db: AsyncSession = Depends(get_async_db)):
     repository = RecommendationsDocRepository(db)
     item = await repository.get_by_id(id)
-    if not item:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Документ рекомендаций с ID {id} не найден"
-        )
+    if not item or item.patient_id != patient_id:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Документ рекомендаций с ID {id} не найден")
     return await repository.update(id, data.model_dump())
 
 
 @recommendations_router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT, summary="Удалить документ рекомендаций")
-async def delete_recommendations_doc(id: int, db: AsyncSession = Depends(get_async_db)):
-    """
-    Удаление документа рекомендаций.
-    
-    - **id**: Уникальный идентификатор документа для удаления
-    
-    Возвращает статус 204 No Content при успешном удалении, иначе выдает ошибку 404.
-    """
+async def delete_recommendations_doc(patient_id: int, id: int, db: AsyncSession = Depends(get_async_db)):
     repository = RecommendationsDocRepository(db)
-    success = await repository.delete(id)
-    if not success:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Документ рекомендаций с ID {id} не найден"
-        )
+    item = await repository.get_by_id(id)
+    if not item or item.patient_id != patient_id:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Документ рекомендаций с ID {id} не найден")
+    await repository.delete(id)
 
 
 # Recommendations Document Details endpoints

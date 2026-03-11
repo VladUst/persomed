@@ -15,6 +15,12 @@ class BaseRepository(Generic[T]):
     async def get_all(self) -> List[T]:
         result = await self.session.execute(select(self.model))
         return result.scalars().all()
+
+    async def get_all_by_patient(self, patient_id: int) -> List[T]:
+        result = await self.session.execute(
+            select(self.model).where(self.model.patient_id == patient_id)
+        )
+        return result.scalars().all()
     
     async def get_by_id(self, id: int) -> Optional[T]:
         result = await self.session.execute(

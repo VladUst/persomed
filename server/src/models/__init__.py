@@ -1,9 +1,11 @@
+from src.models.patient import Patient
 from src.models.medical_documents import (
     AnalyzesDoc,
     OtherDoc,
     DiseasesHistoryDoc,
     RecommendationsDoc,
-    DiseasesHistoryDocDetails
+    DiseasesHistoryDocDetails,
+    RecommendationsDocDetails,
 )
 from src.models.health_indicators import (
     HealthIndicatorBase,
@@ -12,15 +14,17 @@ from src.models.health_indicators import (
     VaccinationsInfo,
     AllergiesInfo,
     FamilyHistoryInfo,
-    LifestyleInfo
+    LifestyleInfo,
 )
 
 __all__ = [
+    "Patient",
     "AnalyzesDoc",
     "OtherDoc",
     "DiseasesHistoryDoc",
     "RecommendationsDoc",
     "DiseasesHistoryDocDetails",
+    "RecommendationsDocDetails",
     "HealthIndicatorBase",
     "GeneralInfo",
     "LaboratoryInfo",

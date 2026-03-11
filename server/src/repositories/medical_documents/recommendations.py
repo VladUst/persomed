@@ -28,6 +28,15 @@ class RecommendationsDocRepository(BaseRepository[RecommendationsDoc]):
         )
         return result.scalars().all()
 
+    async def get_all_with_details_by_patient(self, patient_id: int):
+        """Get all recommendations documents with details filtered by patient"""
+        result = await self.session.execute(
+            select(RecommendationsDoc)
+            .options(selectinload(RecommendationsDoc.details))
+            .where(RecommendationsDoc.patient_id == patient_id)
+        )
+        return result.scalars().all()
+
 
 class RecommendationsDocDetailsRepository(BaseRepository[RecommendationsDocDetails]):
     def __init__(self, session: AsyncSession):

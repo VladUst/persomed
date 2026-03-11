@@ -42,7 +42,7 @@ risk_analysis_router = APIRouter(
         }
     }
 )
-async def get_risks(db: AsyncSession = Depends(get_async_db)):
+async def get_risks(patient_id: int, db: AsyncSession = Depends(get_async_db)):
     """
     Анализ факторов риска пациента на основе показателей здоровья и хронических заболеваний.
     
@@ -65,7 +65,5 @@ async def get_risks(db: AsyncSession = Depends(get_async_db)):
       - source: Источник информации
       - date: Дата анализа
     """
-    # Получаем факторы риска из сервиса
-    risk_factors = await get_risk_factors(db)
-    
+    risk_factors = await get_risk_factors(db, patient_id)
     return risk_factors 

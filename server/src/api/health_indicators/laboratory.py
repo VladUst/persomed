@@ -14,37 +14,28 @@ laboratory_router = APIRouter(
 
 
 @laboratory_router.get("/", response_model=List[LaboratoryInfo], summary="Получить все лабораторные измерения")
-async def get_all_laboratory_info(db: AsyncSession = Depends(get_async_db),):
+async def get_all_laboratory_info(patient_id: int, db: AsyncSession = Depends(get_async_db)):
     """
     Получение всех записей лабораторных измерений.
     
     Возвращает список всех записей лабораторных измерений.
     """
     repository = LaboratoryInfoRepository(db)
-    return await repository.get_all()
+    return await repository.get_all_by_patient(patient_id)
 
 
 @laboratory_router.get("/{id}", response_model=LaboratoryInfo, summary="Получить лабораторное измерение по ID")
-async def get_laboratory_info(id: int, db: AsyncSession = Depends(get_async_db)):
-    """
-    Получение конкретной записи лабораторного измерения по её ID.
-    
-    - **id**: Уникальный идентификатор лабораторного измерения
-    
-    Возвращает запись лабораторного измерения, если оно найдено, иначе выдает ошибку 404.
-    """
+async def get_laboratory_info(patient_id: int, id: int, db: AsyncSession = Depends(get_async_db)):
     repository = LaboratoryInfoRepository(db)
     item = await repository.get_by_id(id)
-    if not item:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Лабораторное измерение с ID {id} не найдено"
-        )
+    if not item or item.patient_id != patient_id:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Лабораторное измерение с ID {id} не найдено")
     return item
 
 
 @laboratory_router.post("/", response_model=LaboratoryInfo, status_code=status.HTTP_201_CREATED, summary="Создать лабораторное измерение")
 async def create_laboratory_info(
+    patient_id: int,
     data: LaboratoryInfoCreate,
     db: AsyncSession = Depends(get_async_db)
 ):
@@ -62,42 +53,22 @@ async def create_laboratory_info(
     Возвращает созданное лабораторное измерение с присвоенным ID.
     """
     repository = LaboratoryInfoRepository(db)
-    return await repository.create(data.model_dump())
+    return await repository.create({**data.model_dump(), "patient_id": patient_id})
 
 
 @laboratory_router.put("/{id}", response_model=LaboratoryInfo, summary="Обновить лабораторное измерение")
-async def update_laboratory_info(id: int, data: LaboratoryInfoCreate, db: AsyncSession = Depends(get_async_db)):
-    """
-    Обновление существующей записи лабораторного измерения.
-    
-    - **id**: Уникальный идентификатор записи для обновления
-    - **data**: Обновленные данные
-    
-    Возвращает обновленную запись лабораторного измерения, если она найдена, иначе выдает ошибку 404.
-    """
+async def update_laboratory_info(patient_id: int, id: int, data: LaboratoryInfoCreate, db: AsyncSession = Depends(get_async_db)):
     repository = LaboratoryInfoRepository(db)
     item = await repository.get_by_id(id)
-    if not item:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Лабораторное измерение с ID {id} не найдено"
-        )
+    if not item or item.patient_id != patient_id:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Лабораторное измерение с ID {id} не найдено")
     return await repository.update(id, data.model_dump())
 
 
 @laboratory_router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT, summary="Удалить лабораторное измерение")
-async def delete_laboratory_info(id: int, db: AsyncSession = Depends(get_async_db)):
-    """
-    Удаление записи лабораторного измерения.
-    
-    - **id**: Уникальный идентификатор записи для удаления
-    
-    Возвращает статус 204 No Content при успешном удалении, иначе выдает ошибку 404.
-    """
+async def delete_laboratory_info(patient_id: int, id: int, db: AsyncSession = Depends(get_async_db)):
     repository = LaboratoryInfoRepository(db)
-    success = await repository.delete(id)
-    if not success:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Лабораторное измерение с ID {id} не найдено"
-        ) 
+    item = await repository.get_by_id(id)
+    if not item or item.patient_id != patient_id:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Лабораторное измерение с ID {id} не найдено")
+    await repository.delete(id) 

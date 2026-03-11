@@ -8,16 +8,16 @@ from src.api.risk_analysis import router as risk_analysis_router
 from src.api.text_processing import router as text_processing_router
 from src.api.patient_status import router as patient_status_router
 
-router = APIRouter(
-    prefix="/api"
-)
+patient_router = APIRouter(prefix="/patients/{patient_id}")
+patient_router.include_router(health_indicators_router)
+patient_router.include_router(medical_documents_router)
+patient_router.include_router(risk_analysis_router)
+patient_router.include_router(patient_status_router)
 
-router.include_router(health_indicators_router)
-router.include_router(medical_documents_router)
+router = APIRouter(prefix="/api")
+router.include_router(patient_router)
 router.include_router(diagnostic_router)
 router.include_router(recommendations_router)
-router.include_router(risk_analysis_router)
 router.include_router(text_processing_router)
-router.include_router(patient_status_router)
 
 __all__ = ["router"]

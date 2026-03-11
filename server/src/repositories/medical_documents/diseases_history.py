@@ -28,6 +28,15 @@ class DiseasesHistoryDocRepository(BaseRepository[DiseasesHistoryDoc]):
         )
         return result.scalars().all()
 
+    async def get_all_with_details_by_patient(self, patient_id: int):
+        """Get all disease history documents with details filtered by patient"""
+        result = await self.session.execute(
+            select(DiseasesHistoryDoc)
+            .options(selectinload(DiseasesHistoryDoc.details))
+            .where(DiseasesHistoryDoc.patient_id == patient_id)
+        )
+        return result.scalars().all()
+
 
 class DiseasesHistoryDocDetailsRepository(BaseRepository[DiseasesHistoryDocDetails]):
     def __init__(self, session: AsyncSession):

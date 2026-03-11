@@ -15,7 +15,7 @@ patient_status_router = APIRouter(
     status_code=status.HTTP_200_OK,
     summary="Получить полный статус пациента"
 )
-async def get_status(db: AsyncSession = Depends(get_async_db)):
+async def get_status(patient_id: int, db: AsyncSession = Depends(get_async_db)):
     """
     Получение полного статуса пациента.
     
@@ -32,5 +32,5 @@ async def get_status(db: AsyncSession = Depends(get_async_db)):
     Returns:
       Полный набор данных о состоянии пациента в структурированном виде
     """
-    status_data = await get_patient_status(db)
+    status_data = await get_patient_status(db, patient_id)
     return {"status": status_data} 
