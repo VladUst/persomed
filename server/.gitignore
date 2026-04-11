@@ -6,3 +6,5 @@ persomed.db
 pyctd.db
 .idea
 __pycache__
+/scripts/genes_analysis/genetical_profile_full.vcf
+/scripts/genes_analysis/.pgs_cache
