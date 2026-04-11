@@ -27,7 +27,6 @@ class Suspicion(BaseModel):
     name: str = Field(description="Название подозреваемого заболевания")
     date: str = Field(description="Дата подозрения")
     source: str = Field(description="Источник подозрения")
-    icd: str = Field(description="Код заболевания по МКБ-10")
 
 
 class Risk(BaseModel):
@@ -40,6 +39,7 @@ class Drug(BaseModel):
     name: str = Field(description="Название препарата")
     dosage: str = Field(description="Дозировка препарата")
     date: str = Field(description="Дата назначения")
+    source: str = Field(description="Источник назначения")
 
 
 class Recommendation(BaseModel):

@@ -177,33 +177,23 @@ async def get_suspicions(symptoms: List[Dict[str, str]]) -> List[Dict[str, str]]
     
     suspicions = []
     
-    # Для каждого источника делаем отдельное предсказание
     for source, symptom_list in symptoms_by_source.items():
         try:
             # Получаем предсказания от сервиса диагностики
             prediction_data = await get_predictions(symptom_list)
             
-            # Получаем предсказания из модели машинного обучения
             ml_predictions = prediction_data["ml"]["prediction"]
             
-            # Выбираем первое предсказание (наиболее вероятное)
-            # Если в предсказаниях есть "Диабет", выбираем его
             selected_disease = None
-            for disease in ml_predictions:
-                if "диабет" in disease.lower():
-                    selected_disease = disease
-                    break
             
-            # Если диабет не найден, берем первое предсказание
             if not selected_disease and ml_predictions:
-                selected_disease = ml_predictions[0]
+                selected_disease = ml_predictions[1]
             
             if selected_disease:
                 suspicion = {
                     "name": selected_disease,
                     "date": prediction_data["ml"]["date"],
                     "source": prediction_data["ml"]["info"],
-                    "icd": ""
                 }
                 suspicions.append(suspicion)
         
@@ -249,44 +239,42 @@ async def get_drugs(session: AsyncSession, patient_id: int) -> List[Dict[str, st
     
     drugs = []
     for prescription in prescriptions:
-        
-        # Проверяем, что есть instructions напрямую в деталях
         if not hasattr(prescription.details, "instructions"):
             continue
-        
+
         instructions = prescription.details.instructions
-        # Разбиваем строку препаратов по запятой
-        drugs_list = instructions.split(",")
-        
-        for drug_info in drugs_list:
-            drug_info = drug_info.strip()
-            
-            # Извлекаем название препарата и дозировку
-            # Паттерн для разделения названия и дозировки
-            match = re.match(r"(.*?)\s+(\d+\s*(?:мг|мл|г|таб)\.?(?:/(?:ден|сут))?\.?)", drug_info)
-            
-            if match:
-                name, dosage = match.groups()
-                name = name.strip()
-                # Делаем первую букву названия препарата заглавной
-                capitalized_name = name[0].upper() + name[1:] if name else ""
-                
-                drugs.append({
-                    "name": capitalized_name,
-                    "dosage": dosage.strip(),
-                    "date": prescription.details.date if hasattr(prescription.details, "date") else prescription.date
-                })
+        if not instructions:
+            continue
+
+        doc_date = prescription.details.date if hasattr(prescription.details, "date") else prescription.date
+        concepts = await process_medical_text(instructions)
+
+        for concept in concepts:
+            type_ids = concept.get("type_ids", [])
+            if "T200" not in type_ids and "T121" not in type_ids:
+                continue
+
+            full_name = concept.get("name", "")
+            if not full_name:
+                continue
+
+            if "T200" in type_ids:
+                # T200 — клинический препарат, дозировка уже в имени: "Эналаприл 10 мг"
+                dose_match = re.search(r"(\d+(?:[.,]\d+)?\s*(?:мг|мл|г|ME|ед)(?:/(?:кг|сут|ден|мл))?)", full_name, re.IGNORECASE)
+                if dose_match:
+                    dosage = dose_match.group(1).strip()
+                    name = full_name[: dose_match.start()].strip()
+                else:
+                    dosage = "-"
+                    name = full_name.strip()
             else:
-                # Если не удалось разделить, просто берем всю строку как название
-                # Делаем первую букву заглавной
-                capitalized_name = drug_info[0].upper() + drug_info[1:] if drug_info else ""
-                
-                drugs.append({
-                    "name": capitalized_name,
-                    "dosage": "Не указано",
-                    "date": prescription.details.date if hasattr(prescription.details, "date") else prescription.date
-                })
-    
+                # T121 — фармакологическое вещество, дозировки в имени нет
+                dosage = "-"
+                name = full_name.strip()
+
+            capitalized_name = name[0].upper() + name[1:] if name else ""
+            drugs.append({"name": capitalized_name, "dosage": dosage, "date": doc_date, "source": prescription.name})
+
     return drugs
 
 
