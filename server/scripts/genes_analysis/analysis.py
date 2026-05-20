@@ -12,77 +12,61 @@
 
 import gzip
 import io
+import math
 import os
-import re
 import sys
 from pathlib import Path
 
 import myvariant
 import pandas as pd
 import requests
+import vcf  # PyVCF3
 from tabulate import tabulate
 
 # ---------------------------------------------------------------------------
-# Стадия 1: Парсинг VCF
+# Стадия 1: Парсинг VCF (через PyVCF3)
 # ---------------------------------------------------------------------------
 
+# Маппинг gt_type PyVCF3 -> человекочитаемая зиготность
+_ZYGOSITY_MAP = {
+    0: "homozygous_ref",  # 0/0
+    1: "heterozygous",     # 0/1 или 1/0
+    2: "homozygous_alt",   # 1/1
+}
+
+
 def parse_vcf(vcf_path: str) -> pd.DataFrame:
-    """Читает VCF-файл и возвращает DataFrame с вариантами.
+    """Читает VCF-файл через PyVCF3 и возвращает DataFrame с вариантами."""
+    reader = vcf.Reader(filename=vcf_path)
 
-    Поддерживает как tab-separated, так и space-separated строки
-    (файлы Genotek иногда содержат пробелы вместо табов).
-    """
     records = []
-    with open(vcf_path, "r", encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if not line or line.startswith("##"):
-                continue
-            # Заголовок — пропускаем
-            if line.startswith("#CHROM"):
-                continue
+    for record in reader:
+        sample = record.samples[0]
+        gt_alleles = sample.gt_alleles  # ['0', '1'] или ['1', '1'] и т.д.
 
-            fields = re.split(r"\s+", line)
-            if len(fields) < 10:
-                continue
+        if gt_alleles is None or len(gt_alleles) != 2:
+            continue
 
-            chrom = fields[0]
-            pos = int(fields[1])
-            rsid = fields[2]
-            ref = fields[3]
-            alt = fields[4]
-            genotype = fields[9]  # напр. "1|0", "0|0", "1|1"
+        a1_idx, a2_idx = int(gt_alleles[0]), int(gt_alleles[1])
+        zygosity = _ZYGOSITY_MAP.get(sample.gt_type, "unknown")
 
-            # Определяем зиготность
-            alleles = re.split(r"[|/]", genotype)
-            if len(alleles) != 2:
-                continue
+        # Собираем список аллелей: [REF, ALT1, ALT2, ...]
+        allele_options = [record.REF] + [str(a) for a in record.ALT]
+        actual_allele_1 = allele_options[a1_idx] if a1_idx < len(allele_options) else "?"
+        actual_allele_2 = allele_options[a2_idx] if a2_idx < len(allele_options) else "?"
 
-            a1, a2 = int(alleles[0]), int(alleles[1])
-
-            if a1 == 0 and a2 == 0:
-                zygosity = "homozygous_ref"
-            elif a1 == a2:
-                zygosity = "homozygous_alt"
-            else:
-                zygosity = "heterozygous"
-
-            # Расшифровка аллелей
-            allele_options = [ref] + alt.split(",")
-            actual_allele_1 = allele_options[a1] if a1 < len(allele_options) else "?"
-            actual_allele_2 = allele_options[a2] if a2 < len(allele_options) else "?"
-
-            records.append({
-                "chrom": chrom,
-                "pos": pos,
-                "rsid": rsid,
-                "ref": ref,
-                "alt": alt,
-                "genotype": genotype,
-                "allele_1": actual_allele_1,
-                "allele_2": actual_allele_2,
-                "zygosity": zygosity,
-            })
+        records.append({
+            "chrom": record.CHROM,
+            "pos": record.POS,
+            "rsid": record.ID,
+            "ref": record.REF,
+            "alt": ",".join(str(a) for a in record.ALT),
+            "genotype": sample["GT"],
+            "allele_1": actual_allele_1,
+            "allele_2": actual_allele_2,
+            "zygosity": zygosity,
+            "phased": sample.phased,
+        })
 
     df = pd.DataFrame(records)
     print(f"[Стадия 1] Прочитано вариантов: {len(df)}")
@@ -390,6 +374,37 @@ def evaluate_complex_genotypes(variants_df: pd.DataFrame) -> list[dict]:
 # Стадия 5: Полигенные шкалы риска (PGS Catalog)
 # ---------------------------------------------------------------------------
 
+def _norm_cdf(z: float) -> float:
+    """Стандартное нормальное распределение через math.erf."""
+    return (1.0 + math.erf(z / math.sqrt(2))) / 2
+
+
+def _risk_tier(percentile: float) -> tuple[str, str]:
+    """Перцентиль → уровень риска и индикатор."""
+    if percentile >= 95:
+        return "Очень высокий", "▲▲▲"
+    if percentile >= 80:
+        return "Повышенный", "▲▲"
+    if percentile >= 60:
+        return "Умеренно повышенный", "▲"
+    if percentile >= 40:
+        return "Средний", "—"
+    if percentile >= 20:
+        return "Умеренно пониженный", "▽"
+    return "Пониженный", "▽▽"
+
+
+def _coverage_label(coverage_pct: float) -> tuple[str, bool]:
+    """Покрытие → метка надёжности и флаг достаточности."""
+    if coverage_pct >= 80:
+        return "Высокое", True
+    if coverage_pct >= 50:
+        return "Среднее", True
+    if coverage_pct >= 20:
+        return "Низкое", False
+    return "Недостаточное", False
+
+
 # Набор PGS-скоров для расчёта.
 # Выбраны скоры с небольшим числом вариантов (десятки-сотни) для демонстрации.
 # Для продакшена можно добавить скоры с миллионами вариантов (genome-wide PGS).
@@ -492,15 +507,19 @@ def calculate_pgs(
       1. Для каждого SNP в scoring-файле ищем совпадение по rsID в VCF
       2. Считаем дозировку эффект-аллеля (0, 1 или 2 копии)
       3. PGS = sum(effect_weight * dosage)
+      4. Если в файле есть частоты аллелей (allelefrequency_effect),
+         вычисляем среднее и СКО для найденных SNP → z-score → перцентиль.
 
     Возвращает dict с результатами.
     """
-    # Определяем колонку с rsID в scoring-файле
     rsid_col = "hm_rsID" if "hm_rsID" in scoring_df.columns else "rsID"
     if rsid_col not in scoring_df.columns:
-        return {"matched": 0, "total": 0, "score": 0.0}
+        return {"matched": 0, "total": 0, "score": 0.0, "coverage_pct": 0,
+                "z_score": None, "percentile": None}
 
-    # Строим lookup из VCF: rsid -> (allele_1, allele_2)
+    eaf_col = "allelefrequency_effect"
+    has_eaf = eaf_col in scoring_df.columns
+
     vcf_lookup = {}
     for _, row in variants_df.iterrows():
         vcf_lookup[row["rsid"]] = (row["allele_1"], row["allele_2"])
@@ -508,6 +527,10 @@ def calculate_pgs(
     total_snps = len(scoring_df)
     matched = 0
     score = 0.0
+    # Для вычисления z-score: среднее и дисперсия по найденным SNP
+    partial_mean = 0.0
+    partial_var = 0.0
+    eaf_used = 0
 
     for _, pgs_row in scoring_df.iterrows():
         rsid = pgs_row.get(rsid_col, "")
@@ -516,22 +539,41 @@ def calculate_pgs(
 
         effect_allele = str(pgs_row.get("effect_allele", ""))
         weight = pgs_row.get("effect_weight", 0.0)
-
         if pd.isna(weight):
             continue
 
         a1, a2 = vcf_lookup[rsid]
-        # Дозировка = количество копий эффект-аллеля (0, 1, 2)
         dosage = (1 if a1 == effect_allele else 0) + (1 if a2 == effect_allele else 0)
+        w = float(weight)
 
-        score += float(weight) * dosage
+        score += w * dosage
         matched += 1
+
+        # Вклад этого SNP в среднее и дисперсию популяции:
+        #   E[w*D] = w * 2 * EAF          (по Hardy-Weinberg)
+        #   Var[w*D] = w² * 2 * EAF * (1-EAF)
+        if has_eaf:
+            eaf = pgs_row.get(eaf_col)
+            if eaf is not None and not pd.isna(eaf):
+                eaf = float(eaf)
+                if 0 < eaf < 1:
+                    partial_mean += w * 2 * eaf
+                    partial_var += w ** 2 * 2 * eaf * (1 - eaf)
+                    eaf_used += 1
+
+    z_score = None
+    percentile = None
+    if eaf_used > 0 and partial_var > 0:
+        z_score = round((score - partial_mean) / math.sqrt(partial_var), 2)
+        percentile = round(_norm_cdf(z_score) * 100, 1)
 
     return {
         "matched": matched,
         "total": total_snps,
         "score": round(score, 6),
         "coverage_pct": round(matched / total_snps * 100, 1) if total_snps > 0 else 0,
+        "z_score": z_score,
+        "percentile": percentile,
     }
 
 
@@ -557,6 +599,12 @@ def compute_pgs_scores(
 
         calc = calculate_pgs(variants_df, scoring_df)
 
+        coverage_label, is_reliable = _coverage_label(calc["coverage_pct"])
+        risk_level = None
+        risk_indicator = None
+        if calc["percentile"] is not None:
+            risk_level, risk_indicator = _risk_tier(calc["percentile"])
+
         results.append({
             "pgs_id": pgs_id,
             "trait": trait,
@@ -565,6 +613,12 @@ def compute_pgs_scores(
             "matched": calc["matched"],
             "total": calc["total"],
             "coverage_pct": calc["coverage_pct"],
+            "coverage_label": coverage_label,
+            "is_reliable": is_reliable,
+            "z_score": calc["z_score"],
+            "percentile": calc["percentile"],
+            "risk_level": risk_level,
+            "risk_indicator": risk_indicator,
         })
 
         status = "OK" if calc["matched"] > 0 else "нет совпадений"
@@ -679,36 +733,50 @@ def print_report(
         not_scored = [r for r in pgs_results if r["matched"] == 0]
 
         if scored:
+            # Таблица: показываем перцентиль и уровень риска там, где есть данные
             table_data = []
             for r in scored:
+                if r["percentile"] is not None and r["is_reliable"]:
+                    percentile_str = f"{r['percentile']:.1f}-й"
+                    risk_str = f"{r['risk_indicator']} {r['risk_level']}"
+                elif r["percentile"] is not None:
+                    percentile_str = f"{r['percentile']:.1f}-й *"
+                    risk_str = f"{r['risk_indicator']} {r['risk_level']} *"
+                else:
+                    percentile_str = "—"
+                    risk_str = "нет EAF данных"
+
                 table_data.append([
                     r["pgs_id"],
                     r["trait"],
                     f"{r['score']:+.4f}",
                     f"{r['matched']}/{r['total']}",
-                    f"{r['coverage_pct']}%",
+                    f"{r['coverage_pct']}% ({r['coverage_label']})",
+                    percentile_str,
+                    risk_str,
                 ])
             print()
             print(tabulate(
                 table_data,
-                headers=["PGS ID", "Заболевание", "Скор", "SNP совпало", "Покрытие"],
+                headers=["PGS ID", "Заболевание", "Скор", "SNP", "Покрытие", "Перцентиль", "Уровень риска"],
                 tablefmt="simple",
                 numalign="left",
             ))
 
-            print("\n  Интерпретация:")
-            print("    Скор > 0: больше эффект-аллелей риска, чем в среднем")
-            print("    Скор < 0: меньше эффект-аллелей риска")
-            print("    Точная оценка риска требует сравнения с популяционным")
-            print("    распределением (перцентили) на полном геноме.")
+            print("\n  Как читать:")
+            print("    Перцентиль — место пациента в популяции по данному скору.")
+            print("    Например, 80-й перцентиль = генетический риск выше, чем у 80% людей.")
+            print("    * — покрытие < 20%, результат предварительный.")
 
         if not_scored:
             print(f"\n  Нет совпадений SNP для: "
                   f"{', '.join(r['trait'] for r in not_scored)}")
 
-        if any(r["coverage_pct"] < 50 for r in scored):
-            print("\n  ВНИМАНИЕ: Низкое покрытие (<50%) — скор может быть")
-            print("  неточным. Для точного расчёта необходим полный VCF-файл.")
+        low_coverage = [r for r in scored if not r["is_reliable"]]
+        if low_coverage:
+            print(f"\n  ВНИМАНИЕ: Покрытие < 20% для "
+                  f"{len(low_coverage)} скор(ов) — для точного расчёта")
+            print("  нужен полный SNP-массив (~650k SNP) или WGS.")
 
 
 # ---------------------------------------------------------------------------

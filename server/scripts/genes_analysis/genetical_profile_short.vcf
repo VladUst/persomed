@@ -1,7 +1,7 @@
 ##fileformat=VCFv4.2
 ##source=Genotek
 ##reference=hghg19
-##FORMAT=<ID=GT,Number=1,Type=String,Description=Genotype>
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
 #CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	nh4122
 chr1	752721	rs3131972	A	G	.	.	.	GT	1|1
 chr1	759036	rs114525117	G	A	.	.	.	GT	0|0
