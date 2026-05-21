@@ -273,76 +273,6 @@ COMPLEX_GENOTYPE_RULES.append({
 })
 
 
-def _mthfr_rule(genotypes: dict) -> dict | None:
-    """Определяет статус MTHFR по rs1801133 (C677T) и rs1801131 (A1298C)."""
-    rs1801133 = genotypes.get("rs1801133")
-    rs1801131 = genotypes.get("rs1801131")
-
-    results = []
-
-    if rs1801133 is not None:
-        a1, a2 = rs1801133
-        if a1 == a2 and a1 != "C":  # Гомозигота TT
-            risk = "Значительно сниженная активность MTHFR (~30%)"
-            level = "Повышенный"
-        elif a1 != a2:  # Гетерозигота CT
-            risk = "Умеренно сниженная активность MTHFR (~65%)"
-            level = "Умеренный"
-        else:
-            risk = "Нормальная активность MTHFR"
-            level = "Базовый"
-
-        return {
-            "gene": "MTHFR (C677T)",
-            "genotype": f"{a1}/{a2}",
-            "disease": "Гипергомоцистеинемия, дефекты нервной трубки",
-            "risk_level": level,
-            "details": risk,
-        }
-
-    return None
-
-
-COMPLEX_GENOTYPE_RULES.append({
-    "name": "MTHFR C677T",
-    "snps": ["rs1801133"],
-    "evaluate": _mthfr_rule,
-})
-
-
-def _factor_v_leiden_rule(genotypes: dict) -> dict | None:
-    """Фактор V Лейдена (rs6025) — риск тромбозов."""
-    rs6025 = genotypes.get("rs6025")
-    if rs6025 is None:
-        return None
-
-    a1, a2 = rs6025
-    if a1 == a2 and a1 != "C":  # Гомозигота по мутации
-        return {
-            "gene": "F5 (Factor V Leiden)",
-            "genotype": f"{a1}/{a2}",
-            "disease": "Тромбофилия (венозные тромбозы)",
-            "risk_level": "Высокий",
-            "details": "Гомозигота — OR ≈ 50-80 для венозной тромбоэмболии",
-        }
-    elif a1 != a2:  # Гетерозигота
-        return {
-            "gene": "F5 (Factor V Leiden)",
-            "genotype": f"{a1}/{a2}",
-            "disease": "Тромбофилия (венозные тромбозы)",
-            "risk_level": "Умеренно повышенный",
-            "details": "Гетерозигота — OR ≈ 5-7 для венозной тромбоэмболии",
-        }
-    return None
-
-
-COMPLEX_GENOTYPE_RULES.append({
-    "name": "Factor V Leiden",
-    "snps": ["rs6025"],
-    "evaluate": _factor_v_leiden_rule,
-})
-
-
 def evaluate_complex_genotypes(variants_df: pd.DataFrame) -> list[dict]:
     """Проверяет все правила комплексных генотипов."""
     results = []
@@ -407,51 +337,71 @@ def _coverage_label(coverage_pct: float) -> tuple[str, bool]:
 
 # Набор PGS-скоров для расчёта.
 # Фокус: Болезнь Альцгеймера, ИБС, Сахарный диабет 2 типа.
-# Для каждого заболевания берём несколько скоров — чтобы видеть согласованность
-# (если 3 разных скора для ИБС дают похожий перцентиль — результат надёжнее).
+# Все ID проверены через check_pgs_candidates.py на наличие EAF —
+# это необходимо для расчёта перцентилей через z-score.
+# Для каждого заболевания берём несколько скоров разного размера:
+# если они дают согласованный перцентиль — результат надёжнее.
 DEFAULT_PGS_SCORES = [
     # === Болезнь Альцгеймера ===
     # Главный генетический фактор (APOE) определяется отдельно в Стадии 4.
     # PGS-скоры ниже добавляют сигнал от других вариантов помимо APOE.
     {
         "pgs_id": "PGS000025",
-        "trait": "Болезнь Альцгеймера",
+        "trait": "Болезнь Альцгеймера (19 SNP)",
         "trait_en": "Alzheimer's disease",
         "variants_count": 19,
     },
     {
-        "pgs_id": "PGS000026",
-        "trait": "Болезнь Альцгеймера (расш.)",
+        "pgs_id": "PGS001775",
+        "trait": "Болезнь Альцгеймера (39 SNP)",
         "trait_en": "Alzheimer's disease",
-        "variants_count": 33,
+        "variants_count": 39,
+    },
+    {
+        "pgs_id": "PGS002280",
+        "trait": "Болезнь Альцгеймера (83 SNP)",
+        "trait_en": "Alzheimer's disease",
+        "variants_count": 83,
     },
 
     # === Ишемическая болезнь сердца / ИБС ===
     {
         "pgs_id": "PGS000010",
-        "trait": "Ишемическая болезнь сердца",
+        "trait": "ИБС (27 SNP)",
         "trait_en": "Coronary heart disease",
         "variants_count": 27,
     },
     {
-        "pgs_id": "PGS000011",
-        "trait": "ИБС (50 SNP)",
+        "pgs_id": "PGS000059",
+        "trait": "ИБС (46 SNP)",
         "trait_en": "Coronary artery disease",
-        "variants_count": 50,
+        "variants_count": 46,
     },
     {
-        "pgs_id": "PGS000019",
-        "trait": "ИБС (192 SNP)",
+        "pgs_id": "PGS000058",
+        "trait": "ИБС (204 SNP)",
         "trait_en": "Coronary artery disease",
-        "variants_count": 192,
+        "variants_count": 204,
     },
 
     # === Сахарный диабет 2 типа ===
     {
-        "pgs_id": "PGS000031",
-        "trait": "Сахарный диабет 2 типа",
+        "pgs_id": "PGS000037",
+        "trait": "Сахарный диабет 2 типа (15 SNP)",
         "trait_en": "Type 2 diabetes",
-        "variants_count": 62,
+        "variants_count": 15,
+    },
+    {
+        "pgs_id": "PGS002247",
+        "trait": "Сахарный диабет 2 типа (68 SNP)",
+        "trait_en": "Type 2 diabetes",
+        "variants_count": 68,
+    },
+    {
+        "pgs_id": "PGS000043",
+        "trait": "Сахарный диабет 2 типа (297 SNP)",
+        "trait_en": "Type 2 diabetes",
+        "variants_count": 297,
     },
 ]
 
