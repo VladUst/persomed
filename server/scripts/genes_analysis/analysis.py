@@ -406,21 +406,13 @@ def _coverage_label(coverage_pct: float) -> tuple[str, bool]:
 
 
 # Набор PGS-скоров для расчёта.
-# Выбраны скоры с небольшим числом вариантов (десятки-сотни) для демонстрации.
-# Для продакшена можно добавить скоры с миллионами вариантов (genome-wide PGS).
+# Фокус: Болезнь Альцгеймера, ИБС, Сахарный диабет 2 типа.
+# Для каждого заболевания берём несколько скоров — чтобы видеть согласованность
+# (если 3 разных скора для ИБС дают похожий перцентиль — результат надёжнее).
 DEFAULT_PGS_SCORES = [
-    {
-        "pgs_id": "PGS000010",
-        "trait": "Ишемическая болезнь сердца (ИБС)",
-        "trait_en": "Coronary heart disease",
-        "variants_count": 27,
-    },
-    {
-        "pgs_id": "PGS000011",
-        "trait": "Ишемическая болезнь сердца (расш.)",
-        "trait_en": "Coronary artery disease",
-        "variants_count": 50,
-    },
+    # === Болезнь Альцгеймера ===
+    # Главный генетический фактор (APOE) определяется отдельно в Стадии 4.
+    # PGS-скоры ниже добавляют сигнал от других вариантов помимо APOE.
     {
         "pgs_id": "PGS000025",
         "trait": "Болезнь Альцгеймера",
@@ -433,23 +425,33 @@ DEFAULT_PGS_SCORES = [
         "trait_en": "Alzheimer's disease",
         "variants_count": 33,
     },
+
+    # === Ишемическая болезнь сердца / ИБС ===
+    {
+        "pgs_id": "PGS000010",
+        "trait": "Ишемическая болезнь сердца",
+        "trait_en": "Coronary heart disease",
+        "variants_count": 27,
+    },
+    {
+        "pgs_id": "PGS000011",
+        "trait": "ИБС (50 SNP)",
+        "trait_en": "Coronary artery disease",
+        "variants_count": 50,
+    },
+    {
+        "pgs_id": "PGS000019",
+        "trait": "ИБС (192 SNP)",
+        "trait_en": "Coronary artery disease",
+        "variants_count": 192,
+    },
+
+    # === Сахарный диабет 2 типа ===
     {
         "pgs_id": "PGS000031",
         "trait": "Сахарный диабет 2 типа",
         "trait_en": "Type 2 diabetes",
         "variants_count": 62,
-    },
-    {
-        "pgs_id": "PGS000001",
-        "trait": "Рак молочной железы",
-        "trait_en": "Breast cancer",
-        "variants_count": 77,
-    },
-    {
-        "pgs_id": "PGS000019",
-        "trait": "Ишемическая болезнь сердца (192 SNP)",
-        "trait_en": "Coronary artery disease",
-        "variants_count": 192,
     },
 ]
 
@@ -501,21 +503,36 @@ def calculate_pgs(
     variants_df: pd.DataFrame,
     scoring_df: pd.DataFrame,
 ) -> dict:
-    """Рассчитывает полигенный скор для одного PGS scoring-файла.
+    """Рассчитывает полигенный скор с mean imputation для пропущенных SNP.
 
     Алгоритм:
-      1. Для каждого SNP в scoring-файле ищем совпадение по rsID в VCF
-      2. Считаем дозировку эффект-аллеля (0, 1 или 2 копии)
-      3. PGS = sum(effect_weight * dosage)
-      4. Если в файле есть частоты аллелей (allelefrequency_effect),
-         вычисляем среднее и СКО для найденных SNP → z-score → перцентиль.
+      1. Для каждого SNP в scoring-файле:
+         а) Если SNP найден в VCF пациента → используем реальную
+            дозировку (0, 1 или 2 копии эффект-аллеля).
+         б) Если SNP отсутствует, но в scoring-файле есть EAF →
+            используем среднюю дозировку 2*EAF (mean imputation).
+            Это статистически корректный приём: вместо того чтобы
+            выкидывать SNP (что искажает score), мы предполагаем
+            "типичный для популяции" генотип у пациента.
+         в) Если нет ни генотипа, ни EAF → пропускаем.
+      2. PGS = sum(weight * dosage)
+      3. Через EAF считаем популяционные mean и variance
+         → z-score → перцентиль.
 
-    Возвращает dict с результатами.
+    Свойства mean imputation:
+      - При высоком измеренном покрытии (50%+) z-score близок к истинному.
+      - При низком покрытии перцентиль автоматически сдвигается к 50-му,
+        отражая возросшую неопределённость (это честное поведение).
+      - Импутированные SNP не добавляют индивидуального сигнала, только
+        корректируют общее среднее и дисперсию.
     """
     rsid_col = "hm_rsID" if "hm_rsID" in scoring_df.columns else "rsID"
     if rsid_col not in scoring_df.columns:
-        return {"matched": 0, "total": 0, "score": 0.0, "coverage_pct": 0,
-                "z_score": None, "percentile": None}
+        return {
+            "matched": 0, "imputed": 0, "skipped": 0, "total": 0,
+            "score": 0.0, "coverage_pct": 0, "effective_coverage_pct": 0,
+            "z_score": None, "percentile": None,
+        }
 
     eaf_col = "allelefrequency_effect"
     has_eaf = eaf_col in scoring_df.columns
@@ -525,53 +542,79 @@ def calculate_pgs(
         vcf_lookup[row["rsid"]] = (row["allele_1"], row["allele_2"])
 
     total_snps = len(scoring_df)
-    matched = 0
+    matched = 0   # SNP реально измерен у пациента
+    imputed = 0   # SNP не измерен, но подставлено среднее по популяции
+    skipped = 0   # SNP не измерен и нет EAF — нельзя ничего сказать
     score = 0.0
-    # Для вычисления z-score: среднее и дисперсия по найденным SNP
     partial_mean = 0.0
     partial_var = 0.0
-    eaf_used = 0
 
     for _, pgs_row in scoring_df.iterrows():
         rsid = pgs_row.get(rsid_col, "")
-        if pd.isna(rsid) or rsid not in vcf_lookup:
+        if pd.isna(rsid):
+            skipped += 1
             continue
 
         effect_allele = str(pgs_row.get("effect_allele", ""))
         weight = pgs_row.get("effect_weight", 0.0)
         if pd.isna(weight):
+            skipped += 1
             continue
-
-        a1, a2 = vcf_lookup[rsid]
-        dosage = (1 if a1 == effect_allele else 0) + (1 if a2 == effect_allele else 0)
         w = float(weight)
 
-        score += w * dosage
-        matched += 1
+        # Достаём популяционную частоту эффект-аллеля для этого SNP
+        eaf_raw = pgs_row.get(eaf_col) if has_eaf else None
+        eaf_valid = (
+            eaf_raw is not None
+            and not pd.isna(eaf_raw)
+            and 0 < float(eaf_raw) < 1
+        )
+        eaf = float(eaf_raw) if eaf_valid else None
 
-        # Вклад этого SNP в среднее и дисперсию популяции:
-        #   E[w*D] = w * 2 * EAF          (по Hardy-Weinberg)
-        #   Var[w*D] = w² * 2 * EAF * (1-EAF)
-        if has_eaf:
-            eaf = pgs_row.get(eaf_col)
-            if eaf is not None and not pd.isna(eaf):
-                eaf = float(eaf)
-                if 0 < eaf < 1:
-                    partial_mean += w * 2 * eaf
-                    partial_var += w ** 2 * 2 * eaf * (1 - eaf)
-                    eaf_used += 1
+        if rsid in vcf_lookup:
+            # SNP измерен у пациента — реальная дозировка
+            a1, a2 = vcf_lookup[rsid]
+            dosage = (1 if a1 == effect_allele else 0) + (1 if a2 == effect_allele else 0)
+            score += w * dosage
+            matched += 1
+
+            # Вклад в популяционные mean/var (для z-score, по Hardy-Weinberg):
+            #   E[w*D] = w * 2 * EAF
+            #   Var[w*D] = w² * 2 * EAF * (1-EAF)
+            if eaf_valid:
+                partial_mean += w * 2 * eaf
+                partial_var += w ** 2 * 2 * eaf * (1 - eaf)
+        elif eaf_valid:
+            # SNP не измерен, но известна EAF → mean imputation.
+            # Подставляем ожидаемое значение дозировки = 2*EAF.
+            # Score сдвигается на w*2*EAF, но (score - mean) от этого SNP = 0,
+            # т.е. он не вносит индивидуального вклада в z-score —
+            # только в общую дисперсию (увеличивает знаменатель).
+            score += w * 2 * eaf
+            partial_mean += w * 2 * eaf
+            partial_var += w ** 2 * 2 * eaf * (1 - eaf)
+            imputed += 1
+        else:
+            # Нет ни генотипа, ни популяционной частоты — пропускаем
+            skipped += 1
 
     z_score = None
     percentile = None
-    if eaf_used > 0 and partial_var > 0:
+    if partial_var > 0:
         z_score = round((score - partial_mean) / math.sqrt(partial_var), 2)
         percentile = round(_norm_cdf(z_score) * 100, 1)
 
+    raw_cov = round(matched / total_snps * 100, 1) if total_snps > 0 else 0
+    eff_cov = round((matched + imputed) / total_snps * 100, 1) if total_snps > 0 else 0
+
     return {
         "matched": matched,
+        "imputed": imputed,
+        "skipped": skipped,
         "total": total_snps,
         "score": round(score, 6),
-        "coverage_pct": round(matched / total_snps * 100, 1) if total_snps > 0 else 0,
+        "coverage_pct": raw_cov,           # % реально измеренных SNP
+        "effective_coverage_pct": eff_cov, # % использованных (measured + imputed)
         "z_score": z_score,
         "percentile": percentile,
     }
@@ -599,6 +642,8 @@ def compute_pgs_scores(
 
         calc = calculate_pgs(variants_df, scoring_df)
 
+        # Надёжность судим по реальному покрытию (matched), а не по effective:
+        # mean imputation помогает математически, но не заменяет настоящих данных.
         coverage_label, is_reliable = _coverage_label(calc["coverage_pct"])
         risk_level = None
         risk_indicator = None
@@ -611,8 +656,11 @@ def compute_pgs_scores(
             "trait_en": pgs_info.get("trait_en", ""),
             "score": calc["score"],
             "matched": calc["matched"],
+            "imputed": calc["imputed"],
+            "skipped": calc["skipped"],
             "total": calc["total"],
             "coverage_pct": calc["coverage_pct"],
+            "effective_coverage_pct": calc["effective_coverage_pct"],
             "coverage_label": coverage_label,
             "is_reliable": is_reliable,
             "z_score": calc["z_score"],
@@ -621,11 +669,15 @@ def compute_pgs_scores(
             "risk_indicator": risk_indicator,
         })
 
-        status = "OK" if calc["matched"] > 0 else "нет совпадений"
+        if calc["matched"] > 0 or calc["imputed"] > 0:
+            status = "OK"
+        else:
+            status = "нет данных"
         print(
             f"    {pgs_id}: {trait} | "
-            f"совпало {calc['matched']}/{calc['total']} SNP "
-            f"({calc['coverage_pct']}%) | score={calc['score']} [{status}]"
+            f"измерено {calc['matched']}/{calc['total']} "
+            f"({calc['coverage_pct']}%), импутировано {calc['imputed']} | "
+            f"score={calc['score']} [{status}]"
         )
 
     print(f"           Рассчитано скоров: {len(results)}")
@@ -729,11 +781,10 @@ def print_report(
     if not pgs_results:
         print("  Полигенные скоры не рассчитаны.")
     else:
-        scored = [r for r in pgs_results if r["matched"] > 0]
-        not_scored = [r for r in pgs_results if r["matched"] == 0]
+        scored = [r for r in pgs_results if (r["matched"] + r["imputed"]) > 0]
+        not_scored = [r for r in pgs_results if (r["matched"] + r["imputed"]) == 0]
 
         if scored:
-            # Таблица: показываем перцентиль и уровень риска там, где есть данные
             table_data = []
             for r in scored:
                 if r["percentile"] is not None and r["is_reliable"]:
@@ -746,37 +797,51 @@ def print_report(
                     percentile_str = "—"
                     risk_str = "нет EAF данных"
 
+                # "Измерено / Импутировано / Всего"
+                snp_str = f"{r['matched']} / {r['imputed']} / {r['total']}"
+                coverage_str = f"{r['coverage_pct']}%"
+
                 table_data.append([
                     r["pgs_id"],
                     r["trait"],
                     f"{r['score']:+.4f}",
-                    f"{r['matched']}/{r['total']}",
-                    f"{r['coverage_pct']}% ({r['coverage_label']})",
+                    snp_str,
+                    coverage_str,
                     percentile_str,
                     risk_str,
                 ])
             print()
             print(tabulate(
                 table_data,
-                headers=["PGS ID", "Заболевание", "Скор", "SNP", "Покрытие", "Перцентиль", "Уровень риска"],
+                headers=["PGS ID", "Заболевание", "Скор",
+                         "Измер./Имп./Всего", "Изм. покрытие",
+                         "Перцентиль", "Уровень риска"],
                 tablefmt="simple",
                 numalign="left",
             ))
 
             print("\n  Как читать:")
+            print("    Измер.     — SNP реально прочитаны на чипе у пациента.")
+            print("    Имп.       — SNP отсутствуют в VCF; подставлена средняя")
+            print("                 для популяции дозировка (mean imputation).")
+            print("                 Эти SNP не добавляют индивидуального сигнала,")
+            print("                 но корректируют общую дисперсию.")
             print("    Перцентиль — место пациента в популяции по данному скору.")
-            print("    Например, 80-й перцентиль = генетический риск выше, чем у 80% людей.")
-            print("    * — покрытие < 20%, результат предварительный.")
+            print("                 Например, 80-й = риск выше, чем у 80% людей.")
+            print("    * — измеренное покрытие < 50%, интерпретировать осторожно.")
 
         if not_scored:
-            print(f"\n  Нет совпадений SNP для: "
+            print(f"\n  Нет данных (ни измеренных SNP, ни популяционных частот) для: "
                   f"{', '.join(r['trait'] for r in not_scored)}")
 
         low_coverage = [r for r in scored if not r["is_reliable"]]
         if low_coverage:
-            print(f"\n  ВНИМАНИЕ: Покрытие < 20% для "
-                  f"{len(low_coverage)} скор(ов) — для точного расчёта")
-            print("  нужен полный SNP-массив (~650k SNP) или WGS.")
+            print(f"\n  ВНИМАНИЕ: измеренное покрытие < 50% для "
+                  f"{len(low_coverage)} скор(ов).")
+            print("  Mean imputation смягчает пропуски, но при низком измеренном")
+            print("  покрытии перцентиль смещён к 50-му (медиане популяции).")
+            print("  Для точного результата нужна настоящая импутация по")
+            print("  референсной панели (1000G/TOPMed) или WGS.")
 
 
 # ---------------------------------------------------------------------------
