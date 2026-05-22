@@ -1,0 +1,250 @@
+# Декларативные правила для определения клинически значимых гаплотипов.
+# Добавление нового правила = добавить запись в `rules` без правки Python.
+#
+# Типы правил:
+#   snp        — один SNP, риск определяется числом копий risk_allele (0/1/2)
+#   haplotype  — несколько SNP комбинируются в гаплотип (как APOE)
+#
+# Каждое правило содержит блок `sources` со ссылками на оригинальные
+# публикации и указанием конкретной таблицы/секции, откуда взяты OR.
+
+rules:
+  # --- APOE (ε2/ε3/ε4) — болезнь Альцгеймера ---
+  - id: apoe
+    name: "APOE"
+    description: "APOE haplotype (ε2/ε3/ε4) — risk of Alzheimer's disease"
+    type: haplotype
+    required_snps: [rs429358, rs7412]
+    haplotype_rules:
+      - alleles: {rs429358: T, rs7412: T}
+        name: e2
+      - alleles: {rs429358: T, rs7412: C}
+        name: e3
+      - alleles: {rs429358: C, rs7412: C}
+        name: e4
+      - alleles: {rs429358: C, rs7412: T}
+        name: e1   # очень редкий
+    diplotype_risk:
+      "e2/e2": {disease: "Болезнь Альцгеймера", level: "Пониженный",       or: 0.6}
+      "e2/e3": {disease: "Болезнь Альцгеймера", level: "Пониженный",       or: 0.6}
+      "e2/e4": {disease: "Болезнь Альцгеймера", level: "Средний",          or: 2.6}
+      "e3/e3": {disease: "Болезнь Альцгеймера", level: "Базовый (средний)", or: 1.0}
+      "e3/e4": {disease: "Болезнь Альцгеймера", level: "Повышенный",       or: 3.2}
+      "e4/e4": {disease: "Болезнь Альцгеймера", level: "Высокий",          or: 11.6}
+    sources:
+      - citation: "Genin E, et al. APOE and Alzheimer disease: a major gene with semi-dominant inheritance. Mol Psychiatry. 2011;16(9):903-907."
+        doi: "10.1038/mp.2011.52"
+        url: "https://doi.org/10.1038/mp.2011.52"
+        pubmed: "21556001"
+        reference: "Table 2 — OR по APOE-генотипу для европейских популяций. ε4/ε4 OR ≈ 11.6, ε3/ε4 OR ≈ 3.2, ε2/ε3 OR ≈ 0.6"
+      - citation: "Reiman EM, et al. Exceptionally low likelihood of Alzheimer's dementia in APOE2 homozygotes from a 5,000-person neuropathological study. Nat Commun. 2020;11(1):667."
+        doi: "10.1038/s41467-019-14279-8"
+        url: "https://doi.org/10.1038/s41467-019-14279-8"
+        pubmed: "32015339"
+        reference: "Table 1 — ε2/ε2 даёт OR ≈ 0.13 для AD по сравнению с ε3/ε3 (мы используем более консервативную оценку 0.6 из мета-анализов)"
+
+  # --- Factor V Leiden — венозная тромбоэмболия ---
+  - id: factor_v_leiden
+    name: "F5 (Factor V Leiden)"
+    description: "rs6025 — Arg506Gln, резистентность к активированному протеину C"
+    type: snp
+    snp: rs6025
+    risk_allele: T
+    genotypes:
+      "0/0":
+        disease: "Тромбофилия (венозные тромбозы)"
+        level: "Базовый"
+        details: "Нормальный генотип"
+      "0/1":
+        disease: "Тромбофилия (венозные тромбозы)"
+        level: "Умеренно повышенный"
+        or: 6
+        details: "Гетерозигота — OR ≈ 5-7 для ВТЭ"
+      "1/1":
+        disease: "Тромбофилия (венозные тромбозы)"
+        level: "Высокий"
+        or: 60
+        details: "Гомозигота — OR ≈ 50-80 для ВТЭ"
+    sources:
+      - citation: "Ridker PM, et al. Mutation in the gene coding for coagulation factor V and the risk of myocardial infarction, stroke, and venous thrombosis in apparently healthy men. N Engl J Med. 1995;332(14):912-917."
+        doi: "10.1056/NEJM199504063321403"
+        url: "https://doi.org/10.1056/NEJM199504063321403"
+        pubmed: "7877648"
+        reference: "Table 2 — относительный риск ВТЭ для гетерозигот ≈ 2.7 (CI 1.3-5.6); более поздние мета-анализы дают 5-7"
+      - citation: "Rosendaal FR, et al. High risk of thrombosis in patients homozygous for factor V Leiden (activated protein C resistance). Blood. 1995;85(6):1504-1508."
+        pubmed: "7888671"
+        url: "https://ashpublications.org/blood/article/85/6/1504/180062/"
+        reference: "Раздел Results — OR гомозигот ≈ 80 (CI 22-289) по сравнению с населением без мутации"
+      - citation: "Segal JB, et al. Predictive value of factor V Leiden and prothrombin G20210A in adults with venous thromboembolism and in family members of those with a mutation: a systematic review. JAMA. 2009;301(23):2472-2485."
+        doi: "10.1001/jama.2009.853"
+        url: "https://doi.org/10.1001/jama.2009.853"
+        pubmed: "19531787"
+        reference: "Table 2 — мета-анализ ВТЭ-рисков по обеим мутациям, OR гетерозигот F5 ≈ 4.9 (CI 4.1-5.9)"
+
+  # --- Prothrombin G20210A — венозная тромбоэмболия ---
+  - id: prothrombin_g20210a
+    name: "F2 (Prothrombin G20210A)"
+    description: "rs1799963 — повышение уровня протромбина, риск ВТЭ"
+    type: snp
+    snp: rs1799963
+    risk_allele: A
+    genotypes:
+      "0/0":
+        disease: "Тромбофилия (венозные тромбозы)"
+        level: "Базовый"
+        details: "Нормальный генотип"
+      "0/1":
+        disease: "Тромбофилия (венозные тромбозы)"
+        level: "Умеренно повышенный"
+        or: 3
+        details: "Гетерозигота — OR ≈ 2-4 для ВТЭ"
+      "1/1":
+        disease: "Тромбофилия (венозные тромбозы)"
+        level: "Высокий"
+        or: 10
+        details: "Гомозигота — редкая, OR ≈ 6-15"
+    sources:
+      - citation: "Poort SR, et al. A common genetic variation in the 3'-untranslated region of the prothrombin gene is associated with elevated plasma prothrombin levels and an increase in venous thrombosis. Blood. 1996;88(10):3698-3703."
+        pubmed: "8916933"
+        url: "https://ashpublications.org/blood/article/88/10/3698/137751/"
+        reference: "Раздел Results, Table 2 — OR гетерозигот ≈ 2.8 (CI 1.4-5.6) для ВТЭ"
+      - citation: "Segal JB, et al. Predictive value of factor V Leiden and prothrombin G20210A. JAMA. 2009;301(23):2472-2485."
+        doi: "10.1001/jama.2009.853"
+        url: "https://doi.org/10.1001/jama.2009.853"
+        pubmed: "19531787"
+        reference: "Table 2 — мета-анализ, OR гетерозигот G20210A ≈ 3.8 (CI 3.0-4.9)"
+
+  # --- HFE C282Y — наследственный гемохроматоз тип 1 ---
+  - id: hfe_c282y
+    name: "HFE C282Y"
+    description: "rs1800562 — основная мутация при гемохроматозе"
+    type: snp
+    snp: rs1800562
+    risk_allele: A
+    genotypes:
+      "0/0":
+        disease: "Наследственный гемохроматоз"
+        level: "Базовый"
+        details: "Нормальный генотип"
+      "0/1":
+        disease: "Наследственный гемохроматоз"
+        level: "Умеренно повышенный"
+        details: "Носитель C282Y — клинически проявляется редко, важно при compound heterozygosity с H63D"
+      "1/1":
+        disease: "Наследственный гемохроматоз"
+        level: "Высокий"
+        details: "Гомозигота C282Y/C282Y — классическая форма, пенетрантность ~30% (мужчины) / ~1% (женщины)"
+    sources:
+      - citation: "Feder JN, et al. A novel MHC class I-like gene is mutated in patients with hereditary haemochromatosis. Nat Genet. 1996;13(4):399-408."
+        doi: "10.1038/ng0896-399"
+        url: "https://doi.org/10.1038/ng0896-399"
+        pubmed: "8696333"
+        reference: "Section 'A candidate gene' — оригинальная характеристика C282Y как причинной мутации"
+      - citation: "European Association for the Study of the Liver. EASL Clinical Practice Guidelines on haemochromatosis. J Hepatol. 2022;77(2):479-502."
+        doi: "10.1016/j.jhep.2022.03.033"
+        url: "https://doi.org/10.1016/j.jhep.2022.03.033"
+        pubmed: "35662478"
+        reference: "Раздел 'Genetic diagnosis', Recommendation 1 — критерий гомозиготы C282Y/C282Y как диагноз HH тип 1"
+      - citation: "Pilling LC, et al. Common conditions associated with hereditary haemochromatosis genetic variants: cohort study in UK Biobank. BMJ. 2019;364:k5222."
+        doi: "10.1136/bmj.k5222"
+        url: "https://doi.org/10.1136/bmj.k5222"
+        pubmed: "30651232"
+        reference: "Table 2 — penetrance C282Y/C282Y в UK Biobank: ~22% мужчин и ~10% женщин с цирроза/диабета к возрасту 70"
+
+  # --- HFE H63D — мягкая форма / модификатор ---
+  - id: hfe_h63d
+    name: "HFE H63D"
+    description: "rs1799945 — мягкая форма перегрузки железом"
+    type: snp
+    snp: rs1799945
+    risk_allele: G
+    genotypes:
+      "0/0":
+        disease: "Гемохроматоз (модификатор)"
+        level: "Базовый"
+        details: "Нормальный генотип"
+      "0/1":
+        disease: "Гемохроматоз (модификатор)"
+        level: "Умеренно повышенный"
+        details: "Носитель H63D — клинически значимо в compound het с C282Y"
+      "1/1":
+        disease: "Гемохроматоз (модификатор)"
+        level: "Умеренно повышенный"
+        details: "H63D/H63D — мягкая форма, редко клинически значима"
+    sources:
+      - citation: "Mura C, Raguenes O, Férec C. HFE mutations analysis in 711 hemochromatosis probands: evidence for S65C implication in mild form of hemochromatosis. Blood. 1999;93(8):2502-2505."
+        pubmed: "10194430"
+        url: "https://ashpublications.org/blood/article/93/8/2502/250793/"
+        reference: "Раздел Discussion — H63D/H63D связан только с мягкой формой; основная клиническая значимость — compound het C282Y/H63D"
+      - citation: "EASL Clinical Practice Guidelines on haemochromatosis. J Hepatol. 2022;77(2):479-502."
+        doi: "10.1016/j.jhep.2022.03.033"
+        url: "https://doi.org/10.1016/j.jhep.2022.03.033"
+        pubmed: "35662478"
+        reference: "Раздел 'Other HFE genotypes' — compound het C282Y/H63D даёт ~1-2% penetrance, H63D/H63D — клинически редко значим"
+
+  # --- PCSK9 R46L — защитный вариант, низкий ЛПНП ---
+  - id: pcsk9_lof
+    name: "PCSK9 (R46L)"
+    description: "rs11591147 — loss-of-function PCSK9, защита от ИБС"
+    type: snp
+    snp: rs11591147
+    risk_allele: T
+    genotypes:
+      "0/0":
+        disease: "Уровень ЛПНП и риск ИБС"
+        level: "Базовый"
+        details: "Нормальный генотип"
+      "0/1":
+        disease: "Уровень ЛПНП (защита от ИБС)"
+        level: "Пониженный"
+        details: "Гетерозигота — снижение ЛПНП ~15%, защита от ИБС ~50%"
+      "1/1":
+        disease: "Уровень ЛПНП (защита от ИБС)"
+        level: "Пониженный"
+        details: "Гомозигота — выраженная защита от атеросклероза"
+    sources:
+      - citation: "Cohen JC, Boerwinkle E, Mosley TH Jr, Hobbs HH. Sequence variations in PCSK9, low LDL, and protection against coronary heart disease. N Engl J Med. 2006;354(12):1264-1272."
+        doi: "10.1056/NEJMoa054013"
+        url: "https://doi.org/10.1056/NEJMoa054013"
+        pubmed: "16554528"
+        reference: "Table 2 (ARIC study) — носители R46L имели снижение ЛПНП на 15% (черные) / 21% (белые) и снижение риска ИБС на 47-88%"
+      - citation: "Kathiresan S, et al. A PCSK9 missense variant associated with a reduced risk of early-onset myocardial infarction. N Engl J Med. 2008;358(21):2299-2300."
+        doi: "10.1056/NEJMc0707445"
+        url: "https://doi.org/10.1056/NEJMc0707445"
+        pubmed: "18499582"
+        reference: "Letter — R46L OR для раннего ИМ ≈ 0.47 (CI 0.32-0.68)"
+
+  # --- HLA-B*57:01 (через tag SNP) — гиперчувствительность к абакавиру ---
+  - id: hla_b5701
+    name: "HLA-B*57:01 (tag SNP)"
+    description: "rs2395029 — proxy for HLA-B*57:01 allele"
+    type: snp
+    snp: rs2395029
+    risk_allele: G
+    genotypes:
+      "0/0":
+        disease: "Гиперчувствительность к абакавиру"
+        level: "Базовый"
+        details: "Не носитель HLA-B*57:01 — абакавир безопасен"
+      "0/1":
+        disease: "Гиперчувствительность к абакавиру"
+        level: "Высокий"
+        details: "Носитель HLA-B*57:01 — абакавир ПРОТИВОПОКАЗАН (риск SJS/TEN)"
+      "1/1":
+        disease: "Гиперчувствительность к абакавиру"
+        level: "Высокий"
+        details: "Гомозигота HLA-B*57:01 — абакавир ПРОТИВОПОКАЗАН"
+    sources:
+      - citation: "Mallal S, et al. HLA-B*5701 screening for hypersensitivity to abacavir. N Engl J Med. 2008;358(6):568-579."
+        doi: "10.1056/NEJMoa0706135"
+        url: "https://doi.org/10.1056/NEJMoa0706135"
+        pubmed: "18256392"
+        reference: "PREDICT-1 trial, Table 2 — скрининг HLA-B*5701 снизил иммунологически подтверждённую гиперчувствительность с 7.8% до 0%"
+      - citation: "Martin MA, et al. Clinical Pharmacogenetics Implementation Consortium guidelines for HLA-B genotype and abacavir dosing: 2014 update. Clin Pharmacol Ther. 2014;95(5):499-500."
+        doi: "10.1038/clpt.2014.38"
+        url: "https://doi.org/10.1038/clpt.2014.38"
+        pubmed: "24561393"
+        reference: "Table 1 — рекомендация Level A: любой носитель HLA-B*57:01 (включая гетерозигот) — абакавир противопоказан"
+      - citation: "PharmGKB / CPIC current guideline (online, periodically updated)."
+        url: "https://cpicpgx.org/guidelines/guideline-for-abacavir-and-hla-b/"
+        reference: "Актуальная версия рекомендации с таблицей фенотипов и дозирования"

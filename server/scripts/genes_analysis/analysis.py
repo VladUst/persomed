@@ -21,6 +21,7 @@ import myvariant
 import pandas as pd
 import requests
 import vcf  # PyVCF3
+import yaml
 from tabulate import tabulate
 
 # ---------------------------------------------------------------------------
@@ -196,103 +197,111 @@ def extract_clinvar_significance(annotations: list[dict], variants_df: pd.DataFr
 
 
 # ---------------------------------------------------------------------------
-# Стадия 4: Комплексные генотипы (APOE и др.)
+# Стадия 4: Комплексные генотипы (загружаются из complex_genotypes.yaml)
 # ---------------------------------------------------------------------------
 
-# Правила для комплексных генотипов, определяемых комбинацией SNP.
-# Каждое правило содержит:
-#   - name: название генотипа/гена
-#   - snps: список rsID, участвующих в определении
-#   - rules: функция, принимающая dict{rsid -> (allele1, allele2)} и возвращающая описание
+# Правила определены декларативно в complex_genotypes.yaml — добавлять
+# новые гаплотипы можно без правки Python.
+#
+# Поддерживаются два типа правил:
+#   - "snp"       — один SNP, риск зависит от числа копий risk_allele (0/1/2)
+#   - "haplotype" — несколько SNP комбинируются в гаплотип (как APOE ε2/ε3/ε4)
 
-COMPLEX_GENOTYPE_RULES = []
+COMPLEX_GENOTYPES_YAML = Path(__file__).parent / "complex_genotypes.yaml"
 
 
-def _apoe_rule(genotypes: dict) -> dict | None:
-    """Определяет APOE-генотип по rs429358 и rs7412.
+def _load_complex_rules() -> list[dict]:
+    """Загружает правила из YAML. Возвращает [], если файл отсутствует."""
+    if not COMPLEX_GENOTYPES_YAML.exists():
+        return []
+    with open(COMPLEX_GENOTYPES_YAML, encoding="utf-8") as f:
+        data = yaml.safe_load(f) or {}
+    return data.get("rules", [])
 
-    APOE аллели:
-      e2 = rs429358-T + rs7412-T
-      e3 = rs429358-T + rs7412-C
-      e4 = rs429358-C + rs7412-C
-    """
-    rs429358 = genotypes.get("rs429358")
-    rs7412 = genotypes.get("rs7412")
 
-    if rs429358 is None or rs7412 is None:
+def _format_details(risk_info: dict) -> str:
+    """Собирает details + OR (если есть) в одну строку."""
+    details = risk_info.get("details", "")
+    or_val = risk_info.get("or")
+    if or_val is not None and "OR" not in details:
+        or_str = f"OR ≈ {or_val}"
+        return "; ".join(filter(None, [details, or_str]))
+    return details
+
+
+def _call_haplotype(rule: dict, snp_to_allele: dict) -> str:
+    """Определяет имя гаплотипа по аллелям на одной хромосоме."""
+    for hap in rule.get("haplotype_rules", []):
+        required = hap["alleles"]
+        if all(snp_to_allele.get(snp) == al for snp, al in required.items()):
+            return hap["name"]
+    return "?"
+
+
+def _eval_haplotype_rule(rule: dict, genotype_lookup: dict) -> dict | None:
+    """Объединяет несколько SNP в диплотип (например, e3/e4)."""
+    required = rule.get("required_snps", [])
+    if any(snp not in genotype_lookup for snp in required):
         return None
 
-    # Определяем аллели APOE на каждой хромосоме
-    # rs429358: REF=T, ALT=C; rs7412: REF=C, ALT=T
-    def _classify_haplotype(rs429358_allele: str, rs7412_allele: str) -> str:
-        if rs429358_allele == "T" and rs7412_allele == "T":
-            return "e2"
-        elif rs429358_allele == "T" and rs7412_allele == "C":
-            return "e3"
-        elif rs429358_allele == "C" and rs7412_allele == "C":
-            return "e4"
-        elif rs429358_allele == "C" and rs7412_allele == "T":
-            # Редкая комбинация (e1), на практике почти не встречается
-            return "e1"
-        return "?"
+    hap1 = _call_haplotype(rule, {snp: genotype_lookup[snp][0] for snp in required})
+    hap2 = _call_haplotype(rule, {snp: genotype_lookup[snp][1] for snp in required})
+    diplotype = "/".join(sorted([hap1, hap2]))
 
-    a1_429, a2_429 = rs429358
-    a1_7412, a2_7412 = rs7412
-
-    hap1 = _classify_haplotype(a1_429, a1_7412)
-    hap2 = _classify_haplotype(a2_429, a2_7412)
-
-    # Сортируем для единообразия (e2/e4, а не e4/e2)
-    apoe_genotype = "/".join(sorted([hap1, hap2]))
-
-    # Оценка риска Альцгеймера
-    risk_map = {
-        "e2/e2": ("Пониженный", "OR ≈ 0.6"),
-        "e2/e3": ("Пониженный", "OR ≈ 0.6"),
-        "e2/e4": ("Средний", "OR ≈ 2.6"),
-        "e3/e3": ("Базовый (средний)", "OR = 1.0"),
-        "e3/e4": ("Повышенный", "OR ≈ 3.2"),
-        "e4/e4": ("Высокий", "OR ≈ 11.6"),
-    }
-
-    risk_level, odds_ratio = risk_map.get(apoe_genotype, ("Неизвестный", "—"))
+    risk = rule.get("diplotype_risk", {}).get(diplotype)
+    if not risk:
+        return None
 
     return {
-        "gene": "APOE",
-        "genotype": apoe_genotype,
-        "disease": "Болезнь Альцгеймера",
-        "risk_level": risk_level,
-        "details": f"{odds_ratio}",
+        "gene": rule["name"],
+        "genotype": diplotype,
+        "disease": risk["disease"],
+        "risk_level": risk["level"],
+        "details": _format_details(risk),
     }
 
 
-COMPLEX_GENOTYPE_RULES.append({
-    "name": "APOE (Alzheimer's disease)",
-    "snps": ["rs429358", "rs7412"],
-    "evaluate": _apoe_rule,
-})
+def _eval_snp_rule(rule: dict, genotype_lookup: dict) -> dict | None:
+    """Один SNP — риск по числу копий risk_allele."""
+    rsid = rule.get("snp")
+    if rsid not in genotype_lookup:
+        return None
+
+    risk_allele = rule.get("risk_allele")
+    a1, a2 = genotype_lookup[rsid]
+    n_risk = (1 if a1 == risk_allele else 0) + (1 if a2 == risk_allele else 0)
+    gt_key = {0: "0/0", 1: "0/1", 2: "1/1"}[n_risk]
+
+    risk = rule.get("genotypes", {}).get(gt_key)
+    if not risk:
+        return None
+
+    return {
+        "gene": rule["name"],
+        "genotype": f"{a1}/{a2}",
+        "disease": risk["disease"],
+        "risk_level": risk["level"],
+        "details": _format_details(risk),
+    }
 
 
 def evaluate_complex_genotypes(variants_df: pd.DataFrame) -> list[dict]:
-    """Проверяет все правила комплексных генотипов."""
-    results = []
+    """Применяет все правила из YAML к генотипам пациента."""
+    rules = _load_complex_rules()
 
-    # Собираем lookup: rsid -> (allele_1, allele_2)
     genotype_lookup = {}
     for _, row in variants_df.iterrows():
         genotype_lookup[row["rsid"]] = (row["allele_1"], row["allele_2"])
 
-    for rule in COMPLEX_GENOTYPE_RULES:
-        # Проверяем, есть ли все нужные SNP
-        required_snps = rule["snps"]
-        available = {s for s in required_snps if s in genotype_lookup}
-
-        if not available:
+    results = []
+    for rule in rules:
+        rtype = rule.get("type", "snp")
+        if rtype == "haplotype":
+            result = _eval_haplotype_rule(rule, genotype_lookup)
+        elif rtype == "snp":
+            result = _eval_snp_rule(rule, genotype_lookup)
+        else:
             continue
-
-        # Передаём доступные генотипы в функцию оценки
-        relevant_genotypes = {s: genotype_lookup[s] for s in available}
-        result = rule["evaluate"](relevant_genotypes)
         if result:
             results.append(result)
 
@@ -712,10 +721,12 @@ def print_report(
                 "Повышенный": "▲▲",
                 "Умеренно повышенный": "▲",
                 "Умеренный": "▲",
+                "Носитель": "⚬",
                 "Средний": "—",
                 "Базовый (средний)": "—",
                 "Базовый": "—",
                 "Пониженный": "▽",
+                "Очень пониженный": "▽▽",
             }.get(r["risk_level"], "?")
 
             print(f"\n  {r['gene']}: {r['genotype']}")
