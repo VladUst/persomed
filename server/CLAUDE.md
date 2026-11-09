@@ -30,7 +30,6 @@ python scripts/fill_database.py
 
 # Genetic profile analysis (standalone; defaults to genetical_profile_short.vcf)
 python scripts/genes_analysis/analysis.py [path/to/file.vcf]
-python scripts/genes_analysis/check_pgs_candidates.py
 ```
 
 Run everything from the server root: the SQLite path `persomed.db` and the `src.` imports are resolved relative to the current working directory.
@@ -88,16 +87,7 @@ Patient-scoped routes receive `patient_id` from the path. They must inject it on
 
 ### Genetics (`scripts/genes_analysis/`, experimental, not wired into the API)
 
-`analysis.py` is a 6-stage CLI pipeline:
-
-1. Parse a VCF (PyVCF3).
-2. Annotate the rsIDs through MyVariant.info (ClinVar, GWAS, CADD; hg19).
-3. Filter clinically significant ClinVar records.
-4. Evaluate declarative SNP/haplotype rules from `complex_genotypes.yaml`, e.g. APOE ε2/ε3/ε4 and Factor V Leiden. Add new rules there, with `sources`, instead of in Python.
-5. Compute polygenic scores from PGS Catalog harmonized GRCh37 scoring files, cached in `.pgs_cache/`. Missing SNPs use EAF mean imputation, then z-score → percentile. Only scores whose scoring file has `allelefrequency_effect` give percentiles. Use `check_pgs_candidates.py` to vet PGS IDs before adding them to `DEFAULT_PGS_SCORES`.
-6. Print a console report.
-
-`genetical_profile_full.vcf` and `.pgs_cache/` are gitignored.
+The standalone VCF pipeline is documented in [`.claude/docs/genes-analysis-script.md`](.claude/docs/genes-analysis-script.md), including its related files, run commands, caches, PGS interpretation, and limitations. It is research-only and does not return a clinically validated disease probability.
 
 `scripts/pyctd/` holds experiments against the Comparative Toxicogenomics Database. They use the `pyctd.db` file in the server root, which is about 15 GB and gitignored.
 

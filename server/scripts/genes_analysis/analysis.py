@@ -7,9 +7,11 @@
   3. Фильтрация клинически значимых вариантов (ClinVar)
   4. Проверка комплексных генотипов (APOE и др.)
   5. Полигенные шкалы риска (PGS Catalog)
-  6. Форматированный отчёт
+  6. Сравнение PGS с EUR-референсом 1000 Genomes, если он подготовлен
+  7. Форматированный отчёт и дополнительная сводка
 """
 
+import contextlib
 import gzip
 import hashlib
 import io
@@ -45,37 +47,42 @@ def parse_vcf(vcf_path: str) -> pd.DataFrame:
     reader = vcf.Reader(filename=vcf_path)
 
     records = []
-    for record in reader:
-        sample = record.samples[0]
-        gt_alleles = sample.gt_alleles  # ['0', '1'] или ['1', '1'] и т.д.
+    with contextlib.closing(reader._reader):
+        for record in reader:
+            sample = record.samples[0]
+            gt_alleles = sample.gt_alleles  # ['0', '1'] или ['1', '1'] и т.д.
 
-        if gt_alleles is None or len(gt_alleles) != 2:
-            continue
+            if (
+                gt_alleles is None or len(gt_alleles) != 2
+                or any(allele is None or not str(allele).isdigit() for allele in gt_alleles)
+            ):
+                continue
 
-        a1_idx, a2_idx = int(gt_alleles[0]), int(gt_alleles[1])
-        zygosity = _ZYGOSITY_MAP.get(sample.gt_type, "unknown")
+            a1_idx, a2_idx = int(gt_alleles[0]), int(gt_alleles[1])
+            zygosity = _ZYGOSITY_MAP.get(sample.gt_type, "unknown")
 
-        # Собираем список аллелей: [REF, ALT1, ALT2, ...]
-        allele_options = [record.REF] + [str(a) for a in record.ALT]
-        actual_allele_1 = allele_options[a1_idx] if a1_idx < len(allele_options) else "?"
-        actual_allele_2 = allele_options[a2_idx] if a2_idx < len(allele_options) else "?"
+            # Собираем список аллелей: [REF, ALT1, ALT2, ...]
+            allele_options = [record.REF] + [str(a) for a in record.ALT]
+            actual_allele_1 = allele_options[a1_idx] if a1_idx < len(allele_options) else "?"
+            actual_allele_2 = allele_options[a2_idx] if a2_idx < len(allele_options) else "?"
 
-        records.append({
-            "chrom": record.CHROM,
-            "pos": record.POS,
-            "rsid": record.ID,
-            "ref": record.REF,
-            "alt": ",".join(str(a) for a in record.ALT),
-            "genotype": sample["GT"],
-            "allele_1": actual_allele_1,
-            "allele_2": actual_allele_2,
-            "zygosity": zygosity,
-            "phased": sample.phased,
-        })
+            records.append({
+                "chrom": record.CHROM,
+                "pos": record.POS,
+                "rsid": record.ID,
+                "ref": record.REF,
+                "alt": ",".join(str(a) for a in record.ALT),
+                "genotype": sample["GT"],
+                "allele_1": actual_allele_1,
+                "allele_2": actual_allele_2,
+                "zygosity": zygosity,
+                "phased": sample.phased,
+                "phase_set": sample["PS"] if "PS" in sample.data._fields else None,
+            })
 
     df = pd.DataFrame(records)
     print(f"[Стадия 1] Прочитано вариантов: {len(df)}")
-    print(f"           С мутациями (не 0|0): {len(df[df['zygosity'] != 'homozygous_ref'])}")
+    print(f"           С ALT-аллелем: {len(df[df['zygosity'] != 'homozygous_ref'])}")
     return df
 
 
@@ -232,22 +239,54 @@ def annotate_variants(
 # Стадия 3: Анализ клинической значимости (ClinVar)
 # ---------------------------------------------------------------------------
 
-SIGNIFICANT_CATEGORIES = {
-    "Pathogenic",
-    "Likely pathogenic",
-    "Pathogenic/Likely pathogenic",
-    "risk factor",
-    "Risk factor",
-    "drug response",
-    "Drug response",
-    "association",
-    "Affects",
+CLINVAR_CATEGORIES = {
+    "pathogenic": "Кандидат для проверки",
+    "likely pathogenic": "Кандидат для проверки",
+    "pathogenic/likely pathogenic": "Кандидат для проверки",
+    "conflicting interpretations of pathogenicity": "Спорное заключение",
+    "uncertain significance": "Неопределённая значимость",
+    "risk factor": "Ассоциация",
+    "association": "Ассоциация",
+    "affects": "Ассоциация",
+    "drug response": "Фармакогенетика",
 }
 
 
+def _matching_snv(annotation: dict, variant: dict) -> bool:
+    """Проверяет hg19 SNV, включая альтернативный аллель в генотипе."""
+    clinvar = annotation.get("clinvar")
+    if not isinstance(clinvar, dict):
+        return False
+    chrom = str(variant["chrom"]).removeprefix("chr")
+    ref, alt = str(variant["ref"]).upper(), str(variant["alt"]).upper()
+    if len(ref) != 1 or len(alt) != 1 or ref not in "ACGT" or alt not in "ACGT":
+        return False
+    if alt not in {variant["allele_1"], variant["allele_2"]}:
+        return False
+    position = int(variant["pos"])
+    hg19 = clinvar.get("hg19")
+    return (
+        annotation.get("_id") == f"chr{chrom}:g.{position}{ref}>{alt}"
+        and str(clinvar.get("chrom")) == chrom
+        and clinvar.get("ref") == ref
+        and clinvar.get("alt") == alt
+        and isinstance(hg19, dict)
+        and hg19.get("start") == position
+        and hg19.get("end") == position
+    )
+
+
 def extract_clinvar_significance(annotations: list[dict], variants_df: pd.DataFrame) -> pd.DataFrame:
-    """Извлекает клинически значимые варианты из аннотаций ClinVar."""
+    """Возвращает ClinVar-записи только для точно сопоставленных hg19 SNP."""
     clinvar_records = []
+    annotated_ids = {
+        ann.get("query") for ann in annotations
+        if isinstance(ann.get("clinvar"), dict)
+    }
+    variants_by_rsid = {}
+    for variant in variants_df[variants_df["rsid"].isin(annotated_ids)].to_dict("records"):
+        variants_by_rsid.setdefault(variant["rsid"], []).append(variant)
+    unmatched = 0
 
     for ann in annotations:
         if ann.get("notfound"):
@@ -255,8 +294,16 @@ def extract_clinvar_significance(annotations: list[dict], variants_df: pd.DataFr
 
         query_rsid = ann.get("query", "")
         clinvar = ann.get("clinvar")
-        if not clinvar:
+        if not isinstance(clinvar, dict):
             continue
+        matching = [
+            variant for variant in variants_by_rsid.get(query_rsid, [])
+            if _matching_snv(ann, variant)
+        ]
+        if len(matching) != 1:
+            unmatched += 1
+            continue
+        variant = matching[0]
 
         # ClinVar может вернуть один объект или список
         rcv_list = clinvar.get("rcv", [])
@@ -265,6 +312,11 @@ def extract_clinvar_significance(annotations: list[dict], variants_df: pd.DataFr
 
         for rcv in rcv_list:
             significance = rcv.get("clinical_significance", "")
+            if not isinstance(significance, str):
+                continue
+            category = CLINVAR_CATEGORIES.get(significance.strip().casefold())
+            if category is None:
+                continue
             conditions = rcv.get("conditions", {})
             condition_name = ""
 
@@ -275,44 +327,35 @@ def extract_clinvar_significance(annotations: list[dict], variants_df: pd.DataFr
                     c.get("name", "") for c in conditions if isinstance(c, dict)
                 )
 
-            # Фильтруем только значимые
-            if any(cat.lower() in significance.lower() for cat in SIGNIFICANT_CATEGORIES):
-                # Получаем ген
-                gene_info = clinvar.get("gene", {})
-                gene_name = ""
-                if isinstance(gene_info, dict):
-                    gene_name = gene_info.get("symbol", "")
-                elif isinstance(gene_info, list):
-                    gene_name = ", ".join(
-                        g.get("symbol", "") for g in gene_info if isinstance(g, dict)
-                    )
+            gene_info = clinvar.get("gene", {})
+            gene_name = ""
+            if isinstance(gene_info, dict):
+                gene_name = gene_info.get("symbol", "")
+            elif isinstance(gene_info, list):
+                gene_name = ", ".join(
+                    g.get("symbol", "") for g in gene_info if isinstance(g, dict)
+                )
 
-                # CADD score
-                cadd = ann.get("cadd", {})
-                cadd_phred = cadd.get("phred", "") if isinstance(cadd, dict) else ""
-
-                # Генотип из исходных данных
-                variant_row = variants_df[variants_df["rsid"] == query_rsid]
-                genotype = ""
-                zygosity = ""
-                if not variant_row.empty:
-                    genotype = f"{variant_row.iloc[0]['allele_1']}/{variant_row.iloc[0]['allele_2']}"
-                    zygosity = variant_row.iloc[0]["zygosity"]
-
-                clinvar_records.append({
-                    "rsid": query_rsid,
-                    "gene": gene_name,
-                    "significance": significance,
-                    "condition": condition_name,
-                    "genotype": genotype,
-                    "zygosity": zygosity,
-                    "cadd_phred": cadd_phred,
-                })
+            clinvar_records.append({
+                "rsid": query_rsid,
+                "variant": ann["_id"],
+                "clinvar_id": rcv.get("accession", ""),
+                "gene": gene_name,
+                "significance": significance,
+                "category": category,
+                "condition": condition_name,
+                "genotype": f"{variant['allele_1']}/{variant['allele_2']}",
+                "zygosity": variant["zygosity"],
+                "review_status": rcv.get("review_status", ""),
+                "last_evaluated": rcv.get("last_evaluated", ""),
+            })
 
     df = pd.DataFrame(clinvar_records)
     if not df.empty:
-        df = df.drop_duplicates(subset=["rsid", "condition"])
-    print(f"[Стадия 3] Клинически значимых записей: {len(df)}")
+        df = df.drop_duplicates(subset=["variant", "clinvar_id", "significance", "condition"])
+    print(f"[Стадия 3] Точно сопоставленных записей ClinVar: {len(df)}")
+    print(f"           Пропущено аннотаций без точного совпадения hg19 SNP: {unmatched}")
+    df.attrs["unmatched_annotations"] = unmatched
     return df
 
 
@@ -361,8 +404,28 @@ def _call_haplotype(rule: dict, snp_to_allele: dict) -> str:
 def _eval_haplotype_rule(rule: dict, genotype_lookup: dict) -> dict | None:
     """Объединяет несколько SNP в диплотип (например, e3/e4)."""
     required = rule.get("required_snps", [])
-    if any(snp not in genotype_lookup for snp in required):
-        return None
+    missing = [snp for snp in required if snp not in genotype_lookup]
+    disease = next(iter(rule.get("diplotype_risk", {}).values()), {}).get("disease", "")
+    if missing:
+        return {
+            "gene": rule["name"], "genotype": "—", "disease": disease,
+            "risk_level": "Не оценено", "status": "Не оценено",
+            "details": f"В VCF отсутствует: {', '.join(missing)}",
+        }
+
+    heterozygous = [
+        snp for snp in required
+        if genotype_lookup[snp][0] != genotype_lookup[snp][1]
+    ]
+    if len(heterozygous) > 1:
+        phase_sets = {genotype_lookup[snp][3] for snp in heterozygous}
+        phased = all(genotype_lookup[snp][2] for snp in heterozygous)
+        if not phased or None in phase_sets or len(phase_sets) != 1:
+            return {
+                "gene": rule["name"], "genotype": "—", "disease": disease,
+                "risk_level": "Не оценено", "status": "Не оценено",
+                "details": "Фаза между вариантами не подтверждена",
+            }
 
     hap1 = _call_haplotype(rule, {snp: genotype_lookup[snp][0] for snp in required})
     hap2 = _call_haplotype(rule, {snp: genotype_lookup[snp][1] for snp in required})
@@ -370,13 +433,18 @@ def _eval_haplotype_rule(rule: dict, genotype_lookup: dict) -> dict | None:
 
     risk = rule.get("diplotype_risk", {}).get(diplotype)
     if not risk:
-        return None
+        return {
+            "gene": rule["name"], "genotype": diplotype, "disease": disease,
+            "risk_level": "Не оценено", "status": "Не оценено",
+            "details": "Для этого диплотипа нет правила интерпретации",
+        }
 
     return {
         "gene": rule["name"],
         "genotype": diplotype,
         "disease": risk["disease"],
         "risk_level": risk["level"],
+        "status": "Оценено по правилу",
         "details": _format_details(risk),
     }
 
@@ -385,10 +453,23 @@ def _eval_snp_rule(rule: dict, genotype_lookup: dict) -> dict | None:
     """Один SNP — риск по числу копий risk_allele."""
     rsid = rule.get("snp")
     if rsid not in genotype_lookup:
-        return None
+        disease = next(iter(rule.get("genotypes", {}).values()), {}).get("disease", "")
+        return {
+            "gene": rule["name"], "genotype": "—", "disease": disease,
+            "risk_level": "Не оценено", "status": "Не оценено",
+            "details": f"В VCF отсутствует {rsid}",
+        }
 
     risk_allele = rule.get("risk_allele")
-    a1, a2 = genotype_lookup[rsid]
+    a1, a2 = genotype_lookup[rsid][:2]
+    ref, alt = genotype_lookup[rsid][4:6]
+    if risk_allele not in {ref, alt}:
+        return {
+            "gene": rule["name"], "genotype": f"{a1}/{a2}",
+            "disease": next(iter(rule.get("genotypes", {}).values()), {}).get("disease", ""),
+            "risk_level": "Не оценено", "status": "Не оценено",
+            "details": f"Аллель {risk_allele} отсутствует среди REF/ALT для {rsid}",
+        }
     n_risk = (1 if a1 == risk_allele else 0) + (1 if a2 == risk_allele else 0)
     gt_key = {0: "0/0", 1: "0/1", 2: "1/1"}[n_risk]
 
@@ -401,6 +482,7 @@ def _eval_snp_rule(rule: dict, genotype_lookup: dict) -> dict | None:
         "genotype": f"{a1}/{a2}",
         "disease": risk["disease"],
         "risk_level": risk["level"],
+        "status": "Оценено по правилу",
         "details": _format_details(risk),
     }
 
@@ -411,7 +493,11 @@ def evaluate_complex_genotypes(variants_df: pd.DataFrame) -> list[dict]:
 
     genotype_lookup = {}
     for _, row in variants_df.iterrows():
-        genotype_lookup[row["rsid"]] = (row["allele_1"], row["allele_2"])
+        genotype_lookup[row["rsid"]] = (
+            row["allele_1"], row["allele_2"],
+            bool(row.get("phased", False)), row.get("phase_set"),
+            row["ref"], row["alt"],
+        )
 
     results = []
     for rule in rules:
@@ -425,7 +511,8 @@ def evaluate_complex_genotypes(variants_df: pd.DataFrame) -> list[dict]:
         if result:
             results.append(result)
 
-    print(f"[Стадия 4] Комплексных генотипов определено: {len(results)}")
+    assessed = sum(result["status"] != "Не оценено" for result in results)
+    print(f"[Стадия 4] Правил оценено: {assessed}; не оценено: {len(results) - assessed}")
     return results
 
 
@@ -433,43 +520,17 @@ def evaluate_complex_genotypes(variants_df: pd.DataFrame) -> list[dict]:
 # Стадия 5: Полигенные шкалы риска (PGS Catalog)
 # ---------------------------------------------------------------------------
 
-def _norm_cdf(z: float) -> float:
-    """Стандартное нормальное распределение через math.erf."""
-    return (1.0 + math.erf(z / math.sqrt(2))) / 2
-
-
-def _risk_tier(percentile: float) -> tuple[str, str]:
-    """Перцентиль → уровень риска и индикатор."""
-    if percentile >= 95:
-        return "Очень высокий", "▲▲▲"
-    if percentile >= 80:
-        return "Повышенный", "▲▲"
-    if percentile >= 60:
-        return "Умеренно повышенный", "▲"
-    if percentile >= 40:
-        return "Средний", "—"
-    if percentile >= 20:
-        return "Умеренно пониженный", "▽"
-    return "Пониженный", "▽▽"
-
-
 def _coverage_label(coverage_pct: float) -> tuple[str, bool]:
-    """Покрытие → метка надёжности и флаг достаточности."""
-    if coverage_pct >= 80:
-        return "Высокое", True
-    if coverage_pct >= 50:
-        return "Среднее", True
-    if coverage_pct >= 20:
-        return "Низкое", False
-    return "Недостаточное", False
+    """Порог отображения исследовательского расчёта, не клинической оценки."""
+    if coverage_pct >= 75:
+        return "Измерено ≥75% SNP", True
+    if coverage_pct >= 30:
+        return "Измерено 30–74% SNP", True
+    return "Измерено <30% SNP", False
 
 
-# Набор PGS-скоров для расчёта.
-# Фокус: Болезнь Альцгеймера, ИБС, Сахарный диабет 2 типа.
-# Все ID проверены через check_pgs_candidates.py на наличие EAF —
-# это необходимо для расчёта перцентилей через z-score.
-# Для каждого заболевания берём несколько скоров разного размера:
-# если они дают согласованный перцентиль — результат надёжнее.
+# Набор PGS-моделей с проверенным соответствием ID и признака.
+# Сумма весов не даёт клинически валидированного перцентиля.
 DEFAULT_PGS_SCORES = [
     # === Болезнь Альцгеймера ===
     # Главный генетический фактор (APOE) определяется отдельно в Стадии 4.
@@ -512,26 +573,65 @@ DEFAULT_PGS_SCORES = [
         "trait_en": "Coronary artery disease",
         "variants_count": 204,
     },
-
-    # === Сахарный диабет 2 типа ===
+    {
+        "pgs_id": "PGS004321",
+        "trait": "ИБС (27 SNP, Marston)",
+        "trait_en": "Coronary heart disease",
+        "variants_count": 27,
+        "source": "https://www.pgscatalog.org/score/PGS004321/",
+    },
+    {
+        "pgs_id": "PGS000200",
+        "trait": "ИБС (28 SNP)",
+        "trait_en": "Coronary heart disease",
+        "variants_count": 28,
+        "source": "https://www.pgscatalog.org/score/PGS000200/",
+    },
+    # Модели диабета, астмы, мигрени, ожирения и триглицеридов сверены
+    # с карточками PGS Catalog и локальным перекрытием hg19 VCF.
+    {
+        "pgs_id": "PGS002733",
+        "trait": "Диабет 2 типа (17 SNP)",
+        "trait_en": "Type 2 diabetes",
+        "variants_count": 17,
+        "source": "https://www.pgscatalog.org/score/PGS002733/",
+    },
+    {
+        "pgs_id": "PGS004106",
+        "trait": "Диабет 2 типа (35 SNP)",
+        "trait_en": "Type 2 diabetes",
+        "variants_count": 35,
+        "source": "https://www.pgscatalog.org/score/PGS004106/",
+    },
     {
         "pgs_id": "PGS000037",
-        "trait": "Сахарный диабет 2 типа (15 SNP)",
-        "trait_en": "Type 2 diabetes",
+        "trait": "Астма (15 SNP)",
+        "trait_en": "Asthma",
         "variants_count": 15,
+        "source": "https://www.pgscatalog.org/score/PGS000037/",
     },
     {
-        "pgs_id": "PGS002247",
-        "trait": "Сахарный диабет 2 типа (68 SNP)",
-        "trait_en": "Type 2 diabetes",
-        "variants_count": 68,
+        "pgs_id": "PGS001281",
+        "trait": "Мигрень (25 SNP)",
+        "trait_en": "Migraine",
+        "variants_count": 25,
+        "source": "https://www.pgscatalog.org/score/PGS001281/",
     },
     {
-        "pgs_id": "PGS000043",
-        "trait": "Сахарный диабет 2 типа (297 SNP)",
-        "trait_en": "Type 2 diabetes",
-        "variants_count": 297,
+        "pgs_id": "PGS003400",
+        "trait": "Ожирение (97 SNP)",
+        "trait_en": "Obesity",
+        "variants_count": 97,
+        "source": "https://www.pgscatalog.org/score/PGS003400/",
     },
+    {
+        "pgs_id": "PGS000063",
+        "trait": "Уровень триглицеридов (32 SNP)",
+        "trait_en": "Triglycerides",
+        "variants_count": 32,
+        "source": "https://www.pgscatalog.org/score/PGS000063/",
+    },
+
 ]
 
 # Директория для кэширования scoring-файлов
@@ -578,70 +678,75 @@ def download_pgs_scoring_file(pgs_id: str) -> pd.DataFrame | None:
     return df
 
 
+def _pgs_alleles_match(pgs_row: pd.Series, variant: dict, effect_allele: str) -> bool:
+    """Не переносит вес REF-аллеля на другую замену в том же rsID."""
+    ref, alt = str(variant["ref"]).upper(), str(variant["alt"]).upper()
+    if len(ref) != 1 or len(alt) != 1 or ref not in "ACGT" or alt not in "ACGT":
+        return False
+    if effect_allele not in {ref, alt}:
+        return False
+    other = pgs_row.get("other_allele")
+    if other is None or pd.isna(other):
+        other = pgs_row.get("hm_inferOtherAllele")
+    other = str(other).upper() if other is not None and not pd.isna(other) else ""
+    if other in {"A", "C", "G", "T"}:
+        return {effect_allele, other} == {ref, alt}
+    # Если эффекторный аллель = ALT, замена определена однозначно.
+    # Для эффекторного REF без второго аллеля вариантов может быть несколько.
+    return effect_allele == alt
+
+
 def calculate_pgs(
     variants_df: pd.DataFrame,
     scoring_df: pd.DataFrame,
 ) -> dict:
-    """Рассчитывает полигенный скор с mean imputation для пропущенных SNP.
+    """Исследовательская сумма весов; 2*EAF только для отсутствующих SNP.
 
-    Алгоритм:
-      1. Для каждого SNP в scoring-файле:
-         а) Если SNP найден в VCF пациента → используем реальную
-            дозировку (0, 1 или 2 копии эффект-аллеля).
-         б) Если SNP отсутствует, но в scoring-файле есть EAF →
-            используем среднюю дозировку 2*EAF (mean imputation).
-            Это статистически корректный приём: вместо того чтобы
-            выкидывать SNP (что искажает score), мы предполагаем
-            "типичный для популяции" генотип у пациента.
-         в) Если нет ни генотипа, ни EAF → пропускаем.
-      2. PGS = sum(weight * dosage)
-      3. Через EAF считаем популяционные mean и variance
-         → z-score → перцентиль.
-
-    Свойства mean imputation:
-      - При высоком измеренном покрытии (50%+) z-score близок к истинному.
-      - При низком покрытии перцентиль автоматически сдвигается к 50-му,
-        отражая возросшую неопределённость (это честное поведение).
-      - Импутированные SNP не добавляют индивидуального сигнала, только
-        корректируют общее среднее и дисперсию.
+    Без подходящей референсной выборки сумма не переводится в персональный
+    перцентиль или вероятность заболевания.
     """
     rsid_col = "hm_rsID" if "hm_rsID" in scoring_df.columns else "rsID"
     if rsid_col not in scoring_df.columns:
         return {
             "matched": 0, "imputed": 0, "skipped": 0, "total": 0,
             "score": 0.0, "coverage_pct": 0, "effective_coverage_pct": 0,
-            "z_score": None, "percentile": None,
         }
 
     eaf_col = "allelefrequency_effect"
     has_eaf = eaf_col in scoring_df.columns
 
+    if any(
+        column.startswith("dosage_") and column.endswith("_weight")
+        for column in scoring_df.columns
+    ):
+        raise ValueError("Модель с весами по дозировкам не поддерживается")
+
+    relevant_ids = set(scoring_df[rsid_col].dropna())
     vcf_lookup = {}
-    for _, row in variants_df.iterrows():
-        vcf_lookup[row["rsid"]] = (row["allele_1"], row["allele_2"])
+    for row in variants_df[variants_df["rsid"].isin(relevant_ids)].to_dict("records"):
+        vcf_lookup.setdefault(row["rsid"], []).append(row)
 
     total_snps = len(scoring_df)
     matched = 0   # SNP реально измерен у пациента
     imputed = 0   # SNP не измерен, но подставлено среднее по популяции
     skipped = 0   # SNP не измерен и нет EAF — нельзя ничего сказать
     score = 0.0
-    partial_mean = 0.0
-    partial_var = 0.0
-
     for _, pgs_row in scoring_df.iterrows():
         rsid = pgs_row.get(rsid_col, "")
-        if pd.isna(rsid):
+        if not isinstance(rsid, str) or not re.fullmatch(r"rs[0-9]+", rsid):
             skipped += 1
             continue
 
-        effect_allele = str(pgs_row.get("effect_allele", ""))
+        effect_allele = str(pgs_row.get("effect_allele", "")).upper()
+        if effect_allele not in {"A", "C", "G", "T"}:
+            skipped += 1
+            continue
         weight = pgs_row.get("effect_weight", 0.0)
         if pd.isna(weight):
             skipped += 1
             continue
         w = float(weight)
 
-        # Достаём популяционную частоту эффект-аллеля для этого SNP
         eaf_raw = pgs_row.get(eaf_col) if has_eaf else None
         eaf_valid = (
             eaf_raw is not None
@@ -650,38 +755,37 @@ def calculate_pgs(
         )
         eaf = float(eaf_raw) if eaf_valid else None
 
-        if rsid in vcf_lookup:
-            # SNP измерен у пациента — реальная дозировка
-            a1, a2 = vcf_lookup[rsid]
-            dosage = (1 if a1 == effect_allele else 0) + (1 if a2 == effect_allele else 0)
+        # rsID не доказывает совпадение аллеля: сверяем координату GRCh37,
+        # REF/ALT и эффектный аллель. Неоднозначные записи не считаем измеренными.
+        chrom = pgs_row.get("hm_chr")
+        pos = pgs_row.get("hm_pos")
+        if pd.isna(chrom) or pd.isna(pos):
+            skipped += 1
+            continue
+        else:
+            chrom = str(chrom).removesuffix(".0").removeprefix("chr")
+            candidates = [
+                row for row in vcf_lookup.get(rsid, [])
+                if str(row["chrom"]).removeprefix("chr") == chrom
+                and int(row["pos"]) == int(pos)
+                and _pgs_alleles_match(pgs_row, row, effect_allele)
+            ]
+        if len(candidates) == 1:
+            row = candidates[0]
+            dosage = (row["allele_1"] == effect_allele) + (row["allele_2"] == effect_allele)
             score += w * dosage
             matched += 1
-
-            # Вклад в популяционные mean/var (для z-score, по Hardy-Weinberg):
-            #   E[w*D] = w * 2 * EAF
-            #   Var[w*D] = w² * 2 * EAF * (1-EAF)
-            if eaf_valid:
-                partial_mean += w * 2 * eaf
-                partial_var += w ** 2 * 2 * eaf * (1 - eaf)
+        elif vcf_lookup.get(rsid):
+            # rsID есть в VCF, но координата/аллели не сходятся или запись
+            # неоднозначна. Популяционное среднее скрывало бы эту ошибку.
+            skipped += 1
         elif eaf_valid:
-            # SNP не измерен, но известна EAF → mean imputation.
-            # Подставляем ожидаемое значение дозировки = 2*EAF.
-            # Score сдвигается на w*2*EAF, но (score - mean) от этого SNP = 0,
-            # т.е. он не вносит индивидуального вклада в z-score —
-            # только в общую дисперсию (увеличивает знаменатель).
             score += w * 2 * eaf
-            partial_mean += w * 2 * eaf
-            partial_var += w ** 2 * 2 * eaf * (1 - eaf)
             imputed += 1
         else:
-            # Нет ни генотипа, ни популяционной частоты — пропускаем
+            # Без EAF отсутствующий SNP не восстанавливается: итоговая
+            # сумма остаётся частичной и не сравнивается с полной моделью.
             skipped += 1
-
-    z_score = None
-    percentile = None
-    if partial_var > 0:
-        z_score = round((score - partial_mean) / math.sqrt(partial_var), 2)
-        percentile = round(_norm_cdf(z_score) * 100, 1)
 
     raw_cov = round(matched / total_snps * 100, 1) if total_snps > 0 else 0
     eff_cov = round((matched + imputed) / total_snps * 100, 1) if total_snps > 0 else 0
@@ -692,10 +796,8 @@ def calculate_pgs(
         "skipped": skipped,
         "total": total_snps,
         "score": round(score, 6),
-        "coverage_pct": raw_cov,           # % реально измеренных SNP
-        "effective_coverage_pct": eff_cov, # % использованных (measured + imputed)
-        "z_score": z_score,
-        "percentile": percentile,
+        "coverage_pct": raw_cov,
+        "effective_coverage_pct": eff_cov,
     }
 
 
@@ -703,11 +805,11 @@ def compute_pgs_scores(
     variants_df: pd.DataFrame,
     pgs_list: list[dict] | None = None,
 ) -> list[dict]:
-    """Рассчитывает полигенные скоры для набора заболеваний из PGS Catalog."""
+    """Рассчитывает исследовательские суммы только для простых моделей."""
     if pgs_list is None:
         pgs_list = DEFAULT_PGS_SCORES
 
-    print(f"[Стадия 5] Расчёт полигенных шкал риска ({len(pgs_list)} скоров)...")
+    print(f"[Стадия 5] Проверка полигенных моделей ({len(pgs_list)})...")
 
     results = []
     for pgs_info in pgs_list:
@@ -716,23 +818,36 @@ def compute_pgs_scores(
 
         scoring_df = download_pgs_scoring_file(pgs_id)
         if scoring_df is None:
-            print(f"    {pgs_id} ({trait}): не удалось загрузить")
+            results.append({"pgs_id": pgs_id, "trait": trait, "status": "Не оценено",
+                            "reason": "Не удалось загрузить файл весов"})
+            continue
+
+        required = {"effect_allele", "effect_weight", "hm_chr", "hm_pos"}
+        if not required.issubset(scoring_df.columns) or any(
+            column.startswith("dosage_") and column.endswith("_weight")
+            for column in scoring_df.columns
+        ) or len(scoring_df) != pgs_info.get("variants_count"):
+            results.append({"pgs_id": pgs_id, "trait": trait, "status": "Не оценено",
+                            "reason": "Формат или размер файла весов не соответствует поддерживаемой модели"})
             continue
 
         calc = calculate_pgs(variants_df, scoring_df)
-
-        # Надёжность судим по реальному покрытию (matched), а не по effective:
-        # mean imputation помогает математически, но не заменяет настоящих данных.
-        coverage_label, is_reliable = _coverage_label(calc["coverage_pct"])
-        risk_level = None
-        risk_indicator = None
-        if calc["percentile"] is not None:
-            risk_level, risk_indicator = _risk_tier(calc["percentile"])
+        coverage_label, has_minimum_overlap = _coverage_label(calc["coverage_pct"])
+        if not has_minimum_overlap:
+            status = "Не оценено"
+            reason = "Измерено менее 30% SNP модели"
+        elif calc["skipped"]:
+            status = "Частичная сумма весов"
+            reason = f"Не учтено {calc['skipped']} SNP; сумма неполная"
+        else:
+            status = "Исследовательский показатель"
+            reason = "Без референсной калибровки"
 
         results.append({
             "pgs_id": pgs_id,
             "trait": trait,
             "trait_en": pgs_info.get("trait_en", ""),
+            "source": pgs_info.get("source", f"https://www.pgscatalog.org/score/{pgs_id}/"),
             "score": calc["score"],
             "matched": calc["matched"],
             "imputed": calc["imputed"],
@@ -741,25 +856,18 @@ def compute_pgs_scores(
             "coverage_pct": calc["coverage_pct"],
             "effective_coverage_pct": calc["effective_coverage_pct"],
             "coverage_label": coverage_label,
-            "is_reliable": is_reliable,
-            "z_score": calc["z_score"],
-            "percentile": calc["percentile"],
-            "risk_level": risk_level,
-            "risk_indicator": risk_indicator,
+            "status": status,
+            "reason": reason,
         })
 
-        if calc["matched"] > 0 or calc["imputed"] > 0:
-            status = "OK"
-        else:
-            status = "нет данных"
         print(
             f"    {pgs_id}: {trait} | "
             f"измерено {calc['matched']}/{calc['total']} "
-            f"({calc['coverage_pct']}%), импутировано {calc['imputed']} | "
-            f"score={calc['score']} [{status}]"
+            f"({calc['coverage_pct']}%), подставлено среднее для {calc['imputed']} | "
+            f"{status}"
         )
 
-    print(f"           Рассчитано скоров: {len(results)}")
+    print(f"           Моделей проверено: {len(results)}")
     return results
 
 
@@ -775,57 +883,53 @@ def print_report(
 ):
     """Выводит итоговый отчёт в консоль."""
     print("\n" + "=" * 70)
-    print("    ГЕНЕТИЧЕСКИЙ ПРОФИЛЬ: АНАЛИЗ РИСКОВ ЗАБОЛЕВАНИЙ")
+    print("    ГЕНЕТИЧЕСКИЙ ПРОФИЛЬ: ПРОВЕРКА ВАРИАНТОВ И ИССЛЕДОВАТЕЛЬСКИХ МОДЕЛЕЙ")
     print("=" * 70)
 
     # --- Сводка ---
     total = len(variants_df)
     mutated = len(variants_df[variants_df["zygosity"] != "homozygous_ref"])
     print(f"\nВсего вариантов в профиле: {total}")
-    print(f"Вариантов с мутациями:    {mutated}")
+    print(f"Вариантов с ALT-аллелем:  {mutated}")
+    print("Генотипы и аннотации из этого отчёта не подтверждают диагноз.")
 
     # --- Раздел 1: Клинически значимые варианты ---
     print("\n" + "-" * 70)
-    print("  1. КЛИНИЧЕСКИ ЗНАЧИМЫЕ ВАРИАНТЫ (ClinVar)")
+    print("  1. ТОЧНО СОПОСТАВЛЕННЫЕ АННОТАЦИИ ClinVar (hg19, SNV)")
     print("-" * 70)
 
     if clinvar_df.empty:
-        print("  Клинически значимых вариантов не найдено.")
+        print("  Аннотаций выбранных категорий для точно совпавших SNP нет.")
+        print("  Это не исключает заболевания или варианты вне проверенного набора.")
     else:
-        # Группируем по уровню значимости (регистронезависимо, без дублей)
-        seen_categories = set()
-        for significance in ["Pathogenic", "Likely pathogenic",
-                             "Pathogenic/Likely pathogenic",
-                             "Risk factor",
-                             "Drug response",
-                             "Association", "Affects"]:
-            if significance.lower() in seen_categories:
-                continue
-            seen_categories.add(significance.lower())
-            subset = clinvar_df[
-                clinvar_df["significance"].str.contains(significance, case=False, na=False)
-            ]
+        for category in ["Кандидат для проверки", "Спорное заключение",
+                         "Неопределённая значимость", "Фармакогенетика", "Ассоциация"]:
+            subset = clinvar_df[clinvar_df["category"] == category]
             if subset.empty:
                 continue
 
-            print(f"\n  [{significance.upper()}]")
+            print(f"\n  [{category.upper()}]")
             table_data = []
             for _, row in subset.iterrows():
-                cadd = f"CADD:{row['cadd_phred']}" if row["cadd_phred"] else ""
                 table_data.append([
-                    row["rsid"],
+                    row["variant"], row["rsid"], row["clinvar_id"],
                     row["gene"],
                     row["genotype"],
-                    row["zygosity"],
+                    row["significance"],
                     row["condition"][:50],
-                    cadd,
+                    row["review_status"], row["last_evaluated"],
                 ])
             print(tabulate(
                 table_data,
-                headers=["rsID", "Ген", "Генотип", "Зиготность", "Заболевание", "CADD"],
+                headers=["Вариант", "rsID", "ClinVar", "Ген", "Генотип",
+                         "Категория ClinVar", "Признак", "Статус проверки", "Дата"],
                 tablefmt="simple",
                 numalign="left",
             ))
+    print(f"  Не оценено из-за отсутствия точного совпадения: "
+          f"{clinvar_df.attrs.get('unmatched_annotations', 0)} аннотаций.")
+    print("  'Кандидат для проверки' означает классификацию варианта в источнике,")
+    print("  а не подтверждение заболевания у владельца VCF.")
 
     # --- Раздел 2: Комплексные генотипы ---
     print("\n" + "-" * 70)
@@ -833,96 +937,55 @@ def print_report(
     print("-" * 70)
 
     if not complex_results:
-        print("  Известные комплексные генотипы не обнаружены в профиле.")
+        print("  Правила отсутствуют или не применились к этому профилю.")
     else:
         for r in complex_results:
-            risk_emoji = {
-                "Высокий": "▲▲▲",
-                "Повышенный": "▲▲",
-                "Умеренно повышенный": "▲",
-                "Умеренный": "▲",
-                "Носитель": "⚬",
-                "Средний": "—",
-                "Базовый (средний)": "—",
-                "Базовый": "—",
-                "Пониженный": "▽",
-                "Очень пониженный": "▽▽",
-            }.get(r["risk_level"], "?")
-
             print(f"\n  {r['gene']}: {r['genotype']}")
-            print(f"    Заболевание:  {r['disease']}")
-            print(f"    Уровень риска: {risk_emoji} {r['risk_level']}")
+            print(f"    Статус:       {r['status']}")
+            print(f"    Признак:      {r['disease']}")
+            if r["status"] != "Не оценено":
+                print(f"    Категория правила: {r['risk_level']}")
             print(f"    Подробности:  {r['details']}")
+    print("  Категории правил описывают опубликованные ассоциации, не диагноз.")
 
     # --- Раздел 3: Полигенные шкалы риска ---
     print("\n" + "-" * 70)
-    print("  3. ПОЛИГЕННЫЕ ШКАЛЫ РИСКА (PGS Catalog)")
+    print("  3. ПОЛИГЕННЫЕ МОДЕЛИ (PGS Catalog, исследовательский расчёт)")
     print("-" * 70)
 
     if not pgs_results:
-        print("  Полигенные скоры не рассчитаны.")
+        print("  Полигенные модели не выбраны.")
     else:
-        scored = [r for r in pgs_results if (r["matched"] + r["imputed"]) > 0]
-        not_scored = [r for r in pgs_results if (r["matched"] + r["imputed"]) == 0]
-
-        if scored:
-            table_data = []
-            for r in scored:
-                if r["percentile"] is not None and r["is_reliable"]:
-                    percentile_str = f"{r['percentile']:.1f}-й"
-                    risk_str = f"{r['risk_indicator']} {r['risk_level']}"
-                elif r["percentile"] is not None:
-                    percentile_str = f"{r['percentile']:.1f}-й *"
-                    risk_str = f"{r['risk_indicator']} {r['risk_level']} *"
-                else:
-                    percentile_str = "—"
-                    risk_str = "нет EAF данных"
-
-                # "Измерено / Импутировано / Всего"
-                snp_str = f"{r['matched']} / {r['imputed']} / {r['total']}"
-                coverage_str = f"{r['coverage_pct']}%"
-
-                table_data.append([
-                    r["pgs_id"],
-                    r["trait"],
-                    f"{r['score']:+.4f}",
-                    snp_str,
-                    coverage_str,
-                    percentile_str,
-                    risk_str,
-                ])
-            print()
-            print(tabulate(
-                table_data,
-                headers=["PGS ID", "Заболевание", "Скор",
-                         "Измер./Имп./Всего", "Изм. покрытие",
-                         "Перцентиль", "Уровень риска"],
-                tablefmt="simple",
-                numalign="left",
-            ))
-
-            print("\n  Как читать:")
-            print("    Измер.     — SNP реально прочитаны на чипе у пациента.")
-            print("    Имп.       — SNP отсутствуют в VCF; подставлена средняя")
-            print("                 для популяции дозировка (mean imputation).")
-            print("                 Эти SNP не добавляют индивидуального сигнала,")
-            print("                 но корректируют общую дисперсию.")
-            print("    Перцентиль — место пациента в популяции по данному скору.")
-            print("                 Например, 80-й = риск выше, чем у 80% людей.")
-            print("    * — измеренное покрытие < 50%, интерпретировать осторожно.")
-
-        if not_scored:
-            print(f"\n  Нет данных (ни измеренных SNP, ни популяционных частот) для: "
-                  f"{', '.join(r['trait'] for r in not_scored)}")
-
-        low_coverage = [r for r in scored if not r["is_reliable"]]
-        if low_coverage:
-            print(f"\n  ВНИМАНИЕ: измеренное покрытие < 50% для "
-                  f"{len(low_coverage)} скор(ов).")
-            print("  Mean imputation смягчает пропуски, но при низком измеренном")
-            print("  покрытии перцентиль смещён к 50-му (медиане популяции).")
-            print("  Для точного результата нужна настоящая импутация по")
-            print("  референсной панели (1000G/TOPMed) или WGS.")
+        table_data = []
+        for r in pgs_results:
+            if r["status"] == "Исследовательский показатель":
+                score = f"{r['score']:+.4f}"
+            elif r["status"] == "Частичная сумма весов":
+                score = f"{r['score']:+.4f}*"
+            else:
+                score = "—"
+            measured = (
+                f"{r['matched']}/{r['total']} ({r['coverage_pct']}%)"
+                if "matched" in r else "—"
+            )
+            table_data.append([
+                r["pgs_id"], r["trait"], measured,
+                score, r["status"], r["reason"],
+            ])
+        print()
+        print(tabulate(
+            table_data,
+            headers=["PGS ID", "Признак", "Измерено", "Сумма весов",
+                     "Статус", "Причина"],
+            tablefmt="simple", numalign="left",
+        ))
+        print("\n  Сумма весов — исследовательский показатель с подстановкой")
+        print("  среднего 2*EAF только там, где EAF есть в файле весов.")
+        print("  * — частичная сумма: не все SNP модели учтены.")
+        print("  Покрытие ≥30% допускает показ исследовательской суммы, но")
+        print("  не подтверждает пригодность модели для оценки риска.")
+        print("  Без референсной калибровки сумма не является вероятностью")
+        print("  заболевания, перцентилем или категорией риска.")
 
 
 # ---------------------------------------------------------------------------
@@ -965,8 +1028,26 @@ def main():
     # Стадия 5: Полигенные шкалы риска
     pgs_results = compute_pgs_scores(variants_df)
 
+    # Сравнение с индивидуальными EUR-генотипами 1000 Genomes, если референс подготовлен.
+    if __package__:
+        from .pgs_interpretation import interpret_pgs
+    else:
+        from pgs_interpretation import interpret_pgs
+    pgs_results = interpret_pgs(
+        variants_df, pgs_results, download_pgs_scoring_file, _pgs_alleles_match,
+    )
+
     # Стадия 6: Отчёт
     print_report(variants_df, clinvar_df, complex_results, pgs_results)
+
+    # Стадия 7: Дополнительная краткая сводка для клинического разбора.
+    if __package__:
+        from .clinical_summary import build_clinical_summary, print_clinical_summary
+    else:
+        from clinical_summary import build_clinical_summary, print_clinical_summary
+
+    summary = build_clinical_summary(variants_df, clinvar_df, complex_results, pgs_results)
+    print_clinical_summary(summary)
 
 
 if __name__ == "__main__":
