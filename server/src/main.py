@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from src.api import router
+from src.api.genes import install_report_examples
 
 
 app = FastAPI(
@@ -27,3 +28,4 @@ app = FastAPI(
 )
 
 app.include_router(router)
+install_report_examples(app)

@@ -1,0 +1,1160 @@
+{
+  "schema_version": "1.0",
+  "analysis_version": "1.0",
+  "patient_id": 1,
+  "profile": {
+    "id": "00000000-0000-0000-0000-000000000001",
+    "filename": "synthetic.vcf",
+    "size_bytes": 1000,
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "uploaded_at": "2026-01-01T00:00:00Z",
+    "sample_name": "SYNTHETIC",
+    "genome_build": "GRCh37",
+    "build_source": "declared"
+  },
+  "generated_at": "2026-01-01T00:00:00Z",
+  "status": "partial",
+  "summary": {
+    "findings": [],
+    "not_detected": [
+      {
+        "message": "F5: указанный аллель не выявлен",
+        "evidence_refs": [
+          {
+            "section": "genotype_rules",
+            "item_id": "factor_v_leiden"
+          }
+        ]
+      },
+      {
+        "message": "F2: указанный аллель не выявлен",
+        "evidence_refs": [
+          {
+            "section": "genotype_rules",
+            "item_id": "prothrombin_g20210a"
+          }
+        ]
+      },
+      {
+        "message": "HFE: указанный аллель не выявлен",
+        "evidence_refs": [
+          {
+            "section": "genotype_rules",
+            "item_id": "hfe_c282y"
+          }
+        ]
+      },
+      {
+        "message": "HFE: указанный аллель не выявлен",
+        "evidence_refs": [
+          {
+            "section": "genotype_rules",
+            "item_id": "hfe_h63d"
+          }
+        ]
+      },
+      {
+        "message": "PCSK9: указанный аллель не выявлен",
+        "evidence_refs": [
+          {
+            "section": "genotype_rules",
+            "item_id": "pcsk9_lof"
+          }
+        ]
+      }
+    ],
+    "not_evaluated": [
+      {
+        "message": "ClinVar недоступен: отсутствие находок не установлено.",
+        "evidence_refs": []
+      }
+    ],
+    "polygenic_overview": [
+      {
+        "trait_id": "alzheimers",
+        "trait": "Болезнь Альцгеймера",
+        "pgs_id": "PGS000025"
+      },
+      {
+        "trait_id": "coronary_disease",
+        "trait": "Ишемическая болезнь сердца",
+        "pgs_id": "PGS000010"
+      },
+      {
+        "trait_id": "type_2_diabetes",
+        "trait": "Диабет 2 типа",
+        "pgs_id": "PGS002733"
+      },
+      {
+        "trait_id": "asthma",
+        "trait": "Астма",
+        "pgs_id": "PGS000037"
+      },
+      {
+        "trait_id": "migraine",
+        "trait": "Мигрень",
+        "pgs_id": "PGS001281"
+      },
+      {
+        "trait_id": "obesity",
+        "trait": "Ожирение",
+        "pgs_id": "PGS003400"
+      },
+      {
+        "trait_id": "triglycerides",
+        "trait": "Уровень триглицеридов",
+        "pgs_id": "PGS000063"
+      }
+    ],
+    "other_candidate_variants_count": null
+  },
+  "clinvar": {
+    "status": "unavailable",
+    "issues": [
+      {
+        "code": "annotation_unavailable",
+        "message": "MyVariant.info недоступен; ClinVar не оценён."
+      }
+    ],
+    "items": []
+  },
+  "genotype_rules": {
+    "status": "complete",
+    "issues": [],
+    "items": [
+      {
+        "id": "apoe",
+        "genes": [
+          "APOE"
+        ],
+        "condition": "Болезнь Альцгеймера",
+        "status": "evaluated",
+        "reason": null,
+        "observed_variants": [
+          {
+            "rsid": "rs429358",
+            "genotype": "0/0",
+            "alleles": [
+              "T",
+              "T"
+            ],
+            "phased": false,
+            "phase_set": null
+          },
+          {
+            "rsid": "rs7412",
+            "genotype": "0/0",
+            "alleles": [
+              "C",
+              "C"
+            ],
+            "phased": false,
+            "phase_set": null
+          }
+        ],
+        "diplotype": "e3/e3",
+        "result": {
+          "code": "reference",
+          "label": "Референсный генотип",
+          "explanation": ""
+        },
+        "effect": {
+          "type": "OR",
+          "value": 1.0,
+          "context": "Болезнь Альцгеймера",
+          "sources": [
+            {
+              "url": "https://doi.org/10.1038/mp.2011.52",
+              "citation": "Genin E, et al. APOE and Alzheimer disease: a major gene with semi-dominant inheritance. Mol Psychiatry. 2011;16(9):903-907.",
+              "doi": "10.1038/mp.2011.52",
+              "pubmed": "21556001",
+              "reference": "Table 2 — OR по APOE-генотипу для европейских популяций. ε4/ε4 OR ≈ 11.6, ε3/ε4 OR ≈ 3.2, ε2/ε3 OR ≈ 0.6"
+            },
+            {
+              "url": "https://doi.org/10.1038/s41467-019-14279-8",
+              "citation": "Reiman EM, et al. Exceptionally low likelihood of Alzheimer's dementia in APOE2 homozygotes from a 5,000-person neuropathological study. Nat Commun. 2020;11(1):667.",
+              "doi": "10.1038/s41467-019-14279-8",
+              "pubmed": "32015339",
+              "reference": "Table 1 — ε2/ε2 даёт OR ≈ 0.13 для AD по сравнению с ε3/ε3 (мы используем более консервативную оценку 0.6 из мета-анализов)"
+            }
+          ]
+        },
+        "limitations": [
+          "Правило не устанавливает диагноз; OR не является абсолютной вероятностью."
+        ],
+        "sources": [
+          {
+            "url": "https://doi.org/10.1038/mp.2011.52",
+            "citation": "Genin E, et al. APOE and Alzheimer disease: a major gene with semi-dominant inheritance. Mol Psychiatry. 2011;16(9):903-907.",
+            "doi": "10.1038/mp.2011.52",
+            "pubmed": "21556001",
+            "reference": "Table 2 — OR по APOE-генотипу для европейских популяций. ε4/ε4 OR ≈ 11.6, ε3/ε4 OR ≈ 3.2, ε2/ε3 OR ≈ 0.6"
+          },
+          {
+            "url": "https://doi.org/10.1038/s41467-019-14279-8",
+            "citation": "Reiman EM, et al. Exceptionally low likelihood of Alzheimer's dementia in APOE2 homozygotes from a 5,000-person neuropathological study. Nat Commun. 2020;11(1):667.",
+            "doi": "10.1038/s41467-019-14279-8",
+            "pubmed": "32015339",
+            "reference": "Table 1 — ε2/ε2 даёт OR ≈ 0.13 для AD по сравнению с ε3/ε3 (мы используем более консервативную оценку 0.6 из мета-анализов)"
+          }
+        ]
+      },
+      {
+        "id": "factor_v_leiden",
+        "genes": [
+          "F5"
+        ],
+        "condition": "Тромбофилия (венозные тромбозы)",
+        "status": "evaluated",
+        "reason": null,
+        "observed_variants": [
+          {
+            "rsid": "rs6025",
+            "genotype": "0/0",
+            "alleles": [
+              "A",
+              "A"
+            ],
+            "phased": false,
+            "phase_set": null
+          }
+        ],
+        "diplotype": null,
+        "result": {
+          "code": "not_detected",
+          "label": "Аллель не выявлен",
+          "explanation": "Вариант F5 Leiden не выявлен; общий риск венозного тромбоза по этому тесту не определяется"
+        },
+        "effect": null,
+        "limitations": [
+          "Правило не устанавливает диагноз; OR не является абсолютной вероятностью."
+        ],
+        "sources": [
+          {
+            "url": "https://doi.org/10.1056/NEJM199504063321403",
+            "citation": "Ridker PM, et al. Mutation in the gene coding for coagulation factor V and the risk of myocardial infarction, stroke, and venous thrombosis in apparently healthy men. N Engl J Med. 1995;332(14):912-917.",
+            "doi": "10.1056/NEJM199504063321403",
+            "pubmed": "7877648",
+            "reference": "Table 2 — относительный риск ВТЭ для гетерозигот ≈ 2.7 (CI 1.3-5.6); более поздние мета-анализы дают 5-7"
+          },
+          {
+            "url": "https://ashpublications.org/blood/article/85/6/1504/180062/",
+            "citation": "Rosendaal FR, et al. High risk of thrombosis in patients homozygous for factor V Leiden (activated protein C resistance). Blood. 1995;85(6):1504-1508.",
+            "doi": null,
+            "pubmed": "7888671",
+            "reference": "Раздел Results — OR гомозигот ≈ 80 (CI 22-289) по сравнению с населением без мутации"
+          },
+          {
+            "url": "https://doi.org/10.1001/jama.2009.853",
+            "citation": "Segal JB, et al. Predictive value of factor V Leiden and prothrombin G20210A in adults with venous thromboembolism and in family members of those with a mutation: a systematic review. JAMA. 2009;301(23):2472-2485.",
+            "doi": "10.1001/jama.2009.853",
+            "pubmed": "19531787",
+            "reference": "Table 2 — мета-анализ ВТЭ-рисков по обеим мутациям, OR гетерозигот F5 ≈ 4.9 (CI 4.1-5.9)"
+          }
+        ]
+      },
+      {
+        "id": "prothrombin_g20210a",
+        "genes": [
+          "F2"
+        ],
+        "condition": "Тромбофилия (венозные тромбозы)",
+        "status": "evaluated",
+        "reason": null,
+        "observed_variants": [
+          {
+            "rsid": "rs1799963",
+            "genotype": "0/0",
+            "alleles": [
+              "G",
+              "G"
+            ],
+            "phased": false,
+            "phase_set": null
+          }
+        ],
+        "diplotype": null,
+        "result": {
+          "code": "not_detected",
+          "label": "Аллель не выявлен",
+          "explanation": "Вариант F2 G20210A не выявлен; общий риск венозного тромбоза по этому тесту не определяется"
+        },
+        "effect": null,
+        "limitations": [
+          "Правило не устанавливает диагноз; OR не является абсолютной вероятностью."
+        ],
+        "sources": [
+          {
+            "url": "https://ashpublications.org/blood/article/88/10/3698/137751/",
+            "citation": "Poort SR, et al. A common genetic variation in the 3'-untranslated region of the prothrombin gene is associated with elevated plasma prothrombin levels and an increase in venous thrombosis. Blood. 1996;88(10):3698-3703.",
+            "doi": null,
+            "pubmed": "8916933",
+            "reference": "Раздел Results, Table 2 — OR гетерозигот ≈ 2.8 (CI 1.4-5.6) для ВТЭ"
+          },
+          {
+            "url": "https://doi.org/10.1001/jama.2009.853",
+            "citation": "Segal JB, et al. Predictive value of factor V Leiden and prothrombin G20210A. JAMA. 2009;301(23):2472-2485.",
+            "doi": "10.1001/jama.2009.853",
+            "pubmed": "19531787",
+            "reference": "Table 2 — мета-анализ, OR гетерозигот G20210A ≈ 3.8 (CI 3.0-4.9)"
+          }
+        ]
+      },
+      {
+        "id": "hfe_c282y",
+        "genes": [
+          "HFE"
+        ],
+        "condition": "Наследственный гемохроматоз",
+        "status": "evaluated",
+        "reason": null,
+        "observed_variants": [
+          {
+            "rsid": "rs1800562",
+            "genotype": "0/0",
+            "alleles": [
+              "G",
+              "G"
+            ],
+            "phased": false,
+            "phase_set": null
+          }
+        ],
+        "diplotype": null,
+        "result": {
+          "code": "not_detected",
+          "label": "Аллель не выявлен",
+          "explanation": "Вариант HFE C282Y не выявлен; это не исключает других причин перегрузки железом"
+        },
+        "effect": null,
+        "limitations": [
+          "Правило не устанавливает диагноз; OR не является абсолютной вероятностью."
+        ],
+        "sources": [
+          {
+            "url": "https://doi.org/10.1038/ng0896-399",
+            "citation": "Feder JN, et al. A novel MHC class I-like gene is mutated in patients with hereditary haemochromatosis. Nat Genet. 1996;13(4):399-408.",
+            "doi": "10.1038/ng0896-399",
+            "pubmed": "8696333",
+            "reference": "Section 'A candidate gene' — оригинальная характеристика C282Y как причинной мутации"
+          },
+          {
+            "url": "https://doi.org/10.1016/j.jhep.2022.03.033",
+            "citation": "European Association for the Study of the Liver. EASL Clinical Practice Guidelines on haemochromatosis. J Hepatol. 2022;77(2):479-502.",
+            "doi": "10.1016/j.jhep.2022.03.033",
+            "pubmed": "35662478",
+            "reference": "Раздел 'Genetic diagnosis', Recommendation 1 — критерий гомозиготы C282Y/C282Y как диагноз HH тип 1"
+          },
+          {
+            "url": "https://doi.org/10.1136/bmj.k5222",
+            "citation": "Pilling LC, et al. Common conditions associated with hereditary haemochromatosis genetic variants: cohort study in UK Biobank. BMJ. 2019;364:k5222.",
+            "doi": "10.1136/bmj.k5222",
+            "pubmed": "30651232",
+            "reference": "Table 2 — penetrance C282Y/C282Y в UK Biobank: ~22% мужчин и ~10% женщин с цирроза/диабета к возрасту 70"
+          }
+        ]
+      },
+      {
+        "id": "hfe_h63d",
+        "genes": [
+          "HFE"
+        ],
+        "condition": "Гемохроматоз (модификатор)",
+        "status": "evaluated",
+        "reason": null,
+        "observed_variants": [
+          {
+            "rsid": "rs1799945",
+            "genotype": "0/0",
+            "alleles": [
+              "A",
+              "A"
+            ],
+            "phased": false,
+            "phase_set": null
+          }
+        ],
+        "diplotype": null,
+        "result": {
+          "code": "not_detected",
+          "label": "Аллель не выявлен",
+          "explanation": "Вариант HFE H63D не выявлен; это не исключает других причин перегрузки железом"
+        },
+        "effect": null,
+        "limitations": [
+          "Правило не устанавливает диагноз; OR не является абсолютной вероятностью."
+        ],
+        "sources": [
+          {
+            "url": "https://ashpublications.org/blood/article/93/8/2502/250793/",
+            "citation": "Mura C, Raguenes O, Férec C. HFE mutations analysis in 711 hemochromatosis probands: evidence for S65C implication in mild form of hemochromatosis. Blood. 1999;93(8):2502-2505.",
+            "doi": null,
+            "pubmed": "10194430",
+            "reference": "Раздел Discussion — H63D/H63D связан только с мягкой формой; основная клиническая значимость — compound het C282Y/H63D"
+          },
+          {
+            "url": "https://doi.org/10.1016/j.jhep.2022.03.033",
+            "citation": "EASL Clinical Practice Guidelines on haemochromatosis. J Hepatol. 2022;77(2):479-502.",
+            "doi": "10.1016/j.jhep.2022.03.033",
+            "pubmed": "35662478",
+            "reference": "Раздел 'Other HFE genotypes' — compound het C282Y/H63D даёт ~1-2% penetrance, H63D/H63D — клинически редко значим"
+          }
+        ]
+      },
+      {
+        "id": "pcsk9_lof",
+        "genes": [
+          "PCSK9"
+        ],
+        "condition": "Уровень ЛПНП и риск ИБС",
+        "status": "evaluated",
+        "reason": null,
+        "observed_variants": [
+          {
+            "rsid": "rs11591147",
+            "genotype": "0/0",
+            "alleles": [
+              "A",
+              "A"
+            ],
+            "phased": false,
+            "phase_set": null
+          }
+        ],
+        "diplotype": null,
+        "result": {
+          "code": "not_detected",
+          "label": "Аллель не выявлен",
+          "explanation": "Защитный вариант PCSK9 R46L не выявлен; по этому тесту нельзя оценить общий риск ИБС"
+        },
+        "effect": null,
+        "limitations": [
+          "Правило не устанавливает диагноз; OR не является абсолютной вероятностью."
+        ],
+        "sources": [
+          {
+            "url": "https://doi.org/10.1056/NEJMoa054013",
+            "citation": "Cohen JC, Boerwinkle E, Mosley TH Jr, Hobbs HH. Sequence variations in PCSK9, low LDL, and protection against coronary heart disease. N Engl J Med. 2006;354(12):1264-1272.",
+            "doi": "10.1056/NEJMoa054013",
+            "pubmed": "16554528",
+            "reference": "Table 2 (ARIC study) — носители R46L имели снижение ЛПНП на 15% (черные) / 21% (белые) и снижение риска ИБС на 47-88%"
+          },
+          {
+            "url": "https://doi.org/10.1056/NEJMc0707445",
+            "citation": "Kathiresan S, et al. A PCSK9 missense variant associated with a reduced risk of early-onset myocardial infarction. N Engl J Med. 2008;358(21):2299-2300.",
+            "doi": "10.1056/NEJMc0707445",
+            "pubmed": "18499582",
+            "reference": "Letter — R46L OR для раннего ИМ ≈ 0.47 (CI 0.32-0.68)"
+          }
+        ]
+      },
+      {
+        "id": "hla_b5701",
+        "genes": [
+          "HLA-B*57:01"
+        ],
+        "condition": "Гиперчувствительность к абакавиру",
+        "status": "evaluated",
+        "reason": null,
+        "observed_variants": [
+          {
+            "rsid": "rs2395029",
+            "genotype": "0/0",
+            "alleles": [
+              "A",
+              "A"
+            ],
+            "phased": false,
+            "phase_set": null
+          }
+        ],
+        "diplotype": null,
+        "result": {
+          "code": "undetermined",
+          "label": "Не определено",
+          "explanation": "Косвенный маркер rs2395029 не обнаружен; статус HLA-B*57:01 не установлен"
+        },
+        "effect": null,
+        "limitations": [
+          "Правило не устанавливает диагноз; OR не является абсолютной вероятностью."
+        ],
+        "sources": [
+          {
+            "url": "https://doi.org/10.1056/NEJMoa0706135",
+            "citation": "Mallal S, et al. HLA-B*5701 screening for hypersensitivity to abacavir. N Engl J Med. 2008;358(6):568-579.",
+            "doi": "10.1056/NEJMoa0706135",
+            "pubmed": "18256392",
+            "reference": "PREDICT-1 trial, Table 2 — скрининг HLA-B*5701 снизил иммунологически подтверждённую гиперчувствительность с 7.8% до 0%"
+          },
+          {
+            "url": "https://doi.org/10.1038/clpt.2014.38",
+            "citation": "Martin MA, et al. Clinical Pharmacogenetics Implementation Consortium guidelines for HLA-B genotype and abacavir dosing: 2014 update. Clin Pharmacol Ther. 2014;95(5):499-500.",
+            "doi": "10.1038/clpt.2014.38",
+            "pubmed": "24561393",
+            "reference": "Table 1 — рекомендация Level A: любой носитель HLA-B*57:01 (включая гетерозигот) — абакавир противопоказан"
+          },
+          {
+            "url": "https://cpicpgx.org/guidelines/guideline-for-abacavir-and-hla-b/",
+            "citation": "PharmGKB / CPIC current guideline (online, periodically updated).",
+            "doi": null,
+            "pubmed": null,
+            "reference": "Актуальная версия рекомендации с таблицей фенотипов и дозирования"
+          }
+        ]
+      }
+    ]
+  },
+  "polygenic_scores": {
+    "status": "complete",
+    "issues": [],
+    "items": [
+      {
+        "pgs_id": "PGS000025",
+        "trait_id": "alzheimers",
+        "trait": "Болезнь Альцгеймера (19 SNP)",
+        "source_url": "https://www.pgscatalog.org/score/PGS000025/",
+        "status": "evaluated",
+        "reason": {
+          "code": "uncalibrated_score",
+          "message": "Исследовательская сумма весов"
+        },
+        "coverage": {
+          "total": 19,
+          "matched": 19,
+          "imputed": 0,
+          "skipped": 0,
+          "measured_percent": 100.0,
+          "effective_percent": 100.0
+        },
+        "raw_score": 0.5,
+        "reference_comparison": {
+          "status": "evaluated",
+          "reason": null,
+          "population": "EUR",
+          "sample_count": 503,
+          "reference_snps": 19,
+          "patient_snps": 19,
+          "percentile": 50.0,
+          "category": "average",
+          "category_label": "Среднее",
+          "z_score": 0.0
+        },
+        "stability": {
+          "quality": "good",
+          "r_squared": 1.0,
+          "tier_agreement": 1.0,
+          "percentile_interval": {
+            "lower": 50.0,
+            "upper": 50.0
+          }
+        },
+        "research_effect": null
+      },
+      {
+        "pgs_id": "PGS001775",
+        "trait_id": "alzheimers",
+        "trait": "Болезнь Альцгеймера (39 SNP)",
+        "source_url": "https://www.pgscatalog.org/score/PGS001775/",
+        "status": "evaluated",
+        "reason": {
+          "code": "uncalibrated_score",
+          "message": "Исследовательская сумма весов"
+        },
+        "coverage": {
+          "total": 39,
+          "matched": 39,
+          "imputed": 0,
+          "skipped": 0,
+          "measured_percent": 100.0,
+          "effective_percent": 100.0
+        },
+        "raw_score": 0.5,
+        "reference_comparison": {
+          "status": "evaluated",
+          "reason": null,
+          "population": "EUR",
+          "sample_count": 503,
+          "reference_snps": 39,
+          "patient_snps": 39,
+          "percentile": 50.0,
+          "category": "average",
+          "category_label": "Среднее",
+          "z_score": 0.0
+        },
+        "stability": {
+          "quality": "good",
+          "r_squared": 1.0,
+          "tier_agreement": 1.0,
+          "percentile_interval": {
+            "lower": 50.0,
+            "upper": 50.0
+          }
+        },
+        "research_effect": null
+      },
+      {
+        "pgs_id": "PGS002280",
+        "trait_id": "alzheimers",
+        "trait": "Болезнь Альцгеймера (83 SNP)",
+        "source_url": "https://www.pgscatalog.org/score/PGS002280/",
+        "status": "evaluated",
+        "reason": {
+          "code": "uncalibrated_score",
+          "message": "Исследовательская сумма весов"
+        },
+        "coverage": {
+          "total": 83,
+          "matched": 83,
+          "imputed": 0,
+          "skipped": 0,
+          "measured_percent": 100.0,
+          "effective_percent": 100.0
+        },
+        "raw_score": 0.5,
+        "reference_comparison": {
+          "status": "evaluated",
+          "reason": null,
+          "population": "EUR",
+          "sample_count": 503,
+          "reference_snps": 83,
+          "patient_snps": 83,
+          "percentile": 50.0,
+          "category": "average",
+          "category_label": "Среднее",
+          "z_score": 0.0
+        },
+        "stability": {
+          "quality": "good",
+          "r_squared": 1.0,
+          "tier_agreement": 1.0,
+          "percentile_interval": {
+            "lower": 50.0,
+            "upper": 50.0
+          }
+        },
+        "research_effect": null
+      },
+      {
+        "pgs_id": "PGS000010",
+        "trait_id": "coronary_disease",
+        "trait": "ИБС (27 SNP)",
+        "source_url": "https://www.pgscatalog.org/score/PGS000010/",
+        "status": "evaluated",
+        "reason": {
+          "code": "uncalibrated_score",
+          "message": "Исследовательская сумма весов"
+        },
+        "coverage": {
+          "total": 27,
+          "matched": 27,
+          "imputed": 0,
+          "skipped": 0,
+          "measured_percent": 100.0,
+          "effective_percent": 100.0
+        },
+        "raw_score": 0.5,
+        "reference_comparison": {
+          "status": "evaluated",
+          "reason": null,
+          "population": "EUR",
+          "sample_count": 503,
+          "reference_snps": 27,
+          "patient_snps": 27,
+          "percentile": 50.0,
+          "category": "average",
+          "category_label": "Среднее",
+          "z_score": 0.0
+        },
+        "stability": {
+          "quality": "good",
+          "r_squared": 1.0,
+          "tier_agreement": 1.0,
+          "percentile_interval": {
+            "lower": 50.0,
+            "upper": 50.0
+          }
+        },
+        "research_effect": null
+      },
+      {
+        "pgs_id": "PGS000059",
+        "trait_id": "coronary_disease",
+        "trait": "ИБС (46 SNP)",
+        "source_url": "https://www.pgscatalog.org/score/PGS000059/",
+        "status": "evaluated",
+        "reason": {
+          "code": "uncalibrated_score",
+          "message": "Исследовательская сумма весов"
+        },
+        "coverage": {
+          "total": 46,
+          "matched": 46,
+          "imputed": 0,
+          "skipped": 0,
+          "measured_percent": 100.0,
+          "effective_percent": 100.0
+        },
+        "raw_score": 0.5,
+        "reference_comparison": {
+          "status": "evaluated",
+          "reason": null,
+          "population": "EUR",
+          "sample_count": 503,
+          "reference_snps": 46,
+          "patient_snps": 46,
+          "percentile": 50.0,
+          "category": "average",
+          "category_label": "Среднее",
+          "z_score": 0.0
+        },
+        "stability": {
+          "quality": "good",
+          "r_squared": 1.0,
+          "tier_agreement": 1.0,
+          "percentile_interval": {
+            "lower": 50.0,
+            "upper": 50.0
+          }
+        },
+        "research_effect": null
+      },
+      {
+        "pgs_id": "PGS000058",
+        "trait_id": "coronary_disease",
+        "trait": "ИБС (204 SNP)",
+        "source_url": "https://www.pgscatalog.org/score/PGS000058/",
+        "status": "evaluated",
+        "reason": {
+          "code": "uncalibrated_score",
+          "message": "Исследовательская сумма весов"
+        },
+        "coverage": {
+          "total": 204,
+          "matched": 204,
+          "imputed": 0,
+          "skipped": 0,
+          "measured_percent": 100.0,
+          "effective_percent": 100.0
+        },
+        "raw_score": 0.5,
+        "reference_comparison": {
+          "status": "evaluated",
+          "reason": null,
+          "population": "EUR",
+          "sample_count": 503,
+          "reference_snps": 204,
+          "patient_snps": 204,
+          "percentile": 50.0,
+          "category": "average",
+          "category_label": "Среднее",
+          "z_score": 0.0
+        },
+        "stability": {
+          "quality": "good",
+          "r_squared": 1.0,
+          "tier_agreement": 1.0,
+          "percentile_interval": {
+            "lower": 50.0,
+            "upper": 50.0
+          }
+        },
+        "research_effect": null
+      },
+      {
+        "pgs_id": "PGS004321",
+        "trait_id": "coronary_disease",
+        "trait": "ИБС (27 SNP, Marston)",
+        "source_url": "https://www.pgscatalog.org/score/PGS004321/",
+        "status": "evaluated",
+        "reason": {
+          "code": "uncalibrated_score",
+          "message": "Исследовательская сумма весов"
+        },
+        "coverage": {
+          "total": 27,
+          "matched": 27,
+          "imputed": 0,
+          "skipped": 0,
+          "measured_percent": 100.0,
+          "effective_percent": 100.0
+        },
+        "raw_score": 0.5,
+        "reference_comparison": {
+          "status": "evaluated",
+          "reason": null,
+          "population": "EUR",
+          "sample_count": 503,
+          "reference_snps": 27,
+          "patient_snps": 27,
+          "percentile": 50.0,
+          "category": "average",
+          "category_label": "Среднее",
+          "z_score": 0.0
+        },
+        "stability": {
+          "quality": "good",
+          "r_squared": 1.0,
+          "tier_agreement": 1.0,
+          "percentile_interval": {
+            "lower": 50.0,
+            "upper": 50.0
+          }
+        },
+        "research_effect": null
+      },
+      {
+        "pgs_id": "PGS000200",
+        "trait_id": "coronary_disease",
+        "trait": "ИБС (28 SNP)",
+        "source_url": "https://www.pgscatalog.org/score/PGS000200/",
+        "status": "evaluated",
+        "reason": {
+          "code": "uncalibrated_score",
+          "message": "Исследовательская сумма весов"
+        },
+        "coverage": {
+          "total": 28,
+          "matched": 28,
+          "imputed": 0,
+          "skipped": 0,
+          "measured_percent": 100.0,
+          "effective_percent": 100.0
+        },
+        "raw_score": 0.5,
+        "reference_comparison": {
+          "status": "evaluated",
+          "reason": null,
+          "population": "EUR",
+          "sample_count": 503,
+          "reference_snps": 28,
+          "patient_snps": 28,
+          "percentile": 50.0,
+          "category": "average",
+          "category_label": "Среднее",
+          "z_score": 0.0
+        },
+        "stability": {
+          "quality": "good",
+          "r_squared": 1.0,
+          "tier_agreement": 1.0,
+          "percentile_interval": {
+            "lower": 50.0,
+            "upper": 50.0
+          }
+        },
+        "research_effect": null
+      },
+      {
+        "pgs_id": "PGS002733",
+        "trait_id": "type_2_diabetes",
+        "trait": "Диабет 2 типа (17 SNP)",
+        "source_url": "https://www.pgscatalog.org/score/PGS002733/",
+        "status": "evaluated",
+        "reason": {
+          "code": "uncalibrated_score",
+          "message": "Исследовательская сумма весов"
+        },
+        "coverage": {
+          "total": 17,
+          "matched": 17,
+          "imputed": 0,
+          "skipped": 0,
+          "measured_percent": 100.0,
+          "effective_percent": 100.0
+        },
+        "raw_score": 0.5,
+        "reference_comparison": {
+          "status": "evaluated",
+          "reason": null,
+          "population": "EUR",
+          "sample_count": 503,
+          "reference_snps": 17,
+          "patient_snps": 17,
+          "percentile": 50.0,
+          "category": "average",
+          "category_label": "Среднее",
+          "z_score": 0.0
+        },
+        "stability": {
+          "quality": "good",
+          "r_squared": 1.0,
+          "tier_agreement": 1.0,
+          "percentile_interval": {
+            "lower": 50.0,
+            "upper": 50.0
+          }
+        },
+        "research_effect": null
+      },
+      {
+        "pgs_id": "PGS004106",
+        "trait_id": "type_2_diabetes",
+        "trait": "Диабет 2 типа (35 SNP)",
+        "source_url": "https://www.pgscatalog.org/score/PGS004106/",
+        "status": "evaluated",
+        "reason": {
+          "code": "uncalibrated_score",
+          "message": "Исследовательская сумма весов"
+        },
+        "coverage": {
+          "total": 35,
+          "matched": 35,
+          "imputed": 0,
+          "skipped": 0,
+          "measured_percent": 100.0,
+          "effective_percent": 100.0
+        },
+        "raw_score": 0.5,
+        "reference_comparison": {
+          "status": "evaluated",
+          "reason": null,
+          "population": "EUR",
+          "sample_count": 503,
+          "reference_snps": 35,
+          "patient_snps": 35,
+          "percentile": 50.0,
+          "category": "average",
+          "category_label": "Среднее",
+          "z_score": 0.0
+        },
+        "stability": {
+          "quality": "good",
+          "r_squared": 1.0,
+          "tier_agreement": 1.0,
+          "percentile_interval": {
+            "lower": 50.0,
+            "upper": 50.0
+          }
+        },
+        "research_effect": null
+      },
+      {
+        "pgs_id": "PGS000037",
+        "trait_id": "asthma",
+        "trait": "Астма (15 SNP)",
+        "source_url": "https://www.pgscatalog.org/score/PGS000037/",
+        "status": "evaluated",
+        "reason": {
+          "code": "uncalibrated_score",
+          "message": "Исследовательская сумма весов"
+        },
+        "coverage": {
+          "total": 15,
+          "matched": 15,
+          "imputed": 0,
+          "skipped": 0,
+          "measured_percent": 100.0,
+          "effective_percent": 100.0
+        },
+        "raw_score": 0.5,
+        "reference_comparison": {
+          "status": "evaluated",
+          "reason": null,
+          "population": "EUR",
+          "sample_count": 503,
+          "reference_snps": 15,
+          "patient_snps": 15,
+          "percentile": 50.0,
+          "category": "average",
+          "category_label": "Среднее",
+          "z_score": 0.0
+        },
+        "stability": {
+          "quality": "good",
+          "r_squared": 1.0,
+          "tier_agreement": 1.0,
+          "percentile_interval": {
+            "lower": 50.0,
+            "upper": 50.0
+          }
+        },
+        "research_effect": null
+      },
+      {
+        "pgs_id": "PGS001281",
+        "trait_id": "migraine",
+        "trait": "Мигрень (25 SNP)",
+        "source_url": "https://www.pgscatalog.org/score/PGS001281/",
+        "status": "evaluated",
+        "reason": {
+          "code": "uncalibrated_score",
+          "message": "Исследовательская сумма весов"
+        },
+        "coverage": {
+          "total": 25,
+          "matched": 25,
+          "imputed": 0,
+          "skipped": 0,
+          "measured_percent": 100.0,
+          "effective_percent": 100.0
+        },
+        "raw_score": 0.5,
+        "reference_comparison": {
+          "status": "evaluated",
+          "reason": null,
+          "population": "EUR",
+          "sample_count": 503,
+          "reference_snps": 25,
+          "patient_snps": 25,
+          "percentile": 50.0,
+          "category": "average",
+          "category_label": "Среднее",
+          "z_score": 0.0
+        },
+        "stability": {
+          "quality": "good",
+          "r_squared": 1.0,
+          "tier_agreement": 1.0,
+          "percentile_interval": {
+            "lower": 50.0,
+            "upper": 50.0
+          }
+        },
+        "research_effect": null
+      },
+      {
+        "pgs_id": "PGS003400",
+        "trait_id": "obesity",
+        "trait": "Ожирение (97 SNP)",
+        "source_url": "https://www.pgscatalog.org/score/PGS003400/",
+        "status": "evaluated",
+        "reason": {
+          "code": "uncalibrated_score",
+          "message": "Исследовательская сумма весов"
+        },
+        "coverage": {
+          "total": 97,
+          "matched": 97,
+          "imputed": 0,
+          "skipped": 0,
+          "measured_percent": 100.0,
+          "effective_percent": 100.0
+        },
+        "raw_score": 0.5,
+        "reference_comparison": {
+          "status": "evaluated",
+          "reason": null,
+          "population": "EUR",
+          "sample_count": 503,
+          "reference_snps": 97,
+          "patient_snps": 97,
+          "percentile": 50.0,
+          "category": "average",
+          "category_label": "Среднее",
+          "z_score": 0.0
+        },
+        "stability": {
+          "quality": "good",
+          "r_squared": 1.0,
+          "tier_agreement": 1.0,
+          "percentile_interval": {
+            "lower": 50.0,
+            "upper": 50.0
+          }
+        },
+        "research_effect": null
+      },
+      {
+        "pgs_id": "PGS000063",
+        "trait_id": "triglycerides",
+        "trait": "Уровень триглицеридов (32 SNP)",
+        "source_url": "https://www.pgscatalog.org/score/PGS000063/",
+        "status": "evaluated",
+        "reason": {
+          "code": "uncalibrated_score",
+          "message": "Исследовательская сумма весов"
+        },
+        "coverage": {
+          "total": 32,
+          "matched": 32,
+          "imputed": 0,
+          "skipped": 0,
+          "measured_percent": 100.0,
+          "effective_percent": 100.0
+        },
+        "raw_score": 0.5,
+        "reference_comparison": {
+          "status": "evaluated",
+          "reason": null,
+          "population": "EUR",
+          "sample_count": 503,
+          "reference_snps": 32,
+          "patient_snps": 32,
+          "percentile": 50.0,
+          "category": "average",
+          "category_label": "Среднее",
+          "z_score": 0.0
+        },
+        "stability": {
+          "quality": "good",
+          "r_squared": 1.0,
+          "tier_agreement": 1.0,
+          "percentile_interval": {
+            "lower": 50.0,
+            "upper": 50.0
+          }
+        },
+        "research_effect": null
+      }
+    ]
+  },
+  "quality": {
+    "total_records": 9,
+    "usable_records": 9,
+    "skipped_records": 0,
+    "alt_records": 1,
+    "unmatched_annotations": 0,
+    "issues": [
+      {
+        "code": "quality_not_filtered",
+        "message": "FILTER, глубина и качество вызовов автоматически не проверялись."
+      }
+    ]
+  },
+  "limitations": [
+    "Демонстрационные синтетические данные; не результат анализа пациента.",
+    "Отчёт предназначен для экспертного разбора и не устанавливает диагноз.",
+    "Перцентиль PGS — положение балла в EUR-референсе, не вероятность заболевания.",
+    "Генетическое происхождение пациента и применимость EUR-референса не определялись.",
+    "Качество вызовов, глубина покрытия и FILTER автоматически не оценивались.",
+    "Отсутствие записи в VCF не означает отсутствие аллеля; охват вариантов и моделей ограничен.",
+    "Значимые варианты требуют клинического подтверждения и сопоставления с фенотипом."
+  ],
+  "provenance": {
+    "rules_reviewed": "2026-11-08",
+    "resources": [
+      {
+        "name": "clinical_findings.yaml",
+        "sha256": "cf5620741612ca98832fa6aeb980cecb5b5892464a384adbd9f12d7bc38440d3"
+      },
+      {
+        "name": "complex_genotypes.yaml",
+        "sha256": "6e1d4d778587268e12abdc7931a0da7b133880635277add9ef6f71bcc70a29de"
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://myvariant.info/",
+        "citation": null,
+        "doi": null,
+        "pubmed": null,
+        "reference": null
+      },
+      {
+        "url": "https://www.pgscatalog.org/",
+        "citation": null,
+        "doi": null,
+        "pubmed": null,
+        "reference": null
+      },
+      {
+        "url": "https://www.internationalgenome.org/",
+        "citation": null,
+        "doi": null,
+        "pubmed": null,
+        "reference": null
+      }
+    ],
+    "annotation_cache_policy": "Ответы MyVariant сохраняются без автоматического срока обновления."
+  }
+}

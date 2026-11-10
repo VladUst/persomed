@@ -45,7 +45,7 @@ Register new ORM models in `src/models/__init__.py` and routers in `src/api/__in
 
 ## Testing Guidelines
 
-No automated test suite, configured framework, or coverage threshold exists. `scripts/pyctd/test.py` is an exploratory script. Verify affected endpoints through `http://localhost:8000/docs`, covering success, invalid input, missing records, and patient ownership. Record reproduction commands and expected responses in the PR. If adding automated tests, use `tests/test_<feature>.py` and document their runner.
+Genetic-analysis tests live in `tests/` and use `python -m unittest discover -s tests -v`; install `requirements-test.txt` first. They use synthetic VCFs, temporary storage/SQLite and mocked network calls. No coverage threshold or CI exists. `scripts/pyctd/test.py` is an exploratory script. Verify other affected endpoints through `http://localhost:8000/docs`, covering success, invalid input, missing records, and patient ownership. Record reproduction commands and expected responses in the PR. Add tests as `tests/test_<feature>.py`.
 
 ## Commit & Pull Request Guidelines
 

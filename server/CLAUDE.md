@@ -6,7 +6,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 PersoMed server: a FastAPI backend for a personalized medical information system. It stores a patient's digital profile (health indicators, medical documents) and runs NLP/ML analysis on it (symptom extraction, disease prediction, risk factors, drug recommendations). User-facing strings, API tags, docstrings and most comments are in **Russian**; keep new user-facing text in Russian.
 
-There is no test suite, linter config or CI. You can check changes by running the server and calling the endpoints through Swagger at `http://localhost:8000/docs`.
+Genetic-analysis tests use `python -m unittest discover -s tests -v`; install
+`requirements-test.txt` first. There is no linter config or CI. Other domains
+are checked through Swagger at `http://localhost:8000/docs`.
 
 ## Commands
 
@@ -86,6 +88,11 @@ Patient-scoped routes receive `patient_id` from the path. They must inject it on
 - The service "info" strings hardcode some counts ("135 заболеваний", "112 лекарственных препаратов") even though the code computes the real counts.
 
 ### Genetics (`scripts/genes_analysis/`, experimental, not wired into the API)
+
+The standalone CLI remains unchanged. Its API implementation now lives in
+`src/services/gene_analysis/`, mounted at `/api/patients/{patient_id}/genes`.
+See [the service runbook](src/services/gene_analysis/README.md) for the typed report,
+atomic profile replacement, persisted partial reports, shared caches and tests.
 
 The standalone VCF pipeline is documented in [`.claude/docs/genes-analysis-script.md`](.claude/docs/genes-analysis-script.md), including its related files, run commands, caches, PGS interpretation, and limitations. It is research-only and does not return a clinically validated disease probability.
 

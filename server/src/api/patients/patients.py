@@ -6,6 +6,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.db_depends import get_async_db
 from src.schemas.patients import PatientCreate, PatientUpdate, PatientResponse
 from src.repositories.patients import PatientRepository
+from src.api.genes.dependencies import locked_patient
+from src.services.gene_analysis.profile_storage import ProfileStorage
+from starlette.concurrency import run_in_threadpool
 
 router = APIRouter(
     prefix="/patients",
@@ -45,9 +48,11 @@ async def update_patient(patient_id: int, data: PatientUpdate, db: AsyncSession 
 
 
 @router.delete("/{patient_id}", status_code=status.HTTP_204_NO_CONTENT, summary="Удалить пациента")
-async def delete_patient(patient_id: int, db: AsyncSession = Depends(get_async_db)):
+async def delete_patient(patient_id: int, db: AsyncSession = Depends(get_async_db),
+                         storage: ProfileStorage = Depends(locked_patient)):
     repository = PatientRepository(db)
     patient = await repository.get_by_id(patient_id)
     if not patient:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Пациент с ID {patient_id} не найден")
+    await run_in_threadpool(storage.delete, patient_id)
     await repository.delete(patient_id)

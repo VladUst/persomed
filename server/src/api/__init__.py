@@ -8,12 +8,14 @@ from src.api.recommendations import router as recommendations_router
 from src.api.risk_analysis import router as risk_analysis_router
 from src.api.text_processing import router as text_processing_router
 from src.api.patient_status import router as patient_status_router
+from src.api.genes import router as genes_router
 
 patient_info_router = APIRouter(prefix="/patients/{patient_id}")
 patient_info_router.include_router(health_indicators_router)
 patient_info_router.include_router(medical_documents_router)
 patient_info_router.include_router(risk_analysis_router)
 patient_info_router.include_router(patient_status_router)
+patient_info_router.include_router(genes_router)
 
 router = APIRouter(prefix="/api")
 router.include_router(patients_router)
