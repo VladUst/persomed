@@ -1,8 +1,6 @@
 venv
-venv-pyctd
 src/services/text_processing/models
 persomed.db
-pyctd.db
 .idea
 .cursor
 .claude
