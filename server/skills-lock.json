@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "fastapi": {
+      "source": "fastapi/fastapi",
+      "sourceType": "github",
+      "skillPath": "fastapi/.agents/skills/fastapi/SKILL.md",
+      "computedHash": "7ca975c93b0a2f93eb5337e93dde4cf70ec24fcb154f28c388a087ce9b1e033b"
+    }
+  }
+}
