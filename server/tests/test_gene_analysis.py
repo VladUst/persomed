@@ -334,6 +334,28 @@ class ApiCase(unittest.TestCase):
                 self.assertEqual(report.status, name)
             self.assertEqual(client.get("/docs").status_code, 200)
 
+    def test_local_frontend_cors(self):
+        from src.main import app
+
+        with TestClient(app) as client:
+            for origin in ("http://localhost:5173", "http://127.0.0.1:5173"):
+                with self.subTest(origin=origin):
+                    response = client.options(
+                        "/api/patients/1/genes/profile",
+                        headers={
+                            "Origin": origin,
+                            "Access-Control-Request-Method": "POST",
+                            "Access-Control-Request-Headers": "content-type",
+                        },
+                    )
+                    self.assertEqual(response.status_code, 200)
+                    self.assertEqual(
+                        response.headers["access-control-allow-origin"], origin
+                    )
+                    self.assertIn(
+                        "POST", response.headers["access-control-allow-methods"]
+                    )
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -176,8 +176,7 @@ export const RecommendationsForm = (props: RecommendationsFormProps) => {
             key={medication.id}
             direction="row"
             spacing={2}
-            alignItems="center"
-            sx={{ width: "100%", mb: 1 }}
+            sx={{ width: "100%", mb: 1, alignItems: "center" }}
           >
             <Autocomplete
               freeSolo

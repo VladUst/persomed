@@ -1,36 +1,37 @@
 {
-    "env": {
-        "browser": true,
-        "es2021": true
-    },
-    "extends": [
-        "standard-with-typescript",
-        "plugin:react/recommended",
-        "plugin:react-hooks/recommended",
-        "plugin:prettier/recommended",
-        "prettier"
-    ],
-    "parserOptions": {
-        "ecmaVersion": "latest",
-        "sourceType": "module"
-    },
-    "plugins": [
-        "react",
-        "prettier"
-    ],
-    "rules": {
-        "react/react-in-jsx-scope": ["off"],
-        "react/jsx-uses-react": ["off"], 
-        "react/jsx-props-no-spreading": ["warn"],
-        "react/no-unescaped-entities": ["off"],
-        "react/display-name": "off",
-        "react-hooks/rules-of-hooks": "error",
-        "react-hooks/exhaustive-deps": "error",
-        "@typescript-eslint/strict-boolean-expressions": "off",
-        "@typescript-eslint/explicit-function-return-type": "off",
-        "@typescript-eslint/promise-function-async": "off",
-        "@typescript-eslint/no-non-null-assertion": ["warn"],
-        "@typescript-eslint/no-confusing-void-expression": "off"
-    },
-    "ignorePatterns": [".eslintrc.cjs", "vite.config.ts"]
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
+  "extends": [
+    "standard-with-typescript",
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended",
+    "plugin:prettier/recommended",
+    "prettier"
+  ],
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "plugins": ["react", "prettier"],
+  "rules": {
+    "react/react-in-jsx-scope": ["off"],
+    "react/jsx-uses-react": ["off"],
+    "react/jsx-props-no-spreading": ["warn"],
+    "react/no-unescaped-entities": ["off"],
+    "react/display-name": "off",
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "error",
+    "@typescript-eslint/strict-boolean-expressions": "off",
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/promise-function-async": "off",
+    "@typescript-eslint/no-non-null-assertion": ["warn"],
+    "@typescript-eslint/no-confusing-void-expression": "off"
+  },
+  "ignorePatterns": [
+    ".eslintrc.cjs",
+    "vite.config.ts",
+    "src/shared/api/schema.ts"
+  ]
 }

@@ -133,15 +133,18 @@ export const AnamnesisForm = (props: AnamnesisFormProps) => {
           options={symptomOptions}
           value={formState.symptoms}
           onChange={(_, newValue) => handleChange("symptoms", newValue)}
-          renderTags={(value, getTagProps) =>
-            value.map((option, index) => (
-              // eslint-disable-next-line react/jsx-key
-              <Chip
-                variant="outlined"
-                label={option}
-                {...getTagProps({ index })}
-              />
-            ))
+          renderValue={(value, getItemProps) =>
+            value.map((option, index) => {
+              const { key, ...itemProps } = getItemProps({ index });
+              return (
+                <Chip
+                  key={key}
+                  variant="outlined"
+                  label={option}
+                  {...itemProps}
+                />
+              );
+            })
           }
           renderInput={(params) => (
             <TextField

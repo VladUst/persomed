@@ -2,10 +2,12 @@ import { type RouteProps } from "react-router-dom";
 import { DigitalProfilePage } from "@/pages/DigitalProfilePage";
 import { HealthIndicatorsPage } from "@/pages/HealthIndicatorsPage";
 import { ChatPage } from "@/pages/ChatPage";
+import { GeneticProfilePage } from "@/pages/GeneticProfilePage";
 import {
   AppRoutes,
   getRouteChat,
   getRouteDigitalProfile,
+  getRouteGeneticProfile,
   getRouteDocumentDetails,
   getRouteHealthIndicators,
   getRouteStatusDetails,
@@ -27,6 +29,10 @@ export const routeConfig: Record<AppRoutes, RouteProps> = {
   [AppRoutes.STATUS_PANEL]: {
     path: getRouteStatusPanel(),
     element: <StatusPanelPage />,
+  },
+  [AppRoutes.GENETIC_PROFILE]: {
+    path: getRouteGeneticProfile(),
+    element: <GeneticProfilePage />,
   },
   [AppRoutes.CHAT]: {
     path: getRouteChat(),

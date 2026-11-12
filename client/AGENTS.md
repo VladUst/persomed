@@ -2,7 +2,7 @@
 
 ## Project Structure & Module Organization
 
-This `client/` directory is the React 18, TypeScript, and Vite frontend for PersoMed. `src/main.tsx` mounts the app; `src/app/` contains global styles and route configuration. UI code is grouped by responsibility: `pages/` for routes, `widgets/` for page-level blocks, `features/` for user actions, `entities/` for domain displays, and `shared/` for reusable components, helpers, constants, fonts, and SVG icons. Within a module, keep components in `ui/`, types or logic in `model/`, and public exports in `index.ts`. There is currently no test directory.
+This `client/` directory is the React 19, TypeScript, and Vite frontend for PersoMed. `src/main.tsx` mounts the app; `src/app/` contains global styles and route configuration. UI code is grouped by responsibility: `pages/` for routes, `widgets/` for page-level blocks, `features/` for user actions, `entities/` for domain displays, and `shared/` for reusable components, helpers, constants, fonts, and SVG icons. Within a module, keep components in `ui/`, types or logic in `model/`, and public exports through `index.ts`. There is currently no test directory.
 
 ## Build, Test, and Development Commands
 

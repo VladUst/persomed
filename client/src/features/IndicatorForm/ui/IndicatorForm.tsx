@@ -14,7 +14,7 @@ import type { Dayjs } from "dayjs";
 import { useState, useEffect } from "react";
 import dayjs from "dayjs";
 import { type HealthMeasurementData } from "@/entities/HealthMeasurement";
-import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutlined";
 
 interface IndicatorFormProps {
   className?: string;

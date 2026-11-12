@@ -5,6 +5,7 @@ import { AppLink } from "@/shared/ui/AppLink";
 import {
   getRouteChat,
   getRouteDigitalProfile,
+  getRouteGeneticProfile,
   getRouteHealthIndicators,
   getRouteStatusPanel,
 } from "@/shared/const/router";
@@ -19,6 +20,7 @@ export const Navbar = memo(({ className }: NavbarProps) => {
       <AppLink to={getRouteDigitalProfile()}>Цифровой профиль</AppLink>
       <AppLink to={getRouteHealthIndicators()}>Показатели здоровья</AppLink>
       <AppLink to={getRouteStatusPanel()}>Панель состояния</AppLink>
+      <AppLink to={getRouteGeneticProfile()}>Генетический профиль</AppLink>
       <AppLink to={getRouteChat()}>Чат</AppLink>
     </header>
   );

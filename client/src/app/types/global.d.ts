@@ -12,3 +12,9 @@ declare module "*.svg" {
   const content: React.FunctionComponent<React.SVGAttributes<SVGElement>>;
   export default content;
 }
+
+interface ImportMeta {
+  readonly env: {
+    readonly VITE_API_BASE_URL?: string;
+  };
+}

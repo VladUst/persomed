@@ -78,7 +78,7 @@ export const IndicatorChart = (props: IndicatorChartProps) => {
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" dy={10} />
           <YAxis />
-          <Tooltip formatter={(value: string) => [`${value}`, "Значение"]} />
+          <Tooltip formatter={(value) => [String(value ?? ""), "Значение"]} />
 
           {isLevelsVisible && (
             <>
