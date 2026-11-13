@@ -41,13 +41,6 @@ export const GeneticProfilePage = () => {
           >
             PersoMed · пациент № {PATIENT_ID}
           </Typography>
-          <Typography component="h1" variant="h4" sx={{ fontWeight: 800 }}>
-            Генетический профиль
-          </Typography>
-          <Typography color="text.secondary">
-            Врачебный разбор VCF с находками, доказательствами и ограничениями
-            анализа.
-          </Typography>
         </Stack>
 
         {profileQuery.isPending && (

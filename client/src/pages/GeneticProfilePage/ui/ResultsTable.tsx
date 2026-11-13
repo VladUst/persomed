@@ -154,7 +154,7 @@ export const ResultsTable = ({
                 setPage(0);
               }}
               rowsPerPageOptions={[10, 25, 50]}
-              labelRowsPerPage="Строк на странице"
+              labelRowsPerPage="Строк в таблице"
               labelDisplayedRows={({ from, to, count }) =>
                 `${from}–${to} из ${count}`
               }

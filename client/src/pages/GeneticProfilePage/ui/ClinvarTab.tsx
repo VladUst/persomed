@@ -6,6 +6,7 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import type { GeneReport } from "../api/genes";
 import type { ClinvarItem, ReportDetail } from "../model/report";
+import { clinvarReviewStatus, clinvarSignificance } from "./clinvarFormatting";
 import { ResultsTable, type TableRowData } from "./ResultsTable";
 import { SectionHeading } from "./SectionHeading";
 
@@ -13,11 +14,14 @@ const clinvarCategories: Array<{
   key: ClinvarItem["category"];
   title: string;
 }> = [
-  { key: "candidate", title: "Кандидаты для проверки" },
-  { key: "conflicting", title: "Спорные заключения" },
-  { key: "uncertain", title: "Неопределённая значимость" },
-  { key: "association", title: "Ассоциации" },
-  { key: "drug_response", title: "Фармакогенетика" },
+  { key: "candidate", title: "Патогенные и вероятно патогенные" },
+  { key: "association", title: "Ассоциации с заболеваниями и признаками" },
+  {
+    key: "drug_response",
+    title: "Варианты, связанные с реакциями на лекарства",
+  },
+  { key: "conflicting", title: "Противоречивые классификации" },
+  { key: "uncertain", title: "Варианты неопределённой клинической значимости" },
 ];
 
 const getClinvarRows = (items: ClinvarItem[]): TableRowData[] =>
@@ -25,9 +29,10 @@ const getClinvarRows = (items: ClinvarItem[]): TableRowData[] =>
     id: item.id,
     cells: [
       item.genes.join(", ") || "Вариант",
-      item.conditions.join("; "),
       item.genotype,
-      item.review_status ?? "Не указан",
+      item.conditions.join("; "),
+      clinvarSignificance(item.significance.original),
+      clinvarReviewStatus(item.review_status),
     ],
     search: [
       item.genes,
@@ -35,6 +40,8 @@ const getClinvarRows = (items: ClinvarItem[]): TableRowData[] =>
       item.variant.rsid,
       item.accession,
       item.significance.original,
+      clinvarSignificance(item.significance.original),
+      clinvarReviewStatus(item.review_status),
     ].join(" "),
     detail: { kind: "clinvar", item },
   }));
@@ -105,7 +112,15 @@ export const ClinvarTab = ({
                     <Chip size="small" label={rows.length} variant="outlined" />
                   </Stack>
                   <ResultsTable
-                    headers={["Ген", "Состояние", "Генотип", "Статус проверки"]}
+                    headers={[
+                      "Ген",
+                      "Генотип",
+                      key === "drug_response"
+                        ? "Ответ на препарат"
+                        : "Заболевание или признак",
+                      "Заключение источника",
+                      "Статус проверки",
+                    ]}
                     rows={rows}
                     onOpen={onOpen}
                     emptyLabel="Нет записей."
