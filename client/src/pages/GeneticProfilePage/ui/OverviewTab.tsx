@@ -126,14 +126,14 @@ export const OverviewTab = ({
                 <Typography variant="body2" sx={{ my: 1 }}>
                   {item?.reference_comparison.percentile == null
                     ? "EUR-сравнение недоступно"
-                    : `${formatNumber(item.reference_comparison.percentile)}-й перцентиль среди EUR-образцов`}
+                    : `Перцентиль среди EUR-образцов: ${formatNumber(item.reference_comparison.percentile)}`}
                 </Typography>
                 {item && (
                   <Button
                     size="small"
                     onClick={() => onOpen({ kind: "pgs", item })}
                   >
-                    Детали модели
+                    Подрнобности
                   </Button>
                 )}
               </Paper>

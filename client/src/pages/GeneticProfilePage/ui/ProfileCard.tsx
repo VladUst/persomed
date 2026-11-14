@@ -74,7 +74,7 @@ export const ProfileCard = ({
         sx={{ gap: 2, alignItems: { sm: "center" } }}
       >
         <Button component="label" variant="outlined">
-          Выбрать файл профиля
+          Выбрать файл VCF
           <input type="file" accept=".vcf" hidden onChange={onSelectFile} />
         </Button>
         {selectedFile && (

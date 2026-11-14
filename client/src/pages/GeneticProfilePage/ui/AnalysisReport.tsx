@@ -88,7 +88,7 @@ export const AnalysisReport = ({ report }: { report: GeneReport }) => {
             {...tabProps(1)}
           />
           <Tab
-            label={`Проверенные генотипы (${ruleItems.length})`}
+            label={`Правила генотипов (${ruleItems.length})`}
             {...tabProps(2)}
           />
           <Tab

@@ -33,14 +33,14 @@ export const GenotypeRulesTab = ({
   onOpen: (detail: ReportDetail) => void;
 }) => (
   <>
-    <SectionHeading title="Оценки отдельных генетических маркеров" />
+    <SectionHeading title="Оценки отдельных генетических маркеров по правилам" />
     <ResultsTable
       headers={[
         "Ген",
         "Заболевание или признак",
         "Варианты",
         "Статус",
-        "Результат или причина",
+        "Результат",
       ]}
       rows={getRuleRows(report.genotype_rules.items ?? [])}
       onOpen={onOpen}
