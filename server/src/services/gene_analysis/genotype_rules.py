@@ -29,9 +29,10 @@ def evaluate_complex_genotypes(variants_df: pd.DataFrame) -> list[dict]:
         choices = rule["diplotype_risk"] if rule["type"] == "haplotype" else rule["genotypes"]
         result = {
             "id": rule["id"], "gene": rule["name"], "genotype": "—",
+            "rsids": required,
             "disease": next(iter(choices.values()))["disease"], "status": "not_evaluated",
             "risk_level": "Не оценено", "risk_code": None, "details": "", "reason_code": None,
-            "effect": None, "sources": rule["sources"], "observed": [], "diplotype": None,
+            "effect": None, "sources": rule["sources"], "observed": [],
         }
         rows = [row for rsid in required for row in lookup.get(rsid, [])]
         result["observed"] = rows
@@ -40,7 +41,7 @@ def evaluate_complex_genotypes(variants_df: pd.DataFrame) -> list[dict]:
         if ambiguous:
             result.update(reason_code="ambiguous_variant", details=f"Неоднозначные записи: {', '.join(ambiguous)}")
         elif missing:
-            result.update(reason_code="missing_variant", details=f"В VCF отсутствует: {', '.join(missing)}")
+            result.update(reason_code="missing_variant", details=f"Отсутствует: {', '.join(missing)}")
         elif rule["type"] == "haplotype":
             heterozygous = [row for row in rows if row["allele_1"] != row["allele_2"]]
             phase_sets = {row["phase_set"] for row in heterozygous}
@@ -54,7 +55,7 @@ def evaluate_complex_genotypes(variants_df: pd.DataFrame) -> list[dict]:
                 haplotypes = [_haplotype(rule, {row["rsid"]: row[key] for row in rows})
                               for key in ("allele_1", "allele_2")]
                 diplotype = "/".join(sorted(haplotypes))
-                result.update(genotype=diplotype, diplotype=diplotype)
+                result["genotype"] = diplotype
                 _apply_choice(result, choices.get(diplotype))
         else:
             row = rows[0]

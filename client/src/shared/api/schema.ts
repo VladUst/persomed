@@ -1495,8 +1495,6 @@ export interface components {
             clinical_question: string;
             /** Next Step */
             next_step: string;
-            /** Limitations */
-            limitations: string[];
             /** Evidence Refs */
             evidence_refs: components["schemas"]["EvidenceRef"][];
             /** Sources */
@@ -1530,8 +1528,6 @@ export interface components {
             genotype_rules: components["schemas"]["Section_GenotypeRuleItem_"];
             polygenic_scores: components["schemas"]["Section_PolygenicScoreItem_"];
             quality: components["schemas"]["Quality"];
-            /** Limitations */
-            limitations: string[];
             provenance: components["schemas"]["Provenance"];
         };
         /** GeneralInfo */
@@ -1624,6 +1620,8 @@ export interface components {
             genes: string[];
             /** Condition */
             condition: string;
+            /** Rsids */
+            rsids: string[];
             /**
              * Status
              * @enum {string}
@@ -1632,12 +1630,8 @@ export interface components {
             reason: components["schemas"]["Issue"] | null;
             /** Observed Variants */
             observed_variants: components["schemas"]["ObservedVariant"][];
-            /** Diplotype */
-            diplotype: string | null;
             result: components["schemas"]["RuleResult"] | null;
             effect: components["schemas"]["RuleEffect"] | null;
-            /** Limitations */
-            limitations: string[];
             /** Sources */
             sources: components["schemas"]["Source"][];
         };
@@ -2526,8 +2520,6 @@ export interface components {
             doi?: string | null;
             /** Pubmed */
             pubmed?: string | null;
-            /** Reference */
-            reference?: string | null;
         };
         /** Stability */
         Stability: {

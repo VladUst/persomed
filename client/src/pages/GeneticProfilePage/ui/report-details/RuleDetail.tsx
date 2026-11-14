@@ -4,35 +4,31 @@ import { Field, Sources } from "./DetailFields";
 
 export const RuleDetail = ({ item }: { item: GenotypeRuleItem }) => (
   <>
-    <Field label="Гены" value={item.genes.join(", ")} />
+    <Field label="Ген" value={item.genes.join(", ")} />
+    <Field label="Заболевание или признак" value={item.condition} />
     <Field label="Статус" value={resultStatus(item.status)} />
     {item.reason && (
-      <Field
-        label="Причина пропуска"
-        value={`${item.reason.message} (${item.reason.code})`}
-      />
+      <Field label="Причина пропуска" value={item.reason.message} />
     )}
+    <Field label="Вариант" value={item.rsids.join(", ")} />
     <Field
-      label="Наблюдаемые варианты"
+      label="Генотип"
       value={
         item.observed_variants.length
           ? item.observed_variants
-              .map(
-                (variant) =>
-                  `${variant.rsid}: ${variant.genotype} [${variant.alleles.join("/")}]${variant.phased ? `, фаза ${variant.phase_set ?? "указана"}` : ", фаза не установлена"}`,
+              .map((variant) =>
+                item.rsids.length > 1
+                  ? `${variant.rsid}: ${variant.alleles.join("/")}`
+                  : variant.alleles.join("/"),
               )
               .join("; ")
           : "Нет данных"
       }
     />
-    <Field label="Диплотип" value={item.diplotype} />
     {item.result && (
       <>
-        <Field
-          label="Результат"
-          value={`${item.result.label} (${item.result.code})`}
-        />
-        <Field label="Объяснение" value={item.result.explanation} />
+        <Field label="Результат" value={item.result.label} />
+        <Field label="Пояснение" value={item.result.explanation} />
       </>
     )}
     {item.effect && (
@@ -47,7 +43,6 @@ export const RuleDetail = ({ item }: { item: GenotypeRuleItem }) => (
         />
       </>
     )}
-    <Field label="Ограничения" value={item.limitations.join("; ")} />
     <Field label="Источники" value={<Sources sources={item.sources} />} />
   </>
 );

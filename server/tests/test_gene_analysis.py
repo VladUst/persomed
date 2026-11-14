@@ -129,6 +129,11 @@ class StorageCase(unittest.TestCase):
         self.assertIsNone(first.summary.other_candidate_variants_count)
         self.assertEqual(len(first.polygenic_scores.items), 14)
         self.assertEqual(len(first.genotype_rules.items), 7)
+        self.assertEqual(first.genotype_rules.items[0].rsids, ["rs429358", "rs7412"])
+        data = first.model_dump(mode="json")
+        self.assertNotIn("limitations", data)
+        self.assertNotIn("diplotype", data["genotype_rules"]["items"][0])
+        self.assertNotIn("limitations", data["genotype_rules"]["items"][0])
         self.assertNotIn("NaN", first.model_dump_json())
         path = self.storage.profile_dir(1, profile) / "analysis.json"
         path.write_text("broken")

@@ -8,15 +8,16 @@ const getRuleRows = (items: GenotypeRuleItem[]): TableRowData[] =>
   items.map((item) => ({
     id: item.id,
     cells: [
-      item.condition,
       item.genes.join(", "),
+      item.condition,
+      item.rsids.join(", "),
       resultStatus(item.status),
       item.result?.label ?? item.reason?.message ?? "—",
-      item.diplotype ?? "—",
     ],
     search: [
       item.condition,
       item.genes,
+      item.rsids,
       item.id,
       item.result?.label,
       item.reason?.message,
@@ -32,14 +33,14 @@ export const GenotypeRulesTab = ({
   onOpen: (detail: ReportDetail) => void;
 }) => (
   <>
-    <SectionHeading title="Правила генотипов" />
+    <SectionHeading title="Оценки отдельных генетических маркеров" />
     <ResultsTable
       headers={[
-        "Состояние",
-        "Гены",
-        "Оценка",
+        "Ген",
+        "Заболевание или признак",
+        "Варианты",
+        "Статус",
         "Результат или причина",
-        "Диплотип",
       ]}
       rows={getRuleRows(report.genotype_rules.items ?? [])}
       onOpen={onOpen}

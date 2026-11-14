@@ -26,9 +26,6 @@
         "interpretation": "Патогенный вариант DHCR7 в ClinVar; для проявления рецессивного заболевания обычно нужны два поражённых аллеля.",
         "clinical_question": "Есть ли клинические признаки или задача репродуктивного консультирования?",
         "next_step": "Подтвердить вариант клиническим методом; при необходимости обсудить панель DHCR7 и генетическое консультирование.",
-        "limitations": [
-          "Одна найденная копия не подтверждает заболевание и не исключает другой вариант, не представленный в VCF."
-        ],
         "evidence_refs": [
           {
             "section": "clinvar",
@@ -40,15 +37,14 @@
             "url": "https://www.ncbi.nlm.nih.gov/clinvar/RCV000020436/",
             "citation": null,
             "doi": null,
-            "pubmed": null,
-            "reference": null
+            "pubmed": null
           }
         ]
       }
     ],
     "not_detected": [
       {
-        "message": "F5: указанный аллель не выявлен",
+        "message": "F5: проверяемый вариант не обнаружен",
         "evidence_refs": [
           {
             "section": "genotype_rules",
@@ -57,7 +53,7 @@
         ]
       },
       {
-        "message": "F2: указанный аллель не выявлен",
+        "message": "F2: проверяемый вариант не обнаружен",
         "evidence_refs": [
           {
             "section": "genotype_rules",
@@ -66,7 +62,7 @@
         ]
       },
       {
-        "message": "HFE: указанный аллель не выявлен",
+        "message": "HFE: проверяемый вариант не обнаружен",
         "evidence_refs": [
           {
             "section": "genotype_rules",
@@ -75,7 +71,7 @@
         ]
       },
       {
-        "message": "HFE: указанный аллель не выявлен",
+        "message": "HFE: проверяемый вариант не обнаружен",
         "evidence_refs": [
           {
             "section": "genotype_rules",
@@ -84,7 +80,7 @@
         ]
       },
       {
-        "message": "PCSK9: указанный аллель не выявлен",
+        "message": "PCSK9: проверяемый вариант не обнаружен",
         "evidence_refs": [
           {
             "section": "genotype_rules",
@@ -177,6 +173,10 @@
           "APOE"
         ],
         "condition": "Болезнь Альцгеймера",
+        "rsids": [
+          "rs429358",
+          "rs7412"
+        ],
         "status": "evaluated",
         "reason": null,
         "observed_variants": [
@@ -201,11 +201,10 @@
             "phase_set": null
           }
         ],
-        "diplotype": "e3/e3",
         "result": {
           "code": "reference",
           "label": "Референсный генотип",
-          "explanation": ""
+          "explanation": "Определён генотип APOE ε3/ε3. Он служит группой сравнения для указанных относительных оценок."
         },
         "effect": {
           "type": "OR",
@@ -216,35 +215,28 @@
               "url": "https://doi.org/10.1038/mp.2011.52",
               "citation": "Genin E, et al. APOE and Alzheimer disease: a major gene with semi-dominant inheritance. Mol Psychiatry. 2011;16(9):903-907.",
               "doi": "10.1038/mp.2011.52",
-              "pubmed": "21556001",
-              "reference": "Table 2 — OR по APOE-генотипу для европейских популяций. ε4/ε4 OR ≈ 11.6, ε3/ε4 OR ≈ 3.2, ε2/ε3 OR ≈ 0.6"
+              "pubmed": "21556001"
             },
             {
               "url": "https://doi.org/10.1038/s41467-019-14279-8",
               "citation": "Reiman EM, et al. Exceptionally low likelihood of Alzheimer's dementia in APOE2 homozygotes from a 5,000-person neuropathological study. Nat Commun. 2020;11(1):667.",
               "doi": "10.1038/s41467-019-14279-8",
-              "pubmed": "32015339",
-              "reference": "Table 1 — ε2/ε2 даёт OR ≈ 0.13 для AD по сравнению с ε3/ε3 (мы используем более консервативную оценку 0.6 из мета-анализов)"
+              "pubmed": "32015339"
             }
           ]
         },
-        "limitations": [
-          "Правило не устанавливает диагноз; OR не является абсолютной вероятностью."
-        ],
         "sources": [
           {
             "url": "https://doi.org/10.1038/mp.2011.52",
             "citation": "Genin E, et al. APOE and Alzheimer disease: a major gene with semi-dominant inheritance. Mol Psychiatry. 2011;16(9):903-907.",
             "doi": "10.1038/mp.2011.52",
-            "pubmed": "21556001",
-            "reference": "Table 2 — OR по APOE-генотипу для европейских популяций. ε4/ε4 OR ≈ 11.6, ε3/ε4 OR ≈ 3.2, ε2/ε3 OR ≈ 0.6"
+            "pubmed": "21556001"
           },
           {
             "url": "https://doi.org/10.1038/s41467-019-14279-8",
             "citation": "Reiman EM, et al. Exceptionally low likelihood of Alzheimer's dementia in APOE2 homozygotes from a 5,000-person neuropathological study. Nat Commun. 2020;11(1):667.",
             "doi": "10.1038/s41467-019-14279-8",
-            "pubmed": "32015339",
-            "reference": "Table 1 — ε2/ε2 даёт OR ≈ 0.13 для AD по сравнению с ε3/ε3 (мы используем более консервативную оценку 0.6 из мета-анализов)"
+            "pubmed": "32015339"
           }
         ]
       },
@@ -254,6 +246,9 @@
           "F5"
         ],
         "condition": "Тромбофилия (венозные тромбозы)",
+        "rsids": [
+          "rs6025"
+        ],
         "status": "evaluated",
         "reason": null,
         "observed_variants": [
@@ -268,37 +263,30 @@
             "phase_set": null
           }
         ],
-        "diplotype": null,
         "result": {
           "code": "not_detected",
-          "label": "Аллель не выявлен",
-          "explanation": "Вариант F5 Leiden не выявлен; общий риск венозного тромбоза по этому тесту не определяется"
+          "label": "Вариант не обнаружен",
+          "explanation": "Вариант F5 Leiden не обнаружен. Другие причины венозного тромбоза этот результат не исключает."
         },
         "effect": null,
-        "limitations": [
-          "Правило не устанавливает диагноз; OR не является абсолютной вероятностью."
-        ],
         "sources": [
           {
             "url": "https://doi.org/10.1056/NEJM199504063321403",
             "citation": "Ridker PM, et al. Mutation in the gene coding for coagulation factor V and the risk of myocardial infarction, stroke, and venous thrombosis in apparently healthy men. N Engl J Med. 1995;332(14):912-917.",
             "doi": "10.1056/NEJM199504063321403",
-            "pubmed": "7877648",
-            "reference": "Table 2 — относительный риск ВТЭ для гетерозигот ≈ 2.7 (CI 1.3-5.6); более поздние мета-анализы дают 5-7"
+            "pubmed": "7877648"
           },
           {
             "url": "https://ashpublications.org/blood/article/85/6/1504/180062/",
             "citation": "Rosendaal FR, et al. High risk of thrombosis in patients homozygous for factor V Leiden (activated protein C resistance). Blood. 1995;85(6):1504-1508.",
             "doi": null,
-            "pubmed": "7888671",
-            "reference": "Раздел Results — OR гомозигот ≈ 80 (CI 22-289) по сравнению с населением без мутации"
+            "pubmed": "7888671"
           },
           {
             "url": "https://doi.org/10.1001/jama.2009.853",
             "citation": "Segal JB, et al. Predictive value of factor V Leiden and prothrombin G20210A in adults with venous thromboembolism and in family members of those with a mutation: a systematic review. JAMA. 2009;301(23):2472-2485.",
             "doi": "10.1001/jama.2009.853",
-            "pubmed": "19531787",
-            "reference": "Table 2 — мета-анализ ВТЭ-рисков по обеим мутациям, OR гетерозигот F5 ≈ 4.9 (CI 4.1-5.9)"
+            "pubmed": "19531787"
           }
         ]
       },
@@ -308,6 +296,9 @@
           "F2"
         ],
         "condition": "Тромбофилия (венозные тромбозы)",
+        "rsids": [
+          "rs1799963"
+        ],
         "status": "evaluated",
         "reason": null,
         "observed_variants": [
@@ -322,30 +313,24 @@
             "phase_set": null
           }
         ],
-        "diplotype": null,
         "result": {
           "code": "not_detected",
-          "label": "Аллель не выявлен",
-          "explanation": "Вариант F2 G20210A не выявлен; общий риск венозного тромбоза по этому тесту не определяется"
+          "label": "Вариант не обнаружен",
+          "explanation": "Вариант F2 G20210A не обнаружен. Другие причины венозного тромбоза этот результат не исключает."
         },
         "effect": null,
-        "limitations": [
-          "Правило не устанавливает диагноз; OR не является абсолютной вероятностью."
-        ],
         "sources": [
           {
             "url": "https://ashpublications.org/blood/article/88/10/3698/137751/",
             "citation": "Poort SR, et al. A common genetic variation in the 3'-untranslated region of the prothrombin gene is associated with elevated plasma prothrombin levels and an increase in venous thrombosis. Blood. 1996;88(10):3698-3703.",
             "doi": null,
-            "pubmed": "8916933",
-            "reference": "Раздел Results, Table 2 — OR гетерозигот ≈ 2.8 (CI 1.4-5.6) для ВТЭ"
+            "pubmed": "8916933"
           },
           {
             "url": "https://doi.org/10.1001/jama.2009.853",
             "citation": "Segal JB, et al. Predictive value of factor V Leiden and prothrombin G20210A. JAMA. 2009;301(23):2472-2485.",
             "doi": "10.1001/jama.2009.853",
-            "pubmed": "19531787",
-            "reference": "Table 2 — мета-анализ, OR гетерозигот G20210A ≈ 3.8 (CI 3.0-4.9)"
+            "pubmed": "19531787"
           }
         ]
       },
@@ -355,6 +340,9 @@
           "HFE"
         ],
         "condition": "Наследственный гемохроматоз",
+        "rsids": [
+          "rs1800562"
+        ],
         "status": "evaluated",
         "reason": null,
         "observed_variants": [
@@ -369,37 +357,30 @@
             "phase_set": null
           }
         ],
-        "diplotype": null,
         "result": {
           "code": "not_detected",
-          "label": "Аллель не выявлен",
-          "explanation": "Вариант HFE C282Y не выявлен; это не исключает других причин перегрузки железом"
+          "label": "Вариант не обнаружен",
+          "explanation": "Вариант HFE C282Y не обнаружен. При повышенных показателях обмена железа их причину нужно оценивать отдельно."
         },
         "effect": null,
-        "limitations": [
-          "Правило не устанавливает диагноз; OR не является абсолютной вероятностью."
-        ],
         "sources": [
           {
             "url": "https://doi.org/10.1038/ng0896-399",
             "citation": "Feder JN, et al. A novel MHC class I-like gene is mutated in patients with hereditary haemochromatosis. Nat Genet. 1996;13(4):399-408.",
             "doi": "10.1038/ng0896-399",
-            "pubmed": "8696333",
-            "reference": "Section 'A candidate gene' — оригинальная характеристика C282Y как причинной мутации"
+            "pubmed": "8696333"
           },
           {
             "url": "https://doi.org/10.1016/j.jhep.2022.03.033",
             "citation": "European Association for the Study of the Liver. EASL Clinical Practice Guidelines on haemochromatosis. J Hepatol. 2022;77(2):479-502.",
             "doi": "10.1016/j.jhep.2022.03.033",
-            "pubmed": "35662478",
-            "reference": "Раздел 'Genetic diagnosis', Recommendation 1 — критерий гомозиготы C282Y/C282Y как диагноз HH тип 1"
+            "pubmed": "35662478"
           },
           {
             "url": "https://doi.org/10.1136/bmj.k5222",
             "citation": "Pilling LC, et al. Common conditions associated with hereditary haemochromatosis genetic variants: cohort study in UK Biobank. BMJ. 2019;364:k5222.",
             "doi": "10.1136/bmj.k5222",
-            "pubmed": "30651232",
-            "reference": "Table 2 — penetrance C282Y/C282Y в UK Biobank: ~22% мужчин и ~10% женщин с цирроза/диабета к возрасту 70"
+            "pubmed": "30651232"
           }
         ]
       },
@@ -408,7 +389,10 @@
         "genes": [
           "HFE"
         ],
-        "condition": "Гемохроматоз (модификатор)",
+        "condition": "Обмен железа",
+        "rsids": [
+          "rs1799945"
+        ],
         "status": "evaluated",
         "reason": null,
         "observed_variants": [
@@ -423,30 +407,24 @@
             "phase_set": null
           }
         ],
-        "diplotype": null,
         "result": {
           "code": "not_detected",
-          "label": "Аллель не выявлен",
-          "explanation": "Вариант HFE H63D не выявлен; это не исключает других причин перегрузки железом"
+          "label": "Вариант не обнаружен",
+          "explanation": "Вариант HFE H63D не обнаружен. При повышенных показателях обмена железа их причину нужно оценивать отдельно."
         },
         "effect": null,
-        "limitations": [
-          "Правило не устанавливает диагноз; OR не является абсолютной вероятностью."
-        ],
         "sources": [
           {
             "url": "https://ashpublications.org/blood/article/93/8/2502/250793/",
             "citation": "Mura C, Raguenes O, Férec C. HFE mutations analysis in 711 hemochromatosis probands: evidence for S65C implication in mild form of hemochromatosis. Blood. 1999;93(8):2502-2505.",
             "doi": null,
-            "pubmed": "10194430",
-            "reference": "Раздел Discussion — H63D/H63D связан только с мягкой формой; основная клиническая значимость — compound het C282Y/H63D"
+            "pubmed": "10194430"
           },
           {
             "url": "https://doi.org/10.1016/j.jhep.2022.03.033",
             "citation": "EASL Clinical Practice Guidelines on haemochromatosis. J Hepatol. 2022;77(2):479-502.",
             "doi": "10.1016/j.jhep.2022.03.033",
-            "pubmed": "35662478",
-            "reference": "Раздел 'Other HFE genotypes' — compound het C282Y/H63D даёт ~1-2% penetrance, H63D/H63D — клинически редко значим"
+            "pubmed": "35662478"
           }
         ]
       },
@@ -456,6 +434,9 @@
           "PCSK9"
         ],
         "condition": "Уровень ЛПНП и риск ИБС",
+        "rsids": [
+          "rs11591147"
+        ],
         "status": "evaluated",
         "reason": null,
         "observed_variants": [
@@ -470,39 +451,36 @@
             "phase_set": null
           }
         ],
-        "diplotype": null,
         "result": {
           "code": "not_detected",
-          "label": "Аллель не выявлен",
-          "explanation": "Защитный вариант PCSK9 R46L не выявлен; по этому тесту нельзя оценить общий риск ИБС"
+          "label": "Защитный вариант не обнаружен",
+          "explanation": "Вариант PCSK9 R46L не обнаружен. Уровень холестерина и риск ишемической болезни сердца по этому результату не определяются."
         },
         "effect": null,
-        "limitations": [
-          "Правило не устанавливает диагноз; OR не является абсолютной вероятностью."
-        ],
         "sources": [
           {
             "url": "https://doi.org/10.1056/NEJMoa054013",
             "citation": "Cohen JC, Boerwinkle E, Mosley TH Jr, Hobbs HH. Sequence variations in PCSK9, low LDL, and protection against coronary heart disease. N Engl J Med. 2006;354(12):1264-1272.",
             "doi": "10.1056/NEJMoa054013",
-            "pubmed": "16554528",
-            "reference": "Table 2 (ARIC study) — носители R46L имели снижение ЛПНП на 15% (черные) / 21% (белые) и снижение риска ИБС на 47-88%"
+            "pubmed": "16554528"
           },
           {
             "url": "https://doi.org/10.1056/NEJMc0707445",
             "citation": "Kathiresan S, et al. A PCSK9 missense variant associated with a reduced risk of early-onset myocardial infarction. N Engl J Med. 2008;358(21):2299-2300.",
             "doi": "10.1056/NEJMc0707445",
-            "pubmed": "18499582",
-            "reference": "Letter — R46L OR для раннего ИМ ≈ 0.47 (CI 0.32-0.68)"
+            "pubmed": "18499582"
           }
         ]
       },
       {
         "id": "hla_b5701",
         "genes": [
-          "HLA-B*57:01"
+          "HCP5"
         ],
         "condition": "Гиперчувствительность к абакавиру",
+        "rsids": [
+          "rs2395029"
+        ],
         "status": "evaluated",
         "reason": null,
         "observed_variants": [
@@ -517,37 +495,30 @@
             "phase_set": null
           }
         ],
-        "diplotype": null,
         "result": {
           "code": "undetermined",
-          "label": "Не определено",
-          "explanation": "Косвенный маркер rs2395029 не обнаружен; статус HLA-B*57:01 не установлен"
+          "label": "Косвенный маркер не обнаружен",
+          "explanation": "Косвенный маркер rs2395029 не обнаружен. Сам аллель HLA-B*57:01 этим анализом не определён."
         },
         "effect": null,
-        "limitations": [
-          "Правило не устанавливает диагноз; OR не является абсолютной вероятностью."
-        ],
         "sources": [
           {
             "url": "https://doi.org/10.1056/NEJMoa0706135",
             "citation": "Mallal S, et al. HLA-B*5701 screening for hypersensitivity to abacavir. N Engl J Med. 2008;358(6):568-579.",
             "doi": "10.1056/NEJMoa0706135",
-            "pubmed": "18256392",
-            "reference": "PREDICT-1 trial, Table 2 — скрининг HLA-B*5701 снизил иммунологически подтверждённую гиперчувствительность с 7.8% до 0%"
+            "pubmed": "18256392"
           },
           {
             "url": "https://doi.org/10.1038/clpt.2014.38",
             "citation": "Martin MA, et al. Clinical Pharmacogenetics Implementation Consortium guidelines for HLA-B genotype and abacavir dosing: 2014 update. Clin Pharmacol Ther. 2014;95(5):499-500.",
             "doi": "10.1038/clpt.2014.38",
-            "pubmed": "24561393",
-            "reference": "Table 1 — рекомендация Level A: любой носитель HLA-B*57:01 (включая гетерозигот) — абакавир противопоказан"
+            "pubmed": "24561393"
           },
           {
             "url": "https://cpicpgx.org/guidelines/guideline-for-abacavir-and-hla-b/",
             "citation": "PharmGKB / CPIC current guideline (online, periodically updated).",
             "doi": null,
-            "pubmed": null,
-            "reference": "Актуальная версия рекомендации с таблицей фенотипов и дозирования"
+            "pubmed": null
           }
         ]
       }
@@ -1160,25 +1131,16 @@
       }
     ]
   },
-  "limitations": [
-    "Демонстрационные синтетические данные; не результат анализа пациента.",
-    "Отчёт предназначен для экспертного разбора и не устанавливает диагноз.",
-    "Перцентиль PGS — положение балла в EUR-референсе, не вероятность заболевания.",
-    "Генетическое происхождение пациента и применимость EUR-референса не определялись.",
-    "Качество вызовов, глубина покрытия и FILTER автоматически не оценивались.",
-    "Отсутствие записи в VCF не означает отсутствие аллеля; охват вариантов и моделей ограничен.",
-    "Значимые варианты требуют клинического подтверждения и сопоставления с фенотипом."
-  ],
   "provenance": {
     "rules_reviewed": "2026-11-08",
     "resources": [
       {
         "name": "clinical_findings.yaml",
-        "sha256": "cf5620741612ca98832fa6aeb980cecb5b5892464a384adbd9f12d7bc38440d3"
+        "sha256": "03a71423a5aefb8e2fd55eac8a6d02d28fd933f9a0f16a361db61dd18a497b91"
       },
       {
         "name": "complex_genotypes.yaml",
-        "sha256": "6e1d4d778587268e12abdc7931a0da7b133880635277add9ef6f71bcc70a29de"
+        "sha256": "9ac9bb0f9c19df5cb0499d54c14d927387283b76cf79d8f3299480cb09882650"
       }
     ],
     "sources": [
@@ -1186,22 +1148,19 @@
         "url": "https://myvariant.info/",
         "citation": null,
         "doi": null,
-        "pubmed": null,
-        "reference": null
+        "pubmed": null
       },
       {
         "url": "https://www.pgscatalog.org/",
         "citation": null,
         "doi": null,
-        "pubmed": null,
-        "reference": null
+        "pubmed": null
       },
       {
         "url": "https://www.internationalgenome.org/",
         "citation": null,
         "doi": null,
-        "pubmed": null,
-        "reference": null
+        "pubmed": null
       }
     ],
     "annotation_cache_policy": "Ответы MyVariant сохраняются без автоматического срока обновления."

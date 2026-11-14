@@ -39,7 +39,6 @@ class Source(Schema):
     citation: str | None = None
     doi: str | None = None
     pubmed: str | None = None
-    reference: str | None = None
 
 
 class EvidenceRef(Schema):
@@ -101,13 +100,12 @@ class GenotypeRuleItem(Schema):
     id: str
     genes: list[str]
     condition: str
+    rsids: list[str]
     status: Literal["evaluated", "not_evaluated"]
     reason: Issue | None
     observed_variants: list[ObservedVariant]
-    diplotype: str | None
     result: RuleResult | None
     effect: RuleEffect | None
-    limitations: list[str]
     sources: list[Source]
 
 
@@ -191,7 +189,6 @@ class Finding(Schema):
     interpretation: str
     clinical_question: str
     next_step: str
-    limitations: list[str]
     evidence_refs: list[EvidenceRef]
     sources: list[Source]
 
@@ -248,7 +245,6 @@ class GeneAnalysisReport(Schema):
     genotype_rules: Section[GenotypeRuleItem]
     polygenic_scores: Section[PolygenicScoreItem]
     quality: Quality
-    limitations: list[str]
     provenance: Provenance
 
     @model_validator(mode="after")

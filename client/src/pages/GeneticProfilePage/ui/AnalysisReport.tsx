@@ -83,8 +83,14 @@ export const AnalysisReport = ({ report }: { report: GeneReport }) => {
           aria-label="Разделы генетического отчёта"
         >
           <Tab label="Обзор" {...tabProps(0)} />
-          <Tab label={`ClinVar (${clinvarItems.length})`} {...tabProps(1)} />
-          <Tab label={`Генотипы (${ruleItems.length})`} {...tabProps(2)} />
+          <Tab
+            label={`Классификации ClinVar (${clinvarItems.length})`}
+            {...tabProps(1)}
+          />
+          <Tab
+            label={`Проверенные генотипы (${ruleItems.length})`}
+            {...tabProps(2)}
+          />
           <Tab
             ref={pgsTabRef}
             label={`Полигенные оценки (${pgsItems.length})`}

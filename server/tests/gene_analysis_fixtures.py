@@ -51,5 +51,4 @@ def example_report(partial: bool = False):
                           pd.DataFrame() if partial else clinvar, evaluate_complex_genotypes(frame), scores,
                           issue("annotation_unavailable", "MyVariant.info недоступен; ClinVar не оценён.") if partial else None, [])
     report.generated_at = datetime(2026, 1, 1, tzinfo=timezone.utc)
-    report.limitations.insert(0, "Демонстрационные синтетические данные; не результат анализа пациента.")
     return report

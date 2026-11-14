@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 import Box from "@mui/material/Box";
 import Link from "@mui/material/Link";
-import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import type { Source } from "../../model/report";
 
@@ -34,38 +33,17 @@ export const Field = ({
 );
 
 export const Sources = ({ sources }: { sources: Source[] }) => (
-  <Stack spacing={1}>
+  <Box sx={{ display: "grid", gap: 1 }}>
     {sources.map((source, index) => (
-      <Box key={`${source.url}-${index}`}>
-        <Link
-          href={source.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          sx={{ overflowWrap: "anywhere" }}
-        >
-          {source.citation ?? source.reference ?? source.url}
-        </Link>
-        {source.citation && source.citation !== source.url && (
-          <Typography variant="caption" sx={{ display: "block" }}>
-            {source.url}
-          </Typography>
-        )}
-        {source.doi && (
-          <Typography variant="caption" sx={{ display: "block" }}>
-            DOI: {source.doi}
-          </Typography>
-        )}
-        {source.pubmed && (
-          <Typography variant="caption" sx={{ display: "block" }}>
-            PubMed: {source.pubmed}
-          </Typography>
-        )}
-        {source.reference && source.citation && (
-          <Typography variant="caption" sx={{ display: "block" }}>
-            {source.reference}
-          </Typography>
-        )}
-      </Box>
+      <Link
+        key={`${source.url}-${index}`}
+        href={source.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        sx={{ overflowWrap: "anywhere" }}
+      >
+        {source.citation ?? source.url}
+      </Link>
     ))}
-  </Stack>
+  </Box>
 );

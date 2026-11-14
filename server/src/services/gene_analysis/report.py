@@ -26,16 +26,6 @@ TRAITS = {
     "Coronary artery disease": "coronary_disease", "Type 2 diabetes": "type_2_diabetes",
     "Asthma": "asthma", "Migraine": "migraine", "Obesity": "obesity", "Triglycerides": "triglycerides",
 }
-LIMITATIONS = [
-    "Отчёт предназначен для экспертного разбора и не устанавливает диагноз.",
-    "Перцентиль PGS — положение балла в EUR-референсе, не вероятность заболевания.",
-    "Генетическое происхождение пациента и применимость EUR-референса не определялись.",
-    "Качество вызовов, глубина покрытия и FILTER автоматически не оценивались.",
-    "Отсутствие записи в VCF не означает отсутствие аллеля; охват вариантов и моделей ограничен.",
-    "Значимые варианты требуют клинического подтверждения и сопоставления с фенотипом.",
-]
-
-
 def issue(code: str, message: str) -> dict:
     return {"code": code, "message": message}
 
@@ -82,6 +72,7 @@ def _rule_items(results: list[dict]) -> list[dict]:
     for row in results:
         items.append({
             "id": row["id"], "genes": [row["gene"].split()[0]], "condition": row["disease"],
+            "rsids": row["rsids"],
             "status": row["status"],
             "reason": issue(row["reason_code"], row["details"]) if row["reason_code"] else None,
             "observed_variants": [{
@@ -89,12 +80,10 @@ def _rule_items(results: list[dict]) -> list[dict]:
                 "alleles": [observed["allele_1"], observed["allele_2"]], "phased": observed["phased"],
                 "phase_set": None if pd.isna(observed["phase_set"]) else str(observed["phase_set"]),
             } for observed in row["observed"]],
-            "diplotype": row["diplotype"],
             "result": {"code": row["risk_code"], "label": row["risk_level"], "explanation": row["details"]}
                       if row["status"] == "evaluated" else None,
             "effect": {"value": row["effect"], "context": row["disease"], "sources": row["sources"]}
                       if row["effect"] is not None else None,
-            "limitations": ["Правило не устанавливает диагноз; OR не является абсолютной вероятностью."],
             "sources": row["sources"],
         })
     return items
@@ -143,14 +132,16 @@ def _summary(raw: dict, clinvar: list[dict], rules: list[dict], pgs: list[dict],
         if row.get("clinvar_id"):
             refs = [reference("clinvar", item["id"]) for item in clinvar
                     if item["accession"] == row["clinvar_id"] and item["variant"]["rsid"] == row["rsid"]]
+        elif row["id"] == "hla_proxy":
+            refs = [reference("genotype_rules", "hla_b5701")]
         else:
             refs = [reference("genotype_rules", item["id"]) for item in rules if row["gene"] in item["genes"]]
         findings.append({
             "id": row.get("id", f"rule_finding_{index}"), "genes": [row["gene"]],
             **{key: row[key] for key in ("condition", "role", "interpretation", "clinical_question", "next_step")},
-            "limitations": [row["limitation"]], "evidence_refs": refs, "sources": [{"url": row["source"]}],
+            "evidence_refs": refs, "sources": [{"url": row["source"]}],
         })
-    not_detected = [{"message": f"{', '.join(item['genes'])}: указанный аллель не выявлен",
+    not_detected = [{"message": f"{', '.join(item['genes'])}: проверяемый вариант не обнаружен",
                      "evidence_refs": [reference("genotype_rules", item["id"])]}
                     for item in rules if item["result"] and item["result"]["code"] == "not_detected"]
     not_evaluated = [{"message": item["reason"]["message"], "evidence_refs": [reference("genotype_rules", item["id"])]}
@@ -201,7 +192,6 @@ def build_report(patient_id: int, profile: Profile, parsed: ParsedProfile, clinv
                     "skipped_records": parsed.skipped_records,
                     "alt_records": int((parsed.variants["zygosity"] != "homozygous_ref").sum()),
                     "unmatched_annotations": clinvar.attrs.get("unmatched_annotations", 0), "issues": quality_issues},
-        "limitations": LIMITATIONS,
         "provenance": {"rules_reviewed": raw_summary["reviewed"],
                        "resources": [{"name": path.name, "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
                                      for path in resources if path.is_file()],
