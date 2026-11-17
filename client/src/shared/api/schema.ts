@@ -1491,10 +1491,8 @@ export interface components {
             role: string;
             /** Interpretation */
             interpretation: string;
-            /** Clinical Question */
-            clinical_question: string;
-            /** Next Step */
-            next_step: string;
+            /** Recommendation */
+            recommendation: string;
             /** Evidence Refs */
             evidence_refs: components["schemas"]["EvidenceRef"][];
             /** Sources */

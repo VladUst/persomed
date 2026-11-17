@@ -69,7 +69,7 @@ HTTP-клиент и reverse proxy должны допускать долгий 
 | Раздел | Отображение |
 | --- | --- |
 | `profile`, `generated_at`, `schema_version`, `analysis_version` | Заголовок, файл, дата снимка, версии |
-| `summary.findings` | Основные находки, вопросы врачу, источники и ссылки на подробные строки |
+| `summary.findings` | Оценки по правилам из `resources/gene_rules.yaml`: заключение, интерпретация, рекомендация, источники и ссылки на подробные строки |
 | `summary.not_detected`, `summary.not_evaluated` | Проверенное отсутствие конкретного аллеля и отдельно невозможность оценки |
 | `summary.polygenic_overview` | Одна выбранная модель на признак; подробности по `pgs_id` |
 | `clinvar.items` | Таблица классификаций вариантов/состояний, accession, review status и дата оценки |

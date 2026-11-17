@@ -8,7 +8,7 @@ import yaml
 from .pgs_catalog import DEFAULT_PGS_SCORES
 
 
-RULES_FILE = Path(__file__).parent / "resources" / "clinical_findings.yaml"
+RULES_FILE = Path(__file__).parent / "resources" / "gene_rules.yaml"
 
 
 def _clinical_rules() -> dict:
@@ -24,6 +24,89 @@ def _exact_variant(row: dict, rule: dict) -> bool:
         and row["alt"] == rule["alt"]
         and rule["alt"] in {row["allele_1"], row["allele_2"]}
     )
+
+
+def _matching_case(rule: dict, observed: dict) -> dict | None:
+    return next(
+        (case for case in rule["cases"]
+         if all(observed.get(key) == value for key, value in case["when"].items())),
+        None,
+    )
+
+
+def _findings(
+    variants_df: pd.DataFrame, clinvar_df: pd.DataFrame,
+    complex_results: list[dict], rules: dict,
+) -> tuple[list[dict], set[str]]:
+    variant_rules = [rule for rule in rules["findings"] if rule["match"]["type"] == "clinvar"]
+    rsids = {rule["match"]["rsid"] for rule in variant_rules}
+    lookup = {}
+    for row in variants_df[variants_df["rsid"].isin(rsids)].to_dict("records"):
+        lookup.setdefault(row["rsid"], []).append(row)
+
+    by_id = {item["id"]: item for item in complex_results}
+    findings = []
+    summarized_variants = set()
+    for rule in rules["findings"]:
+        match = rule["match"]
+        details = {}
+        if match["type"] == "clinvar":
+            matches = [row for row in lookup.get(match["rsid"], []) if _exact_variant(row, match)]
+            if len(matches) != 1:
+                continue
+            row = matches[0]
+            variant_id = f"chr{match['chrom']}:g.{match['pos']}{match['ref']}>{match['alt']}"
+            records = (
+                clinvar_df[(clinvar_df["variant"] == variant_id)
+                           & (clinvar_df["clinvar_id"] == match["clinvar_id"])
+                           & (clinvar_df["category"] == match["category"])]
+                if not clinvar_df.empty else pd.DataFrame()
+            )
+            if records.empty:
+                continue
+            record = records.iloc[0]
+            observed = {"alt_copies": int(row["allele_1"] == match["alt"])
+                        + int(row["allele_2"] == match["alt"])}
+            details = {
+                "rsid": match["rsid"],
+                "genotype": f"{row['allele_1']}/{row['allele_2']}",
+                "clinvar_id": match["clinvar_id"],
+                "clinvar_review_status": record.get("review_status", ""),
+                "clinvar_last_evaluated": record.get("last_evaluated", ""),
+            }
+        elif match["type"] == "genotype_rules":
+            rule_ids = match["rule_ids"]
+            matched = {rule_id: by_id.get(rule_id) for rule_id in rule_ids}
+            if any(item is None or item["status"] == "not_evaluated"
+                   for item in matched.values()):
+                continue
+            observed = {rule_id: item["risk_code"] for rule_id, item in matched.items()}
+            details = {
+                "rsid": " / ".join(item["rsids"][0] for item in matched.values()),
+                "genotype": "; ".join(f"{item['gene']} {item['genotype']}"
+                                      for item in matched.values()),
+                "rule_ids": rule_ids,
+            }
+        else:
+            raise ValueError(f"Неизвестный тип правила находки: {match['type']}")
+
+        case = _matching_case(rule, observed)
+        if case is None:
+            continue
+        findings.append({
+            "id": rule["id"], "gene": rule["gene"], "condition": rule["condition"],
+            "role": case["role"], "interpretation": case["interpretation"],
+            "recommendation": case["recommendation"], "sources": rule["sources"],
+            **details,
+        })
+        if match["type"] == "clinvar":
+            summarized_variants.add(variant_id)
+        elif not clinvar_df.empty:
+            matched_rsids = {item["rsids"][0] for item in matched.values()}
+            summarized_variants.update(
+                clinvar_df.loc[clinvar_df["rsid"].isin(matched_rsids), "variant"]
+            )
+    return findings, summarized_variants
 
 
 PGS_GROUPS = {
@@ -48,72 +131,7 @@ def build_clinical_summary(
 ) -> dict:
     """Отбирает точные находки и отделяет их от технических PGS и пропусков."""
     rules = _clinical_rules()
-    rsids = {rule["rsid"] for rule in rules["findings"]}
-    lookup = {}
-    for row in variants_df[variants_df["rsid"].isin(rsids)].to_dict("records"):
-        lookup.setdefault(row["rsid"], []).append(row)
-
-    findings = []
-    summarized_variants = set()
-    for rule in rules["findings"]:
-        matching = [row for row in lookup.get(rule["rsid"], []) if _exact_variant(row, rule)]
-        if len(matching) != 1:
-            continue
-        row = matching[0]
-        variant_id = f"chr{rule['chrom']}:g.{rule['pos']}{rule['ref']}>{rule['alt']}"
-        matching_clinvar = (
-            clinvar_df[(clinvar_df["variant"] == variant_id)
-                       & (clinvar_df["clinvar_id"] == rule["clinvar_id"])]
-            if not clinvar_df.empty else pd.DataFrame()
-        )
-        if matching_clinvar.empty:
-            continue
-        clinvar_record = matching_clinvar.iloc[0]
-        copies = (row["allele_1"] == rule["alt"]) + (row["allele_2"] == rule["alt"])
-        findings.append({
-            **rule,
-            "variant": variant_id,
-            "genotype": f"{row['allele_1']}/{row['allele_2']}",
-            "role": rule["two_copies_role"] if copies == 2 else rule["one_copy_role"],
-            "clinvar_review_status": clinvar_record.get("review_status", ""),
-            "clinvar_last_evaluated": clinvar_record.get("last_evaluated", ""),
-        })
-        summarized_variants.add(variant_id)
-
-    by_id = {item["id"]: item for item in complex_results}
-    h63d = by_id.get("hfe_h63d")
-    c282y = by_id.get("hfe_c282y")
-    if h63d and c282y and h63d["status"] != "not_evaluated" and c282y["status"] != "not_evaluated":
-        if h63d["risk_code"] == "marker" or c282y["risk_code"] in {"carrier", "high"}:
-            role = (
-                "Генотип, ассоциированный с перегрузкой железом — подтвердить"
-                if c282y["risk_code"] == "high" else
-                "Маркер HFE; диагноз гемохроматоза не установлен"
-            )
-            findings.append({
-                "id": "hfe_combined", "gene": "HFE", "rsid": "rs1799945 / rs1800562",
-                "genotype": f"H63D {h63d['genotype']}; C282Y {c282y['genotype']}",
-                "condition": "Перегрузка железом", "role": role,
-                "interpretation": "Генотип сопоставляется с показателями обмена железа и фенотипом.",
-                "clinical_question": "Есть ли повышение насыщения трансферрина, ферритина или признаки перегрузки железом?",
-                "next_step": "Если есть клиническое подозрение, оценить насыщение трансферрина и ферритин по профильным рекомендациям.",
-                "limitation": "H63D сам по себе не подтверждает HFE-гемохроматоз.",
-                "source": "https://easl.eu/wp-content/uploads/2022/06/PIIS01688278220021121.pdf",
-            })
-            summarized_variants.add("chr6:g.26091179C>G")
-
-    hla = by_id.get("hla_b5701")
-    if hla and hla["risk_code"] == "proxy_marker":
-        findings.append({
-            "id": "hla_proxy", "gene": "HLA-B", "rsid": "rs2395029", "genotype": hla["genotype"],
-            "condition": "Гиперчувствительность к абакавиру",
-            "role": "Косвенный лекарственный маркер — требуется типирование",
-            "interpretation": "SNP связан с HLA-B*57:01, но не определяет HLA-аллель напрямую.",
-            "clinical_question": "Планируется ли назначение абакавира?",
-            "next_step": "Перед назначением получить прямой результат HLA-B*57:01-типирования.",
-            "limitation": "По tag SNP нельзя назначать или отменять лекарство.",
-            "source": "https://cpicpgx.org/wp-content/uploads/2016/01/CPIC_HLAB-Abacavir.pdf",
-        })
+    findings, summarized_variants = _findings(variants_df, clinvar_df, complex_results, rules)
 
     candidate_variants = (
         set(clinvar_df.loc[clinvar_df["category"] == "candidate", "variant"])

@@ -1,34 +1,16 @@
-"""Краткая проверяемая сводка после полного генетического отчёта."""
+"""Консольная сводка использует те же правила находок, что и API."""
 
+import sys
 from pathlib import Path
 
 import pandas as pd
-import yaml
 
+SERVER_ROOT = Path(__file__).resolve().parents[2]
+if str(SERVER_ROOT) not in sys.path:
+    sys.path.insert(0, str(SERVER_ROOT))
 
-RULES_FILE = Path(__file__).with_name("clinical_findings.yaml")
-
-
-def _clinical_rules() -> dict:
-    with RULES_FILE.open(encoding="utf-8") as source:
-        return yaml.safe_load(source)
-
-
-def _exact_variant(row: dict, rule: dict) -> bool:
-    return (
-        str(row["chrom"]).removeprefix("chr") == rule["chrom"]
-        and int(row["pos"]) == rule["pos"]
-        and row["ref"] == rule["ref"]
-        and row["alt"] == rule["alt"]
-        and rule["alt"] in {row["allele_1"], row["allele_2"]}
-    )
-
-
-def _pgs_group(result: dict) -> str:
-    trait = result.get("trait_en", "")
-    if trait.startswith("Coronary"):
-        return "Ишемическая болезнь сердца"
-    return result["trait"].split(" (")[0]
+from src.services.gene_analysis.clinical_summary import build_clinical_summary as build_report_summary
+from src.services.gene_analysis.genotype_rules import evaluate_complex_genotypes
 
 
 def build_clinical_summary(
@@ -37,75 +19,23 @@ def build_clinical_summary(
     complex_results: list[dict],
     pgs_results: list[dict],
 ) -> dict:
-    """Отбирает точные находки и отделяет их от технических PGS и пропусков."""
-    rules = _clinical_rules()
-    rsids = {rule["rsid"] for rule in rules["findings"]}
-    lookup = {}
-    for row in variants_df[variants_df["rsid"].isin(rsids)].to_dict("records"):
-        lookup.setdefault(row["rsid"], []).append(row)
-
-    findings = []
-    summarized_variants = set()
-    for rule in rules["findings"]:
-        matching = [row for row in lookup.get(rule["rsid"], []) if _exact_variant(row, rule)]
-        if len(matching) != 1:
-            continue
-        row = matching[0]
-        variant_id = f"chr{rule['chrom']}:g.{rule['pos']}{rule['ref']}>{rule['alt']}"
-        matching_clinvar = (
-            clinvar_df[(clinvar_df["variant"] == variant_id)
-                       & (clinvar_df["clinvar_id"] == rule["clinvar_id"])]
-            if not clinvar_df.empty else pd.DataFrame()
+    """Приводит консольные результаты к формату общего движка находок."""
+    normalized_clinvar = clinvar_df.copy()
+    if not normalized_clinvar.empty:
+        normalized_clinvar["category"] = normalized_clinvar["category"].replace(
+            {"Кандидат для проверки": "candidate"}
         )
-        if matching_clinvar.empty:
-            continue
-        clinvar_record = matching_clinvar.iloc[0]
-        copies = (row["allele_1"] == rule["alt"]) + (row["allele_2"] == rule["alt"])
-        findings.append({
-            **rule,
-            "variant": variant_id,
-            "genotype": f"{row['allele_1']}/{row['allele_2']}",
-            "role": rule["two_copies_role"] if copies == 2 else rule["one_copy_role"],
-            "clinvar_review_status": clinvar_record.get("review_status", ""),
-            "clinvar_last_evaluated": clinvar_record.get("last_evaluated", ""),
-        })
-        summarized_variants.add(variant_id)
+    normalized_pgs = [
+        {**item, "eur_quality": "good" if item.get("eur_quality") == "хорошая"
+         else item.get("eur_quality")}
+        for item in pgs_results
+    ]
+    summary = build_report_summary(
+        variants_df, normalized_clinvar,
+        evaluate_complex_genotypes(variants_df), normalized_pgs,
+    )
 
     by_name = {item["gene"]: item for item in complex_results}
-    h63d = by_name.get("HFE H63D")
-    c282y = by_name.get("HFE C282Y")
-    if h63d and c282y and h63d["status"] != "Не оценено" and c282y["status"] != "Не оценено":
-        if h63d["risk_level"] == "Маркер" or c282y["risk_level"] in {"Носитель", "Высокий"}:
-            role = (
-                "Генотип, ассоциированный с перегрузкой железом — подтвердить"
-                if c282y["risk_level"] == "Высокий" else
-                "Маркер HFE; диагноз гемохроматоза не установлен"
-            )
-            findings.append({
-                "gene": "HFE", "rsid": "rs1799945 / rs1800562",
-                "genotype": f"H63D {h63d['genotype']}; C282Y {c282y['genotype']}",
-                "condition": "Перегрузка железом", "role": role,
-                "interpretation": "Генотип сопоставляется с показателями обмена железа и фенотипом.",
-                "clinical_question": "Есть ли повышение насыщения трансферрина, ферритина или признаки перегрузки железом?",
-                "next_step": "Если есть клиническое подозрение, оценить насыщение трансферрина и ферритин по профильным рекомендациям.",
-                "limitation": "H63D сам по себе не подтверждает HFE-гемохроматоз.",
-                "source": "https://easl.eu/wp-content/uploads/2022/06/PIIS01688278220021121.pdf",
-            })
-            summarized_variants.add("chr6:g.26091179C>G")
-
-    hla = next((item for item in complex_results if item["gene"].startswith("HLA-B")), None)
-    if hla and hla["risk_level"] == "Косвенный маркер":
-        findings.append({
-            "gene": "HLA-B", "rsid": "rs2395029", "genotype": hla["genotype"],
-            "condition": "Гиперчувствительность к абакавиру",
-            "role": "Косвенный лекарственный маркер — требуется типирование",
-            "interpretation": "SNP связан с HLA-B*57:01, но не определяет HLA-аллель напрямую.",
-            "clinical_question": "Планируется ли назначение абакавира?",
-            "next_step": "Перед назначением получить прямой результат HLA-B*57:01-типирования.",
-            "limitation": "По tag SNP нельзя назначать или отменять лекарство.",
-            "source": "https://cpicpgx.org/wp-content/uploads/2016/01/CPIC_HLAB-Abacavir.pdf",
-        })
-
     absent = []
     for gene, label in [
         ("F5 (Factor V Leiden)", "F5 Leiden"),
@@ -120,44 +50,7 @@ def build_clinical_summary(
         f"{item['gene']}: {item['details']}"
         for item in complex_results if item["status"] == "Не оценено"
     ]
-    if not clinvar_df.empty:
-        conflicting_ampd1 = clinvar_df[
-            (clinvar_df["rsid"] == "rs17602729")
-            & (clinvar_df["category"] == "Спорное заключение")
-        ]
-        if not conflicting_ampd1.empty:
-            unevaluated.append("AMPD1 rs17602729: заключения ClinVar конфликтуют; диагноз по этому маркеру не установлен")
-
-    candidate_variants = (
-        set(clinvar_df.loc[clinvar_df["category"] == "Кандидат для проверки", "variant"])
-        if not clinvar_df.empty else set()
-    )
-    remaining_candidates = len(candidate_variants - summarized_variants)
-
-    pgs_by_group = {}
-    for result in pgs_results:
-        group = _pgs_group(result)
-        # Для ИБС PGS000010 имеет опубликованную оценку впервые возникшей
-        # болезни в EUR; PGS004321 изучалась для событий в FOURIER.
-        model_priority = 1 if result.get("pgs_id") == "PGS000010" else 0
-        priority = (
-            "eur_percentile" in result,
-            model_priority,
-            result.get("eur_quality") == "хорошая",
-            result.get("coverage_pct", 0),
-        )
-        previous = pgs_by_group.get(group)
-        if previous is None or priority > previous[0]:
-            pgs_by_group[group] = (priority, result)
-
-    return {
-        "reviewed": rules["reviewed"],
-        "findings": findings,
-        "absent": absent,
-        "unevaluated": unevaluated,
-        "other_candidates": remaining_candidates,
-        "pgs": [(group, value[1]) for group, value in pgs_by_group.items()],
-    }
+    return {**summary, "absent": absent, "unevaluated": unevaluated}
 
 
 def print_clinical_summary(summary: dict) -> None:
@@ -166,7 +59,7 @@ def print_clinical_summary(summary: dict) -> None:
     print(" ИТОГОВАЯ СВОДКА")
     print("=" * 70)
     print(f"  Правила сводки проверены: {summary['reviewed']}")
-    print("  Это вопросы для врача; генотипы из VCF требуют подтверждения при")
+    print("  Это поводы для проверки; генотипы из VCF требуют подтверждения при")
     print("  принятии медицинских решений.")
     print("  Для PGS предполагается сходство пациента с EUR-выборкой; происхождение")
     print("  не проверяется этим скриптом.")
@@ -182,10 +75,9 @@ def print_clinical_summary(summary: dict) -> None:
             print(f"    ClinVar: {item['clinvar_id']}; review status: "
                   f"{item['clinvar_review_status']}; оценено: "
                   f"{item.get('clinvar_last_evaluated') or 'дата неизвестна'}")
-        print(f"    Вопрос врачу: {item['clinical_question']}")
-        print(f"    Проверить: {item['next_step']}")
-        print(f"    Ограничение: {item['limitation']}")
-        print(f"    Источник: {item['source']}")
+        print(f"    Рекомендация: {item['recommendation']}")
+        for source in item["sources"]:
+            print(f"    Источник: {source}")
     print(f"\n  Других уникальных вариантов с P/LP-записями ClinVar: "
           f"{summary['other_candidates']}; они есть в подробном разделе и не")
     print("  получили автоматической клинической оценки без проверки доказательств.")

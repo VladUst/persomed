@@ -187,8 +187,7 @@ class Finding(Schema):
     condition: str
     role: str
     interpretation: str
-    clinical_question: str
-    next_step: str
+    recommendation: str
     evidence_refs: list[EvidenceRef]
     sources: list[Source]
 

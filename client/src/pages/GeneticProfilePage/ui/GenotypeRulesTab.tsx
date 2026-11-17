@@ -1,8 +1,29 @@
+import Stack from "@mui/material/Stack";
 import type { GeneReport } from "../api/genes";
-import type { GenotypeRuleItem, ReportDetail } from "../model/report";
+import type { Finding, GenotypeRuleItem, ReportDetail } from "../model/report";
 import { resultStatus } from "./reportFormatting";
 import { ResultsTable, type TableRowData } from "./ResultsTable";
 import { SectionHeading } from "./SectionHeading";
+
+const getFindingRows = (items: Finding[]): TableRowData[] =>
+  items.map((item) => ({
+    id: item.id,
+    cells: [
+      item.condition,
+      item.genes.join(", "),
+      item.role,
+      item.interpretation,
+      item.recommendation,
+    ],
+    search: [
+      item.condition,
+      item.genes,
+      item.role,
+      item.interpretation,
+      item.recommendation,
+    ].join(" "),
+    detail: { kind: "finding", item },
+  }));
 
 const getRuleRows = (items: GenotypeRuleItem[]): TableRowData[] =>
   items.map((item) => ({
@@ -32,19 +53,39 @@ export const GenotypeRulesTab = ({
   report: GeneReport;
   onOpen: (detail: ReportDetail) => void;
 }) => (
-  <>
-    <SectionHeading title="Оценки отдельных генетических маркеров по правилам" />
-    <ResultsTable
-      headers={[
-        "Ген",
-        "Заболевание или признак",
-        "Варианты",
-        "Статус",
-        "Результат",
-      ]}
-      rows={getRuleRows(report.genotype_rules.items ?? [])}
-      onOpen={onOpen}
-      emptyLabel="Правила отсутствуют в отчёте."
-    />
-  </>
+  <Stack spacing={3}>
+    <div>
+      <SectionHeading title="Оценки по правилам" />
+      <ResultsTable
+        headers={[
+          "Заболевание или признак",
+          "Ген",
+          "Заключение",
+          "Интерпретация",
+          "Рекомендация",
+        ]}
+        rows={getFindingRows(report.summary.findings)}
+        onOpen={onOpen}
+        emptyLabel="Находок по правилам нет."
+        tableLabel="Оценки по правилам"
+        tableMinWidth={1200}
+      />
+    </div>
+    <div>
+      <SectionHeading title="Комплексные генотипы" />
+      <ResultsTable
+        headers={[
+          "Ген",
+          "Заболевание или признак",
+          "Варианты",
+          "Статус",
+          "Результат",
+        ]}
+        rows={getRuleRows(report.genotype_rules.items ?? [])}
+        onOpen={onOpen}
+        emptyLabel="Комплексные генотипы отсутствуют в отчёте."
+        tableLabel="Комплексные генотипы"
+      />
+    </div>
+  </Stack>
 );

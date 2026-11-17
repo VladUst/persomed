@@ -127,19 +127,17 @@ def _pgs_items(results: list[dict]) -> list[dict]:
 
 def _summary(raw: dict, clinvar: list[dict], rules: list[dict], pgs: list[dict], available: bool) -> dict:
     findings = []
-    for index, row in enumerate(raw["findings"]):
+    for row in raw["findings"]:
         refs = []
         if row.get("clinvar_id"):
             refs = [reference("clinvar", item["id"]) for item in clinvar
                     if item["accession"] == row["clinvar_id"] and item["variant"]["rsid"] == row["rsid"]]
-        elif row["id"] == "hla_proxy":
-            refs = [reference("genotype_rules", "hla_b5701")]
         else:
-            refs = [reference("genotype_rules", item["id"]) for item in rules if row["gene"] in item["genes"]]
+            refs = [reference("genotype_rules", rule_id) for rule_id in row["rule_ids"]]
         findings.append({
-            "id": row.get("id", f"rule_finding_{index}"), "genes": [row["gene"]],
-            **{key: row[key] for key in ("condition", "role", "interpretation", "clinical_question", "next_step")},
-            "evidence_refs": refs, "sources": [{"url": row["source"]}],
+            "id": row["id"], "genes": [row["gene"]],
+            **{key: row[key] for key in ("condition", "role", "interpretation", "recommendation")},
+            "evidence_refs": refs, "sources": [{"url": url} for url in row["sources"]],
         })
     not_detected = [{"message": f"{', '.join(item['genes'])}: проверяемый вариант не обнаружен",
                      "evidence_refs": [reference("genotype_rules", item["id"])]}

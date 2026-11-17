@@ -4,18 +4,18 @@ import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import type { GeneReport } from "../api/genes";
-import type { EvidenceRef, Finding, ReportDetail } from "../model/report";
+import type { Finding, ReportDetail } from "../model/report";
 import { formatNumber } from "./reportFormatting";
 
 export const OverviewTab = ({
   report,
   onOpen,
-  onOpenEvidence,
+  onShowAllFindings,
   onShowAllPgs,
 }: {
   report: GeneReport;
   onOpen: (detail: ReportDetail) => void;
-  onOpenEvidence: (ref: EvidenceRef) => void;
+  onShowAllFindings: () => void;
   onShowAllPgs: () => void;
 }) => {
   const pgsItems = report.polygenic_scores.items ?? [];
@@ -23,7 +23,7 @@ export const OverviewTab = ({
     <Stack spacing={3}>
       <Box>
         <Typography component="h2" variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
-          Основные находки
+          Оценки по правилам
         </Typography>
         {report.summary.findings.length === 0 ? (
           <Typography variant="body2" color="text.secondary">
@@ -40,7 +40,7 @@ export const OverviewTab = ({
               gap: 2,
             }}
           >
-            {report.summary.findings.map((finding: Finding) => (
+            {report.summary.findings.slice(0, 6).map((finding: Finding) => (
               <Paper
                 key={finding.id}
                 variant="outlined"
@@ -62,10 +62,7 @@ export const OverviewTab = ({
                     {finding.interpretation}
                   </Typography>
                   <Typography variant="body2">
-                    <strong>Вопрос врачу:</strong> {finding.clinical_question}
-                  </Typography>
-                  <Typography variant="body2">
-                    <strong>Следующий шаг:</strong> {finding.next_step}
+                    <strong>Рекомендация:</strong> {finding.recommendation}
                   </Typography>
                   <Stack direction="row" sx={{ gap: 1, flexWrap: "wrap" }}>
                     <Button
@@ -74,21 +71,16 @@ export const OverviewTab = ({
                     >
                       Подробнее
                     </Button>
-                    {finding.evidence_refs.map((ref) => (
-                      <Button
-                        key={`${ref.section}-${ref.item_id}`}
-                        size="small"
-                        variant="outlined"
-                        onClick={() => onOpenEvidence(ref)}
-                      >
-                        Доказательство
-                      </Button>
-                    ))}
                   </Stack>
                 </Stack>
               </Paper>
             ))}
           </Box>
+        )}
+        {report.summary.findings.length > 0 && (
+          <Button onClick={onShowAllFindings} sx={{ mt: 1 }}>
+            Все оценки ({report.summary.findings.length})
+          </Button>
         )}
       </Box>
       <Box>

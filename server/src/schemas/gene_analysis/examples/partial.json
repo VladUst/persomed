@@ -1087,11 +1087,11 @@
     ]
   },
   "provenance": {
-    "rules_reviewed": "2026-11-08",
+    "rules_reviewed": "2026-11-17",
     "resources": [
       {
-        "name": "clinical_findings.yaml",
-        "sha256": "03a71423a5aefb8e2fd55eac8a6d02d28fd933f9a0f16a361db61dd18a497b91"
+        "name": "gene_rules.yaml",
+        "sha256": "c7f84e1707103c81ac79fabad3991d5459a65fabe573294e433891ee2fd9de6c"
       },
       {
         "name": "complex_genotypes.yaml",

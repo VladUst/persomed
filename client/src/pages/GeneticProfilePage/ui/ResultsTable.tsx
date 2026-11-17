@@ -31,6 +31,7 @@ export const ResultsTable = ({
   headerHints,
   hideSearch = false,
   tableLabel = "Результаты генетического анализа",
+  tableMinWidth,
 }: {
   headers: string[];
   rows: TableRowData[];
@@ -39,6 +40,7 @@ export const ResultsTable = ({
   headerHints?: Record<string, string>;
   hideSearch?: boolean;
   tableLabel?: string;
+  tableMinWidth?: number;
 }) => {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(0);
@@ -76,7 +78,11 @@ export const ResultsTable = ({
             aria-label={`Прокручиваемая таблица: ${tableLabel}`}
             tabIndex={0}
           >
-            <Table size="small" aria-label={tableLabel}>
+            <Table
+              size="small"
+              aria-label={tableLabel}
+              sx={{ minWidth: tableMinWidth }}
+            >
               <TableHead>
                 <TableRow sx={{ bgcolor: "action.hover" }}>
                   {headers.map((header) => (

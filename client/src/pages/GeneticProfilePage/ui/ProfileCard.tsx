@@ -48,7 +48,7 @@ export const ProfileCard = ({
         </Box>
         {profile && (
           <Chip
-            label={`Сборка генома: ${profile.genome_build}`}
+            label={`Сборка референсного генома: ${profile.genome_build}`}
             color="primary"
             variant="outlined"
           />

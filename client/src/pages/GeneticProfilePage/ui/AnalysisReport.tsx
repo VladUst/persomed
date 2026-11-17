@@ -40,13 +40,18 @@ export const AnalysisReport = ({ report }: { report: GeneReport }) => {
   const id = useId();
   const [tab, setTab] = useState(0);
   const [detail, setDetail] = useState<ReportDetail | null>(null);
+  const [evidenceParent, setEvidenceParent] = useState<ReportDetail | null>(
+    null,
+  );
   const [detailOpen, setDetailOpen] = useState(false);
+  const findingsTabRef = useRef<HTMLDivElement>(null);
   const pgsTabRef = useRef<HTMLDivElement>(null);
   const clinvarItems = report.clinvar.items ?? [];
   const ruleItems = report.genotype_rules.items ?? [];
   const pgsItems = report.polygenic_scores.items ?? [];
 
   const openDetail = (nextDetail: ReportDetail) => {
+    setEvidenceParent(null);
     setDetail(nextDetail);
     setDetailOpen(true);
   };
@@ -54,16 +59,26 @@ export const AnalysisReport = ({ report }: { report: GeneReport }) => {
     setTab(3);
     requestAnimationFrame(() => pgsTabRef.current?.focus());
   };
+  const showAllFindings = () => {
+    setTab(2);
+    requestAnimationFrame(() => findingsTabRef.current?.focus());
+  };
   const openEvidence = (ref: EvidenceRef) => {
+    let nextDetail: ReportDetail | undefined;
     if (ref.section === "clinvar") {
       const item = clinvarItems.find((entry) => entry.id === ref.item_id);
-      if (item) openDetail({ kind: "clinvar", item });
+      if (item) nextDetail = { kind: "clinvar", item };
     } else if (ref.section === "genotype_rules") {
       const item = ruleItems.find((entry) => entry.id === ref.item_id);
-      if (item) openDetail({ kind: "rule", item });
+      if (item) nextDetail = { kind: "rule", item };
     } else {
       const item = pgsItems.find((entry) => entry.pgs_id === ref.item_id);
-      if (item) openDetail({ kind: "pgs", item });
+      if (item) nextDetail = { kind: "pgs", item };
+    }
+    if (nextDetail) {
+      setEvidenceParent(detail?.kind === "finding" ? detail : null);
+      setDetail(nextDetail);
+      setDetailOpen(true);
     }
   };
 
@@ -88,7 +103,8 @@ export const AnalysisReport = ({ report }: { report: GeneReport }) => {
             {...tabProps(1)}
           />
           <Tab
-            label={`Правила генотипов (${ruleItems.length})`}
+            ref={findingsTabRef}
+            label={`Правила генотипов (${report.summary.findings.length + ruleItems.length})`}
             {...tabProps(2)}
           />
           <Tab
@@ -103,7 +119,7 @@ export const AnalysisReport = ({ report }: { report: GeneReport }) => {
           <OverviewTab
             report={report}
             onOpen={openDetail}
-            onOpenEvidence={openEvidence}
+            onShowAllFindings={showAllFindings}
             onShowAllPgs={showAllPgs}
           />
         </ReportTabPanel>
@@ -123,7 +139,19 @@ export const AnalysisReport = ({ report }: { report: GeneReport }) => {
       <ReportDetailDialog
         detail={detail}
         open={detailOpen}
-        onClose={() => setDetailOpen(false)}
+        onClose={() => {
+          setDetailOpen(false);
+          setEvidenceParent(null);
+        }}
+        onOpenEvidence={openEvidence}
+        onBack={
+          evidenceParent
+            ? () => {
+                setDetail(evidenceParent);
+                setEvidenceParent(null);
+              }
+            : undefined
+        }
       />
     </Stack>
   );

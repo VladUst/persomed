@@ -24,6 +24,7 @@ from src.models.patients import Patient
 from src.schemas.gene_analysis import GeneAnalysisReport
 from src.services.gene_analysis.annotations import AnnotationError, _valid_annotation_batch
 from src.services.gene_analysis.clinvar import extract_clinvar_significance
+from src.services.gene_analysis.clinical_summary import build_clinical_summary
 from src.services.gene_analysis.config import PROJECT_ROOT
 from src.services.gene_analysis.errors import GeneAnalysisError
 from src.services.gene_analysis.genotype_rules import evaluate_complex_genotypes
@@ -183,6 +184,60 @@ class StorageCase(unittest.TestCase):
         self.assertEqual(len(frame), 2)
         annotation["clinvar"]["alt"] = "T"
         self.assertTrue(extract_clinvar_significance([annotation], parsed.variants).empty)
+
+    def test_gene_finding_rules_use_yaml_for_all_five_cards(self):
+        variants = pd.DataFrame([
+            {"rsid": "rs11555217", "chrom": "11", "pos": 71152447,
+             "ref": "C", "alt": "T", "allele_1": "C", "allele_2": "T"},
+            {"rsid": "rs17879961", "chrom": "22", "pos": 29121087,
+             "ref": "A", "alt": "G", "allele_1": "A", "allele_2": "G"},
+            {"rsid": "rs4124874", "chrom": "2", "pos": 234665659,
+             "ref": "T", "alt": "G", "allele_1": "G", "allele_2": "G"},
+        ])
+        clinvar = pd.DataFrame([
+            {"rsid": rsid, "variant": variant, "clinvar_id": accession,
+             "category": "candidate", "review_status": "", "last_evaluated": ""}
+            for rsid, variant, accession in [
+                ("rs11555217", "chr11:g.71152447C>T", "RCV000020436"),
+                ("rs17879961", "chr22:g.29121087A>G", "RCV004556709"),
+                ("rs4124874", "chr2:g.234665659T>G", "RCV000999557"),
+            ]
+        ])
+        rule_results = [
+            {"id": rule_id, "status": "evaluated", "risk_code": code,
+             "rsids": [rsid], "gene": gene, "genotype": genotype}
+            for rule_id, code, rsid, gene, genotype in [
+                ("hfe_h63d", "marker", "rs1799945", "HFE H63D", "C/G"),
+                ("hfe_c282y", "not_detected", "rs1800562", "HFE C282Y", "G/G"),
+                ("hla_b5701", "proxy_marker", "rs2395029", "HLA-B", "T/G"),
+            ]
+        ]
+        summary = build_clinical_summary(variants, clinvar, rule_results, [])
+        self.assertEqual(
+            [item["id"] for item in summary["findings"]],
+            ["dhcr7_slos", "chek2_i157t", "ugt1a1_60", "hfe_combined", "hla_proxy"],
+        )
+        self.assertTrue(all(item["recommendation"] for item in summary["findings"]))
+        self.assertIn("две копии", summary["findings"][2]["interpretation"].lower())
+        self.assertNotIn("пенетрант", summary["findings"][1]["role"])
+        self.assertIn("обмена железа", summary["findings"][3]["role"])
+
+        spec = importlib.util.spec_from_file_location(
+            "console_gene_summary", PROJECT_ROOT / "scripts/genes_analysis/clinical_summary.py"
+        )
+        console = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(console)
+        console_clinvar = clinvar.copy()
+        console_clinvar["category"] = "Кандидат для проверки"
+        console_summary = console.build_clinical_summary(variants, console_clinvar, [], [])
+        self.assertEqual(
+            [item["recommendation"] for item in console_summary["findings"][:3]],
+            [item["recommendation"] for item in summary["findings"][:3]],
+        )
+
+        clinvar.loc[clinvar["rsid"] == "rs17879961", "category"] = "conflicting"
+        summary = build_clinical_summary(variants, clinvar, rule_results, [])
+        self.assertNotIn("chek2_i157t", [item["id"] for item in summary["findings"]])
 
     def test_pgs_dosage_imputation_mismatch_and_legacy_parity(self):
         parsed = self.parse(vcf_text()).variants
